@@ -1,8 +1,97 @@
 <!DOCTYPE html>
-
+<html lang="en">
 <head>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    
+    <!-- Task 1: Profile name -->
+    <div class="profile-name">Christopher Fabian</div>
+   
+    <!-- Task 2: Navigation bar -->
+    <div class="navbar">
+        <div class="nav-links">
+            <a href="#about-me">About</a>
+            <a href="#projects">Project details</a>
+            <a href="#skills">Skills</a>
+            <a href="#recommendations">Recommendations</a>
+        </div>
+        <div class="contact-info">
+            <span class="email">christopher@example.com</span>
+            <span class="phone">123-456-7890</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Task 3: About Me section -->
+        <section id="about-me" class="about-me">
+            <img src="profile_image.png" alt="Profile Image">
+            <h2>John Doe</h2>
+            <p>Summary of the learner's profile...</p>
+        </section>
+
+        <!-- Task 4: Skills section -->
+        <section id="skills" class="skills">
+            <div class="skill">
+                <img src="skill1_logo.png" alt="Skill 1">
+                <p>Skill 1</p>
+            </div>
+            <div class="skill">
+                <img src="skill2_logo.png" alt="Skill 2">
+                <p>Skill 2</p>
+            </div>
+            <div class="skill">
+                <img src="skill3_logo.png" alt="Skill 3">
+                <p>Skill 3</p>
+            </div>
+            <div class="skill">
+                <img src="skill4_logo.png" alt="Skill 4">
+                <p>Skill 4</p>
+            </div>
+            <div class="skill">
+                <img src="skill5_logo.png" alt="Skill 5">
+                <p>Skill 5</p>
+            </div>
+        </section>
+
+        <!-- Task 5: Projects section -->
+        <section id="projects" class="projects">
+            <div class="project">
+                <h3>Project 1</h3>
+                <p>Details about project 1...</p>
+            </div>
+            <div class="project">
+                <h3>Project 2</h3>
+                <p>Details about project 2...</p>
+            </div>
+            <div class="project">
+                <h3>Project 3</h3>
+                <p>Details about project 3...</p>
+            </div>
+        </section>
+
+        <!-- Task 6: Recommendations section -->
+        <section id="recommendations" class="recommendations">
+            <div class="recommendation">
+                <p>Recommendation 1...</p>
+            </div>
+            <div class="recommendation">
+                <p>Recommendation 2...</p>
+            </div>
+            <div class="recommendation">
+                <p>Recommendation 3...</p>
+            </div>
+            <button onclick="submitRecommendation()">Submit Recommendation</button>
+        </section>
+    </div>
+
+    <!-- Task 9: Popup for recommendation submission -->
+    <div id="popup" class="popup">
+        <p>Thank you for submitting a recommendation!</p>
+    </div>
+
+    <script src="scripts.js"></script>
 </body>
+</html>

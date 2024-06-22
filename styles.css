@@ -1,0 +1,275 @@
+/* General styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: white;
+}
+/* General styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: white;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* Task 1: Profile name styling */
+.profile-name {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    font-size: 2rem;
+    font-weight: bold;
+    color: white;
+}
+
+/* Task 2: Navigation bar styling */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: orchid;
+    padding: 1rem;
+}
+
+.nav-links {
+    display: flex;
+}
+
+.navbar a {
+    color: #fff;
+    padding: 0.5rem 0.5rem; /* Reduce padding */
+    text-decoration: none;
+    margin: 0 0.5rem; /* Add margin to reduce spacing between items */
+}
+
+.navbar a:hover {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    color: #fff;
+}
+
+.contact-info .email,
+.contact-info .phone {
+    margin: 0.2rem 0;
+}
+
+/* Task 3: About Me section */
+.about-me {
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.about-me img {
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+}
+
+.about-me h2 {
+    margin: 1rem 0;
+}
+
+/* Task 4: Skills section */
+.skills {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin: 2rem 0;
+}
+
+.skill {
+    text-align: center;
+    margin: 1rem;
+}
+
+.skill img {
+    width: 50px;
+    height: 50px;
+}
+
+/* Task 5: Projects section */
+.projects {
+    margin: 2rem 0;
+}
+
+.project {
+    margin: 1rem 0;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Task 6: Recommendations section */
+.recommendations {
+    margin: 2rem 0;
+}
+
+.recommendation {
+    margin: 1rem 0;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Task 8: Home icon */
+.home-icon {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 30px;
+    height: 30px;
+}
+
+/* Popup styling */
+.popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 2rem;
+    border: 2px solid #444;
+    border-radius: 5px;
+    z-index: 1000;
+}
+
+.popup.visible {
+    display: block;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* Task 1: Profile name styling */
+.profile-name {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    font-size: 2rem;
+    font-weight: bold;
+    color: white;
+}
+
+/* Task 2: Navigation bar styling */
+.navbar {
+    display: flex;
+    justify-content: center;
+    background-color: orchid;
+    padding: 1rem;
+}
+
+.navbar a {
+    color: #fff;
+    padding: 0.5rem 0.5rem; /* Reduce padding */
+    text-decoration: none;
+    margin: 0 0.5rem; /* Add margin to reduce spacing between items */
+}
+
+.navbar a:hover {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+/* Task 3: About Me section */
+.about-me {
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.about-me img {
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+}
+
+.about-me h2 {
+    margin: 1rem 0;
+}
+
+/* Task 4: Skills section */
+.skills {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin: 2rem 0;
+}
+
+.skill {
+    text-align: center;
+    margin: 1rem;
+}
+
+.skill img {
+    width: 50px;
+    height: 50px;
+}
+
+/* Task 5: Projects section */
+.projects {
+    margin: 2rem 0;
+}
+
+.project {
+    margin: 1rem 0;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Task 6: Recommendations section */
+.recommendations {
+    margin: 2rem 0;
+}
+
+.recommendation {
+    margin: 1rem 0;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Task 8: Home icon */
+.contact-info {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 100px;
+    height: 30px;
+}
+
+/* Popup styling */
+.popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 2rem;
+    border: 2px solid #444;
+    border-radius: 5px;
+    z-index: 1000;
+}
+
+.popup.visible {
+    display: block;
+}
