@@ -9,7 +9,8 @@
 <body>
     <!-- Task 1: Profile name -->
     <div class="profile-name">Christopher Fabian</div>
-   
+    <img src="home_icon.png" alt="Home" class="home-icon">
+
     <!-- Task 2: Navigation bar -->
     <div class="navbar">
         <div class="nav-links">
@@ -28,62 +29,81 @@
         <!-- Task 3: About Me section -->
         <section id="about-me" class="about-me">
             <img src="profile_image.png" alt="Profile Image">
-            <h2>John Doe</h2>
-            <p>Summary of the learner's profile...</p>
+            <h2>Christopher Fabian</h2>
+            <p>Hello! I am a recent graduate with a Bachelor's degree in Computer Science. Throughout my academic journey, I have developed a strong foundation in software development, data structures, and algorithms. I have hands-on experience with various programming languages, including Python, Java, and C++. My passion for technology drives me to continually learn and explore new areas within the field.</p>
+
+            <p> I am highly ambitious and eager to apply my skills in a professional setting. During my studies, I worked on several projects that enhanced my problem-solving abilities and provided practical experience in coding, debugging, and collaborating within a team. I am particularly interested in areas such as AI, machine learning, and web development.</p>
+                
+            <p> With a keen eye for detail and a strong work ethic, I am ready to take on new challenges and contribute to innovative projects. I am excited to bring my technical skills, creativity, and enthusiasm to a dynamic team and grow as a professional in the tech industry.</p>
         </section>
 
         <!-- Task 4: Skills section -->
         <section id="skills" class="skills">
             <div class="skill">
                 <img src="skill1_logo.png" alt="Skill 1">
-                <p>Skill 1</p>
+                <p>C++</p>
             </div>
             <div class="skill">
                 <img src="skill2_logo.png" alt="Skill 2">
-                <p>Skill 2</p>
+                <p>Problem Solving</p>
             </div>
             <div class="skill">
                 <img src="skill3_logo.png" alt="Skill 3">
-                <p>Skill 3</p>
+                <p>Software Development</p>
             </div>
             <div class="skill">
                 <img src="skill4_logo.png" alt="Skill 4">
-                <p>Skill 4</p>
+                <p>Data Structures</p>
             </div>
             <div class="skill">
                 <img src="skill5_logo.png" alt="Skill 5">
-                <p>Skill 5</p>
+                <p>Version Control</p>
             </div>
         </section>
 
         <!-- Task 5: Projects section -->
         <section id="projects" class="projects">
             <div class="project">
-                <h3>Project 1</h3>
-                <p>Details about project 1...</p>
+                <h3>Personal Finance Tracker</h3>
+                <p>Create a personal finance tracker that allows users to manage their income, expenses, and savings. This application will help users visualize their financial health and set budget goals, ensuring they stay on track with their finances.</p>
             </div>
             <div class="project">
-                <h3>Project 2</h3>
-                <p>Details about project 2...</p>
+                <h3>Recipe Sharing Platform</h3>
+                <p>Develop a recipe sharing platform where users can share their favorite recipes, search for new recipes, and follow other users to see their posts. This platform includes user ratings and comments for each recipe, making it a vibrant community for cooking enthusiasts.</p>
             </div>
             <div class="project">
-                <h3>Project 3</h3>
-                <p>Details about project 3...</p>
+                <h3>Task Management and Collaboration Tool</h3>
+                <p>Build a task management and collaboration tool for teams. This tool allows users to create and assign tasks, set deadlines, and track progress. It also includes team chat functionality and file sharing to facilitate collaboration.</p>
             </div>
         </section>
 
         <!-- Task 6: Recommendations section -->
         <section id="recommendations" class="recommendations">
             <div class="recommendation">
-                <p>Recommendation 1...</p>
+                <h4><i>Samantha Reynolds</i></h4>
+                <p><i>Christopher consistently demonstrates exceptional problem-solving skills and a keen ability to understand and implement complex concepts. His dedication to delivering high-quality work is truly commendable.</i></p>
+
             </div>
             <div class="recommendation">
-                <p>Recommendation 2...</p>
+                <h4><i>Jonathan Miller</i></h4>
+                <p><i>Christopher's attention to detail and commitment to excellence make him an invaluable asset to any team. He consistently goes above and beyond to ensure project success and client satisfaction.</i></p>
+
             </div>
             <div class="recommendation">
-                <p>Recommendation 3...</p>
+                <h4><i>Olivia Thompson</i></h4>
+                <p><i>Christopher's ability to effectively communicate and collaborate with team members has significantly contributed to the success of our projects. His proactive approach and positive attitude are truly inspiring.</i></p>
             </div>
-            <button onclick="submitRecommendation()">Submit Recommendation</button>
+            <!-- Form to submit new recommendation -->
+            <div class="recommendation-form">
+                <h3>Submit a Recommendation</h3>
+                <form id="recommendationForm">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required>
+                    <label for="message">Message:</label>
+                    <textarea id="message" name="message" required></textarea>
+                    <button type="submit">Submit Recommendation</button>
+                </form>
+            </div>
         </section>
     </div>
 
