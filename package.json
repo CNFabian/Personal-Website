@@ -6,7 +6,10 @@
   "author": "CNFabian <cfabian2127@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "react-scripts build"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
   "dependencies": {
     "react": "^18.0.0",

@@ -9,17 +9,8 @@ const Home = () => {
       <Helmet>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Portfolio</title>
+        <title>Home</title>
       </Helmet>
-
-      {/* Navigation */}
-      <nav className="navigation">
-        <a href="#home">Home</a>
-        <a href="#portfolio">Portfolio</a>
-        <a href="#resume">Resume</a>
-        <a href="#about">About</a>
-        <a href="#secret">Secret</a>
-      </nav>
 
       {/* Hero Section */}
       <section className="hero" id="home">
