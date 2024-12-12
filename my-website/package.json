@@ -1,35 +1,14 @@
 {
-  "name": "my-website",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "cra-template": "1.2.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-scripts": "5.0.1"
-  },
+  "name": "Personal-Website",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/CNFabian/Personal-Website.git",
+  "author": "CNFabian <cfabian2127@gmail.com>",
+  "license": "MIT",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "build": "react-scripts build"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "dependencies": {
+    "react-scripts": "^5.0.1"
   }
 }
