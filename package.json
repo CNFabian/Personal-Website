@@ -1,0 +1,8 @@
+{
+  "name": "Personal-Website",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/CNFabian/Personal-Website.git",
+  "author": "CNFabian <cfabian2127@gmail.com>",
+  "license": "MIT"
+}
