@@ -5,11 +5,10 @@
   "repository": "https://github.com/CNFabian/Personal-Website.git",
   "author": "CNFabian <cfabian2127@gmail.com>",
   "license": "MIT",
-    "scripts": {
-      "start": "react-scripts start",
-      "build": "react-scripts build",
-      "test": "react-scripts test",
-      "eject": "react-scripts eject"
-    }
-  
+  "scripts": {
+    "build": "react-scripts build"
+  },
+  "dependencies": {
+    "react-scripts": "^5.0.1"
+  }
 }
