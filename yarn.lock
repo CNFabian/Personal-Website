@@ -1526,6 +1526,72 @@
   resolved "https://registry.yarnpkg.com/@leichtgewicht/ip-codec/-/ip-codec-2.0.5.tgz#4fc56c15c580b9adb7dc3c333a134e540b44bfb1"
   integrity sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw==
 
+"@napi-rs/canvas-android-arm64@0.1.65":
+  version "0.1.65"
+  resolved "https://registry.yarnpkg.com/@napi-rs/canvas-android-arm64/-/canvas-android-arm64-0.1.65.tgz#b42f2a2f67cb32ad6669e53561987d58384e791f"
+  integrity sha512-ZYwqFYEKcT5Zr8lbiaJNJj/poLaeK2TncolY914r+gD2TJNeP7ZqvE7A2SX/1C9MB4E3DQEwm3YhL3WEf0x3MQ==
+
+"@napi-rs/canvas-darwin-arm64@0.1.65":
+  version "0.1.65"
+  resolved "https://registry.yarnpkg.com/@napi-rs/canvas-darwin-arm64/-/canvas-darwin-arm64-0.1.65.tgz#8b1a8c2495816f640c1c0299e717de722b961608"
+  integrity sha512-Pg1pfiJEyDIsX+V0QaJPRWvXbw5zmWAk3bivFCvt/5pwZb37/sT6E/RqPHT9NnqpDyKW6SriwY9ypjljysUA1Q==
+
+"@napi-rs/canvas-darwin-x64@0.1.65":
+  version "0.1.65"
+  resolved "https://registry.yarnpkg.com/@napi-rs/canvas-darwin-x64/-/canvas-darwin-x64-0.1.65.tgz#c34da0605c6220ec4e42bbf4dd2ae594c19a4048"
+  integrity sha512-3Tr+/HjdJN7Z/VKIcsxV2DvDIibZCExgfYTgljCkUSFuoI7iNkOE6Dc1Q6j212EB9PeO8KmfrViBqHYT6IwWkA==
+
+"@napi-rs/canvas-linux-arm-gnueabihf@0.1.65":
+  version "0.1.65"
+  resolved "https://registry.yarnpkg.com/@napi-rs/canvas-linux-arm-gnueabihf/-/canvas-linux-arm-gnueabihf-0.1.65.tgz#83b618fe762190bbbfdb66e636f6de0ea940c0ec"
+  integrity sha512-3KP+dYObH7CVkZMZWwk1WX9jRjL+EKdQtD43H8MOI+illf+dwqLlecdQ4d9bQRIxELKJ8dyPWY4fOp/Ngufrdg==
+
+"@napi-rs/canvas-linux-arm64-gnu@0.1.65":
+  version "0.1.65"
+  resolved "https://registry.yarnpkg.com/@napi-rs/canvas-linux-arm64-gnu/-/canvas-linux-arm64-gnu-0.1.65.tgz#b267573eea3209c76d69c69f8fd040407720167d"
+  integrity sha512-Ka3StKz7Dq7kjTF3nNJCq43UN/VlANS7qGE3dWkn1d+tQNsCRy/wRmyt1TUFzIjRqcTFMQNRbgYq84+53UBA0A==
+
+"@napi-rs/canvas-linux-arm64-musl@0.1.65":
+  version "0.1.65"
+  resolved "https://registry.yarnpkg.com/@napi-rs/canvas-linux-arm64-musl/-/canvas-linux-arm64-musl-0.1.65.tgz#36896b8166f6e8752c0142c6114cb64cf235a649"
+  integrity sha512-O4xMASm2JrmqYoiDyxVWi+z5C14H+oVEag2rZ5iIA67dhWqYZB+iO7wCFpBYRj31JPBR29FOsu6X9zL+DwBFdw==
+
+"@napi-rs/canvas-linux-riscv64-gnu@0.1.65":
+  version "0.1.65"
+  resolved "https://registry.yarnpkg.com/@napi-rs/canvas-linux-riscv64-gnu/-/canvas-linux-riscv64-gnu-0.1.65.tgz#ab5059fae49769ccf726e8ded103f15e0a39e16c"
+  integrity sha512-dblWDaA59ZU8bPbkfM+riSke7sFbNZ70LEevUdI5rgiFEUzYUQlU34gSBzemTACj5rCWt1BYeu0GfkLSjNMBSw==
+
+"@napi-rs/canvas-linux-x64-gnu@0.1.65":
+  version "0.1.65"
+  resolved "https://registry.yarnpkg.com/@napi-rs/canvas-linux-x64-gnu/-/canvas-linux-x64-gnu-0.1.65.tgz#767b023c9d7d9d09be06afdfe37ed0549b5b7a6c"
+  integrity sha512-wsp+atutw13OJXGU3DDkdngtBDoEg01IuK5xMe0L6VFPV8maGkh17CXze078OD5QJOc6kFyw3DDscMLOPF8+oA==
+
+"@napi-rs/canvas-linux-x64-musl@0.1.65":
+  version "0.1.65"
+  resolved "https://registry.yarnpkg.com/@napi-rs/canvas-linux-x64-musl/-/canvas-linux-x64-musl-0.1.65.tgz#9551edca5b5f0e7abfe7d5fea97b1ce25aeed4ca"
+  integrity sha512-odX+nN+IozWzhdj31INcHz3Iy9+EckNw+VqsZcaUxZOTu7/3FmktRNI6aC1qe5minZNv1m05YOS1FVf7fvmjlA==
+
+"@napi-rs/canvas-win32-x64-msvc@0.1.65":
+  version "0.1.65"
+  resolved "https://registry.yarnpkg.com/@napi-rs/canvas-win32-x64-msvc/-/canvas-win32-x64-msvc-0.1.65.tgz#86b9209267a20df2c0044b650feb9abc8c85be3d"
+  integrity sha512-RZQX3luWnlNWgdMnLMQ1hyfQraeAn9lnxWWVCHuUM4tAWEV8UDdeb7cMwmJW7eyt8kAosmjeHt3cylQMHOxGFg==
+
+"@napi-rs/canvas@^0.1.64":
+  version "0.1.65"
+  resolved "https://registry.yarnpkg.com/@napi-rs/canvas/-/canvas-0.1.65.tgz#ef97a41b83aa03ae37862e789d124ec80eaf5b33"
+  integrity sha512-YcFhXQcp+b2d38zFOJNbpyPHnIL7KAEkhJQ+UeeKI5IpE9B8Cpf/M6RiHPQXSsSqnYbrfFylnW49dyh2oeSblQ==
+  optionalDependencies:
+    "@napi-rs/canvas-android-arm64" "0.1.65"
+    "@napi-rs/canvas-darwin-arm64" "0.1.65"
+    "@napi-rs/canvas-darwin-x64" "0.1.65"
+    "@napi-rs/canvas-linux-arm-gnueabihf" "0.1.65"
+    "@napi-rs/canvas-linux-arm64-gnu" "0.1.65"
+    "@napi-rs/canvas-linux-arm64-musl" "0.1.65"
+    "@napi-rs/canvas-linux-riscv64-gnu" "0.1.65"
+    "@napi-rs/canvas-linux-x64-gnu" "0.1.65"
+    "@napi-rs/canvas-linux-x64-musl" "0.1.65"
+    "@napi-rs/canvas-win32-x64-msvc" "0.1.65"
+
 "@nicolo-ribaudo/eslint-scope-5-internals@5.1.1-v1":
   version "5.1.1-v1"
   resolved "https://registry.yarnpkg.com/@nicolo-ribaudo/eslint-scope-5-internals/-/eslint-scope-5-internals-5.1.1-v1.tgz#dbf733a965ca47b1973177dc0bb6c889edcfb129"
@@ -1571,6 +1637,146 @@
     loader-utils "^2.0.4"
     schema-utils "^4.2.0"
     source-map "^0.7.3"
+
+"@react-pdf-viewer/attachment@3.12.0":
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/@react-pdf-viewer/attachment/-/attachment-3.12.0.tgz#82a43dc31ba01da8a366fbcdf8dd826a7ae161c0"
+  integrity sha512-mhwrYJSIpCvHdERpLUotqhMgSjhtF+BTY1Yb9Fnzpcq3gLZP+Twp5Rynq21tCrVdDizPaVY7SKu400GkgdMfZw==
+  dependencies:
+    "@react-pdf-viewer/core" "3.12.0"
+
+"@react-pdf-viewer/bookmark@3.12.0":
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/@react-pdf-viewer/bookmark/-/bookmark-3.12.0.tgz#94288a06a19402658a73f5463ea0b447dcb3ff2d"
+  integrity sha512-i7nEit8vIFMAES8RFGwprZ9cXOOZb9ZStPW6E6yuObJEXcvBj/ctsbBJGZxqUZOGklM0JoB7sjHyxAriHfe92A==
+  dependencies:
+    "@react-pdf-viewer/core" "3.12.0"
+
+"@react-pdf-viewer/core@3.12.0", "@react-pdf-viewer/core@^3.12.0":
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/@react-pdf-viewer/core/-/core-3.12.0.tgz#40dc9bee5bce5281cd9ea62d958e4169b500fa14"
+  integrity sha512-8MsdlQJ4jaw3GT+zpCHS33nwnvzpY0ED6DEahZg9WngG++A5RMhk8LSlxdHelwaFFHFiXBjmOaj2Kpxh50VQRg==
+
+"@react-pdf-viewer/default-layout@^3.12.0":
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/@react-pdf-viewer/default-layout/-/default-layout-3.12.0.tgz#8e7ed62c1d2858b79d5ff305390c07c7c05a5538"
+  integrity sha512-K2fS4+TJynHxxCBFuIDiFuAw3nqOh4bkBgtVZ/2pGvnFn9lLg46YGLMnTXCQqtyZzzXYh696jmlFViun3is4pA==
+  dependencies:
+    "@react-pdf-viewer/attachment" "3.12.0"
+    "@react-pdf-viewer/bookmark" "3.12.0"
+    "@react-pdf-viewer/core" "3.12.0"
+    "@react-pdf-viewer/thumbnail" "3.12.0"
+    "@react-pdf-viewer/toolbar" "3.12.0"
+
+"@react-pdf-viewer/full-screen@3.12.0":
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/@react-pdf-viewer/full-screen/-/full-screen-3.12.0.tgz#537bd7f4980e6d49ca491052d6e2390d4b1b5680"
+  integrity sha512-hQouJ26QUaRBCXNMU1aI1zpJn4l4PJRvlHhuE2dZYtLl37ycjl7vBCQYZW1FwnuxMWztZsY47R43DKaZORg0pg==
+  dependencies:
+    "@react-pdf-viewer/core" "3.12.0"
+
+"@react-pdf-viewer/get-file@3.12.0":
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/@react-pdf-viewer/get-file/-/get-file-3.12.0.tgz#940c7475f9dc89c56c3e351a4636cc1a3f9f7080"
+  integrity sha512-Uhq45n2RWlZ7Ec/BtBJ0WQESRciaYIltveDXHNdWvXgFdOS8XsvB+mnTh/wzm7Cfl9hpPyzfeezifdU9AkQgQg==
+  dependencies:
+    "@react-pdf-viewer/core" "3.12.0"
+
+"@react-pdf-viewer/open@3.12.0":
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/@react-pdf-viewer/open/-/open-3.12.0.tgz#de668c0c64767b73828ca1fb9f990732b9d5d3d2"
+  integrity sha512-vhiDEYsiQLxvZkIKT9VPYHZ1BOnv46x9eCEmRWxO1DJ8fa/GRDTA9ivXmq/ap0dGEJs6t+epleCkCEfllLR/Yw==
+  dependencies:
+    "@react-pdf-viewer/core" "3.12.0"
+
+"@react-pdf-viewer/page-navigation@3.12.0":
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/@react-pdf-viewer/page-navigation/-/page-navigation-3.12.0.tgz#399f1cc06e5dd8b40d5e44e4c57bcb6c84bced62"
+  integrity sha512-tVEJ48Dd5kajV1nKkrPWijglJRNBiKBTyYDKVexhiRdTHUP1f6QQXiSyDgCUb0IGSZeJzOJb1h7ApKHe8OTtuw==
+  dependencies:
+    "@react-pdf-viewer/core" "3.12.0"
+
+"@react-pdf-viewer/print@3.12.0":
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/@react-pdf-viewer/print/-/print-3.12.0.tgz#0d978c4e8654585d8a486c45388b6fe68f3d47e0"
+  integrity sha512-xJn76CgbU/M2iNaN7wLHTg+sdOekkRMfCakFLwPrE+SR7qD6NUF4vQQKJBSVCCK5bUijzb6cWfKGfo8VA72o4Q==
+  dependencies:
+    "@react-pdf-viewer/core" "3.12.0"
+
+"@react-pdf-viewer/properties@3.12.0":
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/@react-pdf-viewer/properties/-/properties-3.12.0.tgz#0fe85d9b07a65b612d456b50de6e5ab993c1970b"
+  integrity sha512-dYTCHtVwFNkpDo7QxL2qk/8zAKndLwdD1FFxBftl6jIlQbtvNdxkFfkv1HcQING9Ic+7DBryOiD7W0ze4IERYg==
+  dependencies:
+    "@react-pdf-viewer/core" "3.12.0"
+
+"@react-pdf-viewer/rotate@3.12.0":
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/@react-pdf-viewer/rotate/-/rotate-3.12.0.tgz#f2e87d3e1fc3d8d16fe490636f68354334e58c3a"
+  integrity sha512-yaxaMYPChvNOjR8+AxRmj0kvojyJKPq4XHEcIB2lJJgBY1Zra3mliDUP3Nlb4yV8BS9+yBqWn9U9mtnopQD+tw==
+  dependencies:
+    "@react-pdf-viewer/core" "3.12.0"
+
+"@react-pdf-viewer/scroll-mode@3.12.0":
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/@react-pdf-viewer/scroll-mode/-/scroll-mode-3.12.0.tgz#a875b9b58883b229d1757943c1420eb65aceaefd"
+  integrity sha512-okII7Xqhl6cMvl1izdEvlXNJ+vJVq/qdg53hJIDYVgBCWskLk/cpjUg/ZonBxseG9lIDP3w2VO1McT8Gn11OAg==
+  dependencies:
+    "@react-pdf-viewer/core" "3.12.0"
+
+"@react-pdf-viewer/search@3.12.0":
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/@react-pdf-viewer/search/-/search-3.12.0.tgz#e308d0d8b30f087ef9877a968c821af1a6aaf180"
+  integrity sha512-jAkLpis49fsDDY/HrbUZIOIhzF5vynONQNA4INQKI38r/MjveblrkNv7qbr9j5lQ/WFic5+gD1e+Mtpf1/7DiA==
+  dependencies:
+    "@react-pdf-viewer/core" "3.12.0"
+
+"@react-pdf-viewer/selection-mode@3.12.0":
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/@react-pdf-viewer/selection-mode/-/selection-mode-3.12.0.tgz#f86bd951205d6f485bbb5cce0c3128a00fea147b"
+  integrity sha512-yysWEu2aCtBvzSgbhgI9kT5cq2hf0FU6Z+3B7MMXz14Kxyc3y18wUqxtgbvpFEfWF0bNUUq16JtWRljtxvZ83w==
+  dependencies:
+    "@react-pdf-viewer/core" "3.12.0"
+
+"@react-pdf-viewer/theme@3.12.0":
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/@react-pdf-viewer/theme/-/theme-3.12.0.tgz#d7f667124ec4d5dacc6396e0a4ab1935b8f188af"
+  integrity sha512-cdBi+wR1VOZ6URCcO9plmAZQu4ZGFcd7HJdBe7VIFiGyrvl9I/Of74ONLycnDImSuONt8D3uNjPBLieeaShVeg==
+  dependencies:
+    "@react-pdf-viewer/core" "3.12.0"
+
+"@react-pdf-viewer/thumbnail@3.12.0":
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/@react-pdf-viewer/thumbnail/-/thumbnail-3.12.0.tgz#cfb13094ada7c7d2761d265326043ee9ddf9e22c"
+  integrity sha512-Vc8j3bO6wumWZV4o6pAbktPWKDSC9tQAzOCJ3cof541u4i44C11ccYC4W9aNcsMMUSO3bNwAGWtP8OFthV5akQ==
+  dependencies:
+    "@react-pdf-viewer/core" "3.12.0"
+
+"@react-pdf-viewer/toolbar@3.12.0":
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/@react-pdf-viewer/toolbar/-/toolbar-3.12.0.tgz#e168ca964a4933fb76831cee48cb3ed862011ad2"
+  integrity sha512-qACTU3qXHgtNK8J+T13EWio+0liilj86SJ87BdapqXynhl720OKPlSKOQqskUGqg3oTUJAhrse9XG6SFdHJx+g==
+  dependencies:
+    "@react-pdf-viewer/core" "3.12.0"
+    "@react-pdf-viewer/full-screen" "3.12.0"
+    "@react-pdf-viewer/get-file" "3.12.0"
+    "@react-pdf-viewer/open" "3.12.0"
+    "@react-pdf-viewer/page-navigation" "3.12.0"
+    "@react-pdf-viewer/print" "3.12.0"
+    "@react-pdf-viewer/properties" "3.12.0"
+    "@react-pdf-viewer/rotate" "3.12.0"
+    "@react-pdf-viewer/scroll-mode" "3.12.0"
+    "@react-pdf-viewer/search" "3.12.0"
+    "@react-pdf-viewer/selection-mode" "3.12.0"
+    "@react-pdf-viewer/theme" "3.12.0"
+    "@react-pdf-viewer/zoom" "3.12.0"
+
+"@react-pdf-viewer/zoom@3.12.0":
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/@react-pdf-viewer/zoom/-/zoom-3.12.0.tgz#4eaa0d28d5f92b10124c4374b684cbaefc51c1c2"
+  integrity sha512-V0GUTyPM77+LzhoKX+T3XI10/HfGdqRTbgeP7ID60FCzcwu6kXWqJn5tzabjDKLTlFv8mJmn0aa/ppkIU97nfA==
+  dependencies:
+    "@react-pdf-viewer/core" "3.12.0"
 
 "@rollup/plugin-babel@^5.2.0":
   version "5.3.1"
@@ -6814,6 +7020,13 @@ path-type@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/path-type/-/path-type-4.0.0.tgz#84ed01c0a7ba380afe09d90a8c180dcd9d03043b"
   integrity sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==
+
+pdfjs-dist@^4.9.155:
+  version "4.9.155"
+  resolved "https://registry.yarnpkg.com/pdfjs-dist/-/pdfjs-dist-4.9.155.tgz#80c9fc7f5411a4cf00751cdea242ffd8b0f23a96"
+  integrity sha512-epRZn6DQQKCOEqbmFsxkiMBm1MHaNrnr6T4VBNP0bsDvdJdmrWcZbS5cgJXW68P0d3uJTlFhF6Wms2tlSgPYig==
+  optionalDependencies:
+    "@napi-rs/canvas" "^0.1.64"
 
 performance-now@^2.1.0:
   version "2.1.0"

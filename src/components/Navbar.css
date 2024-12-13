@@ -1,20 +1,25 @@
-/* Navbar.css */
+    /* Navbar.css */
 
-/* General Navigation Styles */
-.navigation {
-    display: flex;
-    justify-content: center;
-    padding: 20px;
-    background-color: rgba(0, 0, 0, 0.7);
-    position: fixed;
-    width: 100%;
-    top: 0;
-    z-index: 1;
-  }
-  
+    /* General Navigation Styles */
+    .layout {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh; /* Full-page layout */
+    }
+
+    .navigation {
+        background-color: rgba(0, 0, 0, 0.9);
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        height: 60px; /* Occupy space in the layout */
+        flex-shrink: 0; /* Prevents it from shrinking */
+    }
+
   .nav-links {
     display: flex;
     list-style: none;
+    margin-top: 20px;
   }
   
   .nav-link {
@@ -25,6 +30,9 @@
     font-weight: bold;
     font-size: 1.2rem;
     transition: transform 0.3s ease, color 0.3s ease; /* Smooth transition for both size and color */
+    position: relative; /* Required for positioning the tooltip */
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+
   }
   
   .nav-link:hover {
@@ -35,7 +43,33 @@
   .nav-link.active {
     border-bottom: 2px solid #ff0000;
   }
+
+
   
+  /* Tooltip Styles */
+  .nav-link::after {
+    content: attr(data-tooltip); /* Pulls tooltip text from the data-tooltip attribute */
+    position: absolute;
+    bottom: -35px; /* Position tooltip below the link */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ce5b13; /* Dark background for the tooltip */
+    color: #fff; /* White text color */
+    padding: 5px 10px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    opacity: 0; /* Hidden by default */
+    pointer-events: none; /* Prevent interaction with the tooltip */
+    transition: opacity 0.5s ease, transform 0.5s ease-in-out;
+  }
+  
+  .nav-link:hover::after {
+    opacity: 1; /* Show tooltip on hover */
+    transform: translateX(-50%) translateY(-5px); /* Slightly move up for effect */
+  }
+  
+  /* Responsive Adjustments */
   @media (max-width: 768px) {
     .navigation {
       flex-direction: column;

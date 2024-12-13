@@ -6,33 +6,14 @@
   }
   
   body {
-    font-family: Arial, sans-serif;
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     color: #fff;
     background-color: #111;
   }
   
-  /* Navigation */
-  .navigation {
-    display: flex;
-    justify-content: center;
-    padding: 20px;
-    background-color: rgba(0, 0, 0, 0.7);
-    position: fixed;
-    width: 100%;
-    top: 0;
-    z-index: 1;
-  }
-  
-  .navigation a {
-    color: #fff;
-    margin: 0 15px;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  
   /* Hero Section */
   .hero {
-    height: 100vh;
+    min-height: 75vh;
     /*background-image: url('/images/your-image.jpg'); */
     background-size: cover;
     background-position: center;
@@ -42,7 +23,8 @@
     justify-content: center;
     text-align: center;
     color: #fff;
-    padding-top: 60px;
+    margin-top: 70px;
+    min-width: 50vh;
   }
   
   .hero h1 {
@@ -99,4 +81,71 @@
     width: 100%;
     border-radius: 5px;
   }
-  
+    
+  .hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px; /* Space between photo and text */
+  }
+
+  /* Profile Photo Styles */
+  .profile-photo-container {
+    margin-top: 20px;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px; /* Space below the photo */
+  }
+
+  .profile-photo {
+    width: 250px;
+    height: 250px;
+    border-radius: 50%; /* Makes the image circular */
+    object-fit: cover; /* Ensures the image fits within the circle */
+    border: 3px solid #ffffff; /* Optional: Adds a border */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Adds a shadow */
+    transition: transform 0.3s ease-in-out; /* Smooth animation on hover */
+  }
+
+  .profile-photo-container:hover .profile-photo {
+    transform: scale(1.2); /* Slightly enlarges the photo on hover */
+  }
+
+  /* Hero Text */
+  .hero-text {
+    max-width: 800px; /* Optional: Restrict text width */
+  }
+
+  .hero-text h1 {
+    font-size: 2.5em;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .hero-text span {
+    color: #feb47b; /* Highlight your name with a different color */
+  }
+
+  .hero-text p {
+    font-size: 1.2em;
+    color: #aaa; /* Subtle text color */
+  }
+  /* Responsive Hero Section */
+@media (max-width: 768px) {
+  .hero-content {
+    flex-direction: column; /* Stack the photo and text vertically */
+  }
+
+  .profile-photo {
+    width: 200px; /* Smaller size for smaller screens */
+    height: 200px;
+  }
+
+  .hero-text h1 {
+    font-size: 2em; /* Reduce text size */
+  }
+
+  .hero-text p {
+    font-size: 1em;
+  }
+}

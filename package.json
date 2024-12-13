@@ -12,6 +12,9 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
+    "@react-pdf-viewer/core": "^3.12.0",
+    "@react-pdf-viewer/default-layout": "^3.12.0",
+    "pdfjs-dist": "^4.9.155",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-helmet": "^6.1.0",

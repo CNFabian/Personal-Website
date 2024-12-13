@@ -1,6 +1,7 @@
 import React from 'react';
 import './Home.css'; // Import CSS file for styles
 import { Helmet } from 'react-helmet'; // For <head> modifications
+import profilePhoto from '../assets/profile.jpg'; // Replace with the actual path to your profile photo
 
 const Home = () => {
   return (
@@ -14,8 +15,18 @@ const Home = () => {
 
       {/* Hero Section */}
       <section className="hero" id="home">
-        <h1>Hello, I'm <span>Christopher N Fabian</span></h1>
-        <p>Presenting my Resume!</p>
+        <div className="hero-content">
+          {/* Profile Photo */}
+          <div className="profile-photo-container">
+            <img src={profilePhoto} alt="Christopher N Fabian" className="profile-photo" />
+          </div>
+
+          {/* Text Content */}
+          <div className="hero-text">
+            <h1>Hello, I'm <span>Christopher N Fabian</span></h1>
+            <p>Presenting my Resume!</p>
+          </div>
+        </div>
       </section>
 
       {/* Portfolio Section */}
@@ -28,21 +39,6 @@ const Home = () => {
           <a href="#typography">Typography</a>
           <a href="#photography">Photography</a>
         </div>
-       {/* <div className="gallery">
-          <div className="gallery-item">
-            <img src="/images/project1.jpg" alt="Project 1" /> 
-          </div>
-          <div className="gallery-item">
-            <img src="/images/project2.jpg" alt="Project 2" />
-          </div>
-          <div className="gallery-item">
-            <img src="/images/project3.jpg" alt="Project 3" />
-          </div>
-          <div className="gallery-item">
-            <img src="/images/project4.jpg" alt="Project 4" />
-          </div>
-        </div>
-        */}
       </section>
     </>
   );
