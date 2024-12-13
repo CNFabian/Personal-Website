@@ -31,7 +31,7 @@ const Puzzle3Page = () => {
       />
       <button onClick={handleSubmit}>Submit</button>
       {message && <p>{message}</p>}
-      <a href="/">Back to Main Page</a>
+      <a href="/secret">Back to Secret Page</a>
     </div>
   );
 };

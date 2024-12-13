@@ -42,7 +42,7 @@ const Puzzle1Page = () => {
         </p>
       )}
 
-      <a href="/" className="back-link">Back to Main Page</a>
+      <a href="/secret" className="back-link">Back to Secret Page</a>
     </div>
   );
 };
