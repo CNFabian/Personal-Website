@@ -3,11 +3,11 @@ frontend:
   phases:
     preBuild:
       commands:
-        # Ensure Node.js version is correct using NVM and cache Node.js installation
+        # Cache Node.js installation
         - if ! command -v node > /dev/null; then nvm install 20; fi
         - nvm use 20
         - node -v
-        # Cache node_modules to avoid unnecessary "yarn install" if the cache exists
+        # Cache node_modules and avoid unnecessary "yarn install" if the cache exists
         - if [ ! -d node_modules ]; then yarn install; else echo "Using cached node_modules"; fi
     build:
       commands:
