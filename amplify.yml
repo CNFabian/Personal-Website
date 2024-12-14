@@ -3,16 +3,14 @@ frontend:
   phases:
     preBuild:
       commands:
-        # Cache Node.js installation
-        - if ! command -v node > /dev/null; then nvm install 20; fi
+        - rm -rf node_modules
+        - nvm install 20
         - nvm use 20
         - node -v
-        # Cache node_modules and avoid unnecessary "yarn install" if the cache exists
-        - if [ ! -d node_modules ]; then yarn install; else echo "Using cached node_modules"; fi
+        - yarn install
     build:
       commands:
-        # Use caching to avoid re-running the build if the build directory is unchanged
-        - if [ ! -d build ]; then yarn build; else echo "Using cached build files"; fi
+        - yarn build
   artifacts:
     baseDirectory: build
     files:
@@ -20,5 +18,3 @@ frontend:
   cache:
     paths:
       - node_modules/**/*
-      - build/**/*
-      - ~/.nvm/versions/node/**/*
