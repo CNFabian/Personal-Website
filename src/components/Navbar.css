@@ -1,87 +1,155 @@
-    /* Navbar.css */
+/* General Navigation Styles */
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 
-    /* General Navigation Styles */
-    .layout {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh; /* Full-page layout */
-    }
+.navigation {
+  background-color: rgba(0, 0, 0, 0.9);
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+  height: 60px; 
+  position: relative;
+}
 
-    .navigation {
-        background-color: rgba(0, 0, 0, 0.9);
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        height: 60px; /* Occupy space in the layout */
-        flex-shrink: 0; /* Prevents it from shrinking */
-    }
+.navbar-header {
+  display: none; 
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.hamburger {
+  display: none;
+  font-size: 2rem;
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+.hamburger.open {
+  color: #ce5b13; 
+}
+
+.nav-links {
+  display: flex; 
+  justify-content: center; 
+  list-style: none; 
+  width: 100%;
+  padding: 0; 
+}
+
+.nav-link {
+  display: inline-block;
+  color: #fff;
+  margin: 0 15px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.2rem; 
+  position: relative; 
+  transition: transform 0.3s ease, color 0.3s ease; 
+  font-family: 'Lucida Sans', Geneva, Verdana, sans-serif;
+}
+
+.nav-link:hover {
+  color: #ce5b13;
+  transform: scale(1.1); /* Scale up the hovered nav link */
+}
+
+.nav-link.active {
+  border-bottom: 2px solid #ff0000;
+}
+
+/* Tooltip Styles for Large Screens */
+.nav-link::after {
+  content: attr(data-tooltip); 
+  position: absolute;
+  top: 120%; 
+  left: 50%; 
+  transform: translateX(-50%); 
+  background-color: #ce5b13;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  opacity: 0; 
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.nav-link:hover::after {
+  opacity: 1; 
+  transform: translateX(-50%) translateY(5px); 
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .navbar-header {
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    width: 100%;
+  }
+
+.hamburger {
+  display: block; 
+  position: absolute; 
+  top: 15px; 
+  z-index: 1100; 
+}
+
 
   .nav-links {
-    display: flex;
-    list-style: none;
-    margin-top: 20px;
+    display: none; 
+    flex-direction: column; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100vh; 
+    background-color: rgba(0, 0, 0, 0.95); 
+    justify-content: center; 
+    align-items: center; 
+    transition: all 0.3s ease-in-out;
   }
-  
+
+  .nav-links.show {
+    display: flex; 
+  }
+
   .nav-link {
-    display: inline-block;
-    color: #fff;
-    margin: 0 15px;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 1.2rem;
-    transition: transform 0.3s ease, color 0.3s ease; /* Smooth transition for both size and color */
-    position: relative; /* Required for positioning the tooltip */
-    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-
-  }
-  
-  .nav-link:hover {
-    color: #ce5b13;
-    transform: scale(1.2); /* Grows the link size */
-  }
-  
-  .nav-link.active {
-    border-bottom: 2px solid #ff0000;
+    padding: 20px 0;
+    font-size: 1.5rem; 
   }
 
-
-  
-  /* Tooltip Styles */
+  /* Tooltip Styles for Small Screens */
   .nav-link::after {
-    content: attr(data-tooltip); /* Pulls tooltip text from the data-tooltip attribute */
-    position: absolute;
-    bottom: -35px; /* Position tooltip below the link */
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #ce5b13; /* Dark background for the tooltip */
-    color: #fff; /* White text color */
+    top: 50%; 
+    left: 100%; 
+    transform: translateX(10px) translateY(-50%);
+    background-color: #ce5b13;
+    color: #fff;
     padding: 5px 10px;
     border-radius: 10px;
-    font-size: 0.7rem;
+    font-size: 0.9rem;
     white-space: nowrap;
-    opacity: 0; /* Hidden by default */
-    pointer-events: none; /* Prevent interaction with the tooltip */
-    transition: opacity 0.5s ease, transform 0.5s ease-in-out;
+    opacity: 0; 
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
   }
-  
+
   .nav-link:hover::after {
-    opacity: 1; /* Show tooltip on hover */
-    transform: translateX(-50%) translateY(-5px); /* Slightly move up for effect */
+    opacity: 1; 
+    transform: translateX(15px) translateY(-50%);
   }
-  
-  /* Responsive Adjustments */
-  @media (max-width: 768px) {
-    .navigation {
-      flex-direction: column;
-      align-items: center;
-    }
-  
-    .nav-links {
-      flex-direction: column;
-    }
-  
-    .nav-link {
-      margin: 10px 0;
-    }
+
+  .nav-link:hover {
+    color: #ce5b13;
+    transform: translateX(-20px); /* Move the nav link to the left */
   }
-  
+}

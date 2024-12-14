@@ -7,6 +7,7 @@ const Secret = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [isShaking, setIsShaking] = useState(false); 
   const [isFlashing, setIsFlashing] = useState(false); 
+  const [isFlashingError, setIsFlashingError] = useState(false); 
   const inputRef = useRef(null);
   const [hints, setHints] = useState(['???', '???', '???']);
   const [flickerStyle, setFlickerStyle] = useState({ color: '#ff0000', textShadow: '0px 0px 30px #ff0000' });
@@ -25,10 +26,12 @@ const Secret = () => {
       setPassword(''); 
       setIsShaking(true); 
       setIsFlashing(true); 
+      setIsFlashingError(true);
       inputRef.current.focus(); 
 
-      setTimeout(() => setIsShaking(false), 500); 
-      setTimeout(() => setIsFlashing(false), 500); 
+      setTimeout(() => setIsShaking(false), 1500); 
+      setTimeout(() => setIsFlashing(false), 1500); 
+      setTimeout(() => setIsFlashingError(false), 3000); 
     }
   };
 
@@ -99,7 +102,11 @@ const Secret = () => {
           >
             Reveal
           </button>
-          {errorMessage && <p className="error-message">{errorMessage}</p>}
+
+          <div className={`error-message ${isFlashingError ? 'flash-error' : ''}`}>
+            <p>{errorMessage}</p>
+          </div>
+        
         </div>
       ) : (
         <div className="secret-message">

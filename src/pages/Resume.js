@@ -2,7 +2,7 @@ import React from 'react';
 
 const Resume = () => {
   return (
-    <div style={{ height: '100vh', width: '100%', paddingTop: '60px' }}>
+    <div style={{ height: '100vh', width: '100%'}}>
       <iframe
         src="/Resume.pdf"
         title="Resume PDF"

@@ -1,3 +1,4 @@
+/* General container for the entire puzzle page */
 .puzzle-container {
     min-height: 100vh;
     display: flex;
@@ -5,46 +6,145 @@
     align-items: center;
     background-color: #0a0a0a;
     color: #e0e0e0;
-    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     flex-direction: column;
-    margin-top: 40px;
+    padding: 20px;
 }
 
 .puzzle-title {
-    font-size: 3rem;
-    text-align: center;
+    font-size: 2.5rem;
     color: #ff0000;
     margin-bottom: 20px;
 }
 
-.puzzle-input {
-    width: 100%;
-    max-width: 300px;
-    padding: 15px;
+.instructions {
+    font-size: 1.2rem;
+    color: #e0e0e0;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Grid layout for 3x3 puzzle */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 60px);
+    grid-template-rows: repeat(3, 60px);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.cell {
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    font-size: 2rem;
+    border: 2px solid #ff0000;
     background-color: #0a0a0a;
     color: #e0e0e0;
-    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-    flex-direction: column;
-    border: 2px solid #ff0000;
     border-radius: 5px;
-    margin-top: 40px;
-    margin-bottom: 40px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.cell:focus {
+    border-color: #e60000;
+    background-color: #1a1a1a;
 }
 
 .submit-button {
     background-color: #ff0000;
     color: #e0e0e0;
-    padding: 10px 20px;
+    padding: 15px 30px;
     border-radius: 5px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    border: none;
+    margin-top: 20px; /* Space above the button */
     cursor: pointer;
-    margin-bottom: 30px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .submit-button:hover {
     background-color: #e60000;
 }
 
-.back-link {
-    color: #e0e0e0;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+.submit-button:active {
+    background-color: #cc0000;
+    transform: scale(0.95);
+}
+
+/* Ominous Hint Styles */
+.hint {
+    background-color: #1a1a1a; /* Dark, shadowy background */
+    border: 2px solid #550000; /* Dark red border */
+    padding: 20px;
+    font-size: 1.2rem;
+    color: #ff3333; /* Dark blood red text */
+    text-align: center;
+    border-radius: 5px;
+    max-width: 300px;
+    margin-top: 20px;
+    box-shadow: 0 0 15px 2px #550000; /* Red glowing shadow */
+    animation: flicker 1.5s infinite ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.hint h2 {
+    color: #ff3333; /* Blood red title */
+    margin-bottom: 10px;
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; /* Eerie font for title */
+    animation: flicker 2s infinite ease-in-out;
+}
+
+.hint p {
+    font-size: 1.1rem;
+    color: #f2f2f2; /* Slightly off-white to give it a faded look */
+    text-shadow: 0 0 5px #550000, 0 0 10px #ff0000;
+    animation: text-flicker 3s infinite;
+}
+
+/* Keyframes for flickering hint effect */
+@keyframes flicker {
+    0% { box-shadow: 0 0 15px 2px #550000; }
+    20% { box-shadow: 0 0 25px 5px #770000; }
+    50% { box-shadow: 0 0 10px 1px #550000; }
+    80% { box-shadow: 0 0 20px 4px #660000; }
+    100% { box-shadow: 0 0 15px 2px #550000; }
+}
+
+@keyframes text-flicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        opacity: 1;
+    }
+    20%, 22%, 24%, 55% {
+        opacity: 0.5;
+    }
+}
+
+/* Responsive styles for smaller devices */
+@media (max-width: 600px) {
+    .puzzle-title {
+        font-size: 2rem;
+    }
+
+    .cell {
+        width: 40px;
+        height: 40px;
+        font-size: 1.5rem;
+    }
+
+    .submit-button {
+        font-size: 0.9rem;
+        padding: 10px 20px;
+    }
+
+    .hint {
+        font-size: 1rem;
+        padding: 10px 15px;
+    }
+
+    .hint p {
+        font-size: 1rem;
+    }
 }
