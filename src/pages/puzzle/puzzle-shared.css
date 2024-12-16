@@ -28,8 +28,8 @@
     display: grid;
     grid-template-columns: repeat(3, 60px);
     grid-template-rows: repeat(3, 60px);
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 0px; /* Removed gap to eliminate black space */
+    
 }
 
 .cell {
