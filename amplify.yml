@@ -18,3 +18,63 @@ frontend:
   cache:
     paths:
       - node_modules/**/*
+  customHeaders:
+    # Don't cache HTML files
+    - pattern: '**/*.html'
+      headers: 
+        - key: 'Cache-Control'
+          value: 'no-cache, must-revalidate'
+    # Cache JS files for 1 year
+    - pattern: '**/*.js'
+      headers: 
+        - key: 'Cache-Control'
+          value: 'public, max-age=31536000'
+    # Cache CSS files for 1 year
+    - pattern: '**/*.css'
+      headers: 
+        - key: 'Cache-Control'
+          value: 'public, max-age=31536000'
+    # Cache images (jpg, png, gif, webp) for 1 week
+    - pattern: '**/*.png'
+      headers: 
+        - key: 'Cache-Control'
+          value: 'public, max-age=604800'
+    - pattern: '**/*.jpg'
+      headers: 
+        - key: 'Cache-Control'
+          value: 'public, max-age=604800'
+    - pattern: '**/*.jpeg'
+      headers: 
+        - key: 'Cache-Control'
+          value: 'public, max-age=604800'
+    - pattern: '**/*.gif'
+      headers: 
+        - key: 'Cache-Control'
+          value: 'public, max-age=604800'
+    - pattern: '**/*.webp'
+      headers: 
+        - key: 'Cache-Control'
+          value: 'public, max-age=604800'
+    # Cache SVG files for 1 week
+    - pattern: '**/*.svg'
+      headers: 
+        - key: 'Cache-Control'
+          value: 'public, max-age=604800'
+    # Cache font files (woff, woff2, ttf) for 1 year
+    - pattern: '**/*.woff'
+      headers: 
+        - key: 'Cache-Control'
+          value: 'public, max-age=31536000'
+    - pattern: '**/*.woff2'
+      headers: 
+        - key: 'Cache-Control'
+          value: 'public, max-age=31536000'
+    - pattern: '**/*.ttf'
+      headers: 
+        - key: 'Cache-Control'
+          value: 'public, max-age=31536000'
+    # Cache JSON files for 1 day
+    - pattern: '**/*.json'
+      headers: 
+        - key: 'Cache-Control'
+          value: 'public, max-age=86400'
