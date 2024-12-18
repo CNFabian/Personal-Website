@@ -10,7 +10,7 @@ const Secret = () => {
   const [isFlashingError, setIsFlashingError] = useState(false); 
   const [hints, setHints] = useState(['???', '???', '???']);
   const [hasRevealedHint, setHasRevealedHint] = useState(false);
-  const [countdownTime, setCountdownTime] = useState(600); 
+  const [countdownTime, setCountdownTime] = useState(1800); 
   const [flickerStyle, setFlickerStyle] = useState({ color: '#ff0000', textShadow: '0px 0px 30px #ff0000' });
   const inputRef = useRef(null);
   const correctPassword = 'open-sesame'; 
@@ -157,7 +157,7 @@ const Secret = () => {
         <h2>Hints</h2>
         {hints.map((hint, index) => <p key={index}>Hint {index + 1}: {hint}</p>)}
         <div className="warning-message">
-          <p>Warning: Hints will be cleared automatically after 10 minutes.</p>
+          <p>Warning: Hints will be cleared automatically after 30 minutes.</p>
         </div>
       </div>
       <a className="puzzle-link" href="/puzzle1">Solve Puzzle 1</a>

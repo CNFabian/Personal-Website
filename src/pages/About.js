@@ -1,12 +1,18 @@
 import React from 'react';
 import './About.css';
+import beachPhoto from '../assets/beach.png';
+import scenicPhoto from '../assets/scenic_view.png';
+import familyPhoto from '../assets/family.png';
+import drawingPhoto from '../assets/drawing.png';
+import chowPhoto from '../assets/chow.png'
+import momPhoto from '../assets/mom.png'
 
 const About = () => {
   return (
     <div className="about-page">
       <main>
         <section className="hero">
-          <img src="path/to/your/profile-picture.jpg" alt="Profile picture of Christopher" className="profile-picture" />
+          <img src={beachPhoto} alt="Profile picture of Christopher" className="picture" />
           <h1>About Me</h1>
           <p>Hey there! I’m Christopher Fabian, someone who appreciates creativity, learning, and personal growth. I love connecting with people, exploring new ideas, and finding joy in the little things that make life exciting.</p>
         </section>
@@ -28,19 +34,13 @@ const About = () => {
 
         <section className="gallery">
           <h2>Gallery</h2>
-          <div className="gallery-item"><img src="path/to/image1.jpg" alt="A scenic view I enjoyed" /></div>
-          <div className="gallery-item"><img src="path/to/image2.jpg" alt="A memorable moment with family" /></div>
-          <div className="gallery-item"><img src="path/to/image3.jpg" alt="One of my favorite places to relax" /></div>
+          <div className="gallery-item"><img src={scenicPhoto} alt="A scenic view I enjoyed" /></div>
+          <div className="gallery-item"><img src={familyPhoto} alt="A memorable moment with family" /></div>
+          <div className="gallery-item"><img src={drawingPhoto} alt="One of my favorite places to relax" /></div>
+          <div className="gallery-item"><img src={chowPhoto} alt="A memorable moment with family" /></div>
+          <div className="gallery-item"><img src={momPhoto} alt="One of my favorite places to relax" /></div>        
         </section>
       </main>
-
-      <footer>
-        <p>&copy; 2024 Christopher Fabian. All Rights Reserved.</p>
-        <ul>
-          <li><a href="https://github.com/yourusername" target="_blank">GitHub</a></li>
-          <li><a href="https://www.linkedin.com/in/yourusername" target="_blank">LinkedIn</a></li>
-        </ul>
-      </footer>
     </div>
   );
 };

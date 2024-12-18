@@ -1,4 +1,9 @@
 /* General Navigation Styles */
+@font-face {
+  font-family: 'inter-bold';
+  src: url('../assets/Inter_28pt-SemiBold.ttf') format('truetype');
+}
+
 .layout {
     display: flex;
     flex-direction: column;
@@ -48,11 +53,10 @@
     color: #fff;
     margin: 0 15px;
     text-decoration: none;
-    font-weight: bold;
-    font-size: 1.2rem; 
+    font-size: 1.5rem; 
     position: relative; 
     transition: transform 0.3s ease, color 0.3s ease; 
-    font-family: 'Lucida Sans', Geneva, Verdana, sans-serif;
+    font-family: 'inter-bold';
   }
   
   .nav-link:hover {
