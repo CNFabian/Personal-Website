@@ -1,105 +1,130 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import './puzzle-shared.css';
 
 const Puzzle1Page = () => {
-  // State for the 3x3 grid and hint visibility
   const [grid, setGrid] = useState(Array(3).fill().map(() => Array(3).fill('')));
   const [hint, setHint] = useState('');
   const [isHintRevealed, setIsHintRevealed] = useState(false);
+  const [fadedNumbers, setFadedNumbers] = useState([]); // State to track which numbers have been entered
+  
+  const validConfigurations = [
+    [
+      [2, 7, 6],
+      [9, 5, 1],
+      [4, 3, 8]
+    ],
+    [
+      [2, 9, 4],
+      [7, 5, 3],
+      [6, 1, 8]
+    ],
+    [
+      [4, 3, 8],
+      [9, 5, 1],
+      [2, 7, 6]
+    ],
+    [
+      [4, 9, 2],
+      [3, 5, 7],
+      [8, 1, 6]
+    ],
+    [
+      [6, 1, 8],
+      [7, 5, 3],
+      [2, 9, 4]
+    ],
+    [
+      [6, 7, 2],
+      [1, 5, 9],
+      [8, 3, 4]
+    ],
+    [
+      [8, 1, 6],
+      [3, 5, 7],
+      [4, 9, 2]
+    ],
+    [
+      [8, 3, 4],
+      [1, 5, 9],
+      [6, 7, 2]
+    ]
+  ];
+  
 
-  // List of possible correct configurations
-// List of possible correct configurations
-const validConfigurations = [
-  [
-    [2, 7, 6],
-    [9, 5, 1],
-    [4, 3, 8]
-  ],
-  [
-    [2, 9, 4],
-    [7, 5, 3],
-    [6, 1, 8]
-  ],
-  [
-    [4, 3, 8],
-    [9, 5, 1],
-    [2, 7, 6]
-  ],
-  [
-    [4, 9, 2],
-    [3, 5, 7],
-    [8, 1, 6]
-  ],
-  [
-    [6, 1, 8],
-    [7, 5, 3],
-    [2, 9, 4]
-  ],
-  [
-    [6, 7, 2],
-    [1, 5, 9],
-    [8, 3, 4]
-  ],
-  [
-    [8, 1, 6],
-    [3, 5, 7],
-    [4, 9, 2]
-  ],
-  [
-    [8, 3, 4],
-    [1, 5, 9],
-    [6, 7, 2]
-  ]
-];
-
-
-  // Handle input change for each cell
   const handleInputChange = (row, col, value) => {
-    if (/^[0-9]?$/.test(value)) { // Allow only single-digit numbers (0-9)
+    if (/^[1-9]?$/.test(value)) { 
       const newGrid = [...grid];
       newGrid[row][col] = value;
       setGrid(newGrid);
+
+      // Extract all the numbers currently in the grid
+      const allNumbersInGrid = newGrid.flat().filter(val => val !== '');
+      
+      // Update faded numbers state to reflect only numbers currently in the grid
+      setFadedNumbers(allNumbersInGrid);
     }
   };
 
-  // Check if the user's current grid matches any valid configuration
   const checkForValidConfiguration = () => {
-    // Convert user input from strings to numbers, treating empty cells as NaN
     const userGrid = grid.map(row => row.map(cell => parseInt(cell) || NaN));
-
-    // Loop through each valid configuration to see if one matches
+  
     const isMatch = validConfigurations.some(config =>
       config.every((row, rowIndex) =>
         row.every((value, colIndex) => value === userGrid[rowIndex][colIndex])
       )
     );
-
+  
     if (isMatch && !isHintRevealed) {
-      revealHint();
+      revealHint(); // Show the hint
     } else {
       alert('Incorrect configuration. Please try again.');
+      resetPuzzle(); // Only reset the grid if the configuration is incorrect
     }
   };
-
-  // Reveal the hint when a valid configuration is found
-  const revealHint = () => {
-    setHint('The path you’ve uncovered is only one of many. Beware — symmetry is not always your ally.');
+  
+  const revealHint = (index, hintText) => {
+    setHint(hintText);
     setIsHintRevealed(true);
-};
+    localStorage.setItem('hint1', 'The path you’ve uncovered is only one of many.'); // Puzzle 1 hint
+    
+    // Only set countdown start time if it's not already running
+    const existingStartTime = localStorage.getItem('countdownStartTime');
+    if (!existingStartTime) {
+      const startTime = Date.now();
+      localStorage.setItem('countdownStartTime', startTime.toString()); // Set countdown start time
+      localStorage.setItem('countdownTime', '600'); // Store countdown duration (600 seconds = 10 min)
+    }
+  
+  };
 
-  // Reset the puzzle grid and hint
   const resetPuzzle = () => {
     setGrid(Array(3).fill().map(() => Array(3).fill('')));
     setHint('');
     setIsHintRevealed(false);
+    setFadedNumbers([]);
   };
 
   return (
     <div className="puzzle-container">
-      <h1 className="puzzle-title">Puzzle 1</h1>
+      <h1 className="puzzle-title">
+        Puzzle 1
+        <Link to="/puzzle2" className="next-icon">&gt;</Link>
+        </h1>
       <p className="instructions">
-        <strong>Rule:</strong> Fill the 3x3 grid with single-digit numbers (0-9) such that the sum of every row, every column, and both diagonals equals <strong>15</strong>. There are multiple correct configurations.
+        <strong>Rule:</strong> Fill the 3x3 grid with single-digit numbers (1-9) such that the sum of every row, every column, and both diagonals equals <strong>15</strong>. There are multiple correct configurations.
       </p>
+
+      <div className="number-row">
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+          <span 
+            key={num} 
+            className={`number ${fadedNumbers.includes(num.toString()) ? 'flicker-out' : 'glow-up'}`}
+          >
+            {num}
+          </span>
+        ))}
+      </div>
 
       <div className="grid">
         {grid.map((row, rowIndex) => (
