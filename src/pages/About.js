@@ -34,11 +34,13 @@ const About = () => {
 
         <section className="gallery">
           <h2>Gallery</h2>
-          <div className="gallery-item"><img src={scenicPhoto} alt="A scenic view I enjoyed" /></div>
-          <div className="gallery-item"><img src={familyPhoto} alt="A memorable moment with family" /></div>
-          <div className="gallery-item"><img src={drawingPhoto} alt="One of my favorite places to relax" /></div>
-          <div className="gallery-item"><img src={chowPhoto} alt="A memorable moment with family" /></div>
-          <div className="gallery-item"><img src={momPhoto} alt="One of my favorite places to relax" /></div>        
+          <div className="gallery-content">
+            <div className="gallery-item"><img src={scenicPhoto} alt="A scenic view I enjoyed" /></div>
+            <div className="gallery-item"><img src={familyPhoto} alt="A memorable moment with family" /></div>
+            <div className="gallery-item"><img src={drawingPhoto} alt="One of my favorite places to relax" /></div>
+            <div className="gallery-item"><img src={chowPhoto} alt="A memorable moment with family" /></div>
+            <div className="gallery-item"><img src={momPhoto} alt="One of my favorite places to relax" /></div>        
+          </div>        
         </section>
       </main>
     </div>

@@ -5,152 +5,150 @@
 }
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  body {
-    font-family: 'inter-bold';
-    color: #fff;
-    background-color: #111;
-  }
-  
-  /* Hero Section */
-  .hero {
-    min-height: 75vh;
-    /*background-image: url('/images/your-image.jpg'); */
-    background-size: cover;
-    background-position: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: #fff;
-    min-width: 50vh;
-    font-family: 'inter-bold';
-  }
-  
-  .hero h1 {
-    font-size: 3em;
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
-  
-  .hero p {
-    font-size: 1.2em;
-    color: #aaa;
-  }
-  
-  /* Portfolio Section */
-  .portfolio {
-    background-color: #222;
-    padding: 50px 20px;
-    text-align: center;
-  }
-  
-  .portfolio h2 {
-    font-size: 2em;
-    color: #fff;
-    margin-bottom: 20px;
-  }
-  
-  .portfolio .categories {
-    color: #888;
-    margin-bottom: 30px;
-  }
-  
-  .portfolio .categories a {
-    margin: 0 15px;
-    color: #888;
-    text-decoration: none;
-    font-size: 0.9em;
-  }
-  
-  .portfolio .gallery {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-  }
-  
-  .portfolio .gallery-item {
-    width: 200px;
-    background-color: #333;
-    padding: 20px;
-    border-radius: 8px;
-  }
-  
-  .portfolio .gallery-item img {
-    width: 100%;
-    border-radius: 5px;
-  }
-    
-  .hero-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px; /* Space between photo and text */
-  }
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  /* Profile Photo Styles */
-  .profile-photo-container {
-    margin-top: 20px;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px; /* Space below the photo */
-  }
+.home-page {
+  font-family: 'inter-bold';
+  color: #fff;
+  background-color: #111;
+}
 
-  .profile-photo {
-    width: 250px;
-    height: 250px;
-    border-radius: 50%; /* Makes the image circular */
-    object-fit: cover; /* Ensures the image fits within the circle */
-    border: 3px solid #ffffff; /* Optional: Adds a border */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Adds a shadow */
-    transition: transform 0.3s ease-in-out; /* Smooth animation on hover */
-  }
+/* Hero Section */
+.home-page .hero {
+  min-height: 75vh;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+}
 
-  .profile-photo-container:hover .profile-photo {
-    transform: scale(1.2); /* Slightly enlarges the photo on hover */
-  }
+.home-page .hero h1 {
+  font-size: 3em;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
 
-  /* Hero Text */
-  .hero-text {
-    max-width: 800px; /* Optional: Restrict text width */
-  }
+.home-page .hero p {
+  font-size: 1.2em;
+  color: #aaa; /* Subtle text color */
+}
 
-  .hero-text h1 {
-    font-size: 2.5em;
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
+/* Hero Content */
+.home-page .hero-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px; /* Space between photo and text */
+}
 
-  .hero-text span {
-    color: #feb47b; /* Highlight your name with a different color */
-  }
+/* Profile Photo Styles */
+.home-page .profile-photo-container {
+  margin-top: 20px;
+  margin-bottom: 20px; /* Space below the photo */
+  justify-content: center;
+  align-items: center;
+}
 
-  .hero-text p {
-    font-size: 1.2em;
-    color: #aaa; /* Subtle text color */
-  }
-  /* Responsive Hero Section */
+.home-page .profile-photo {
+  width: 250px;
+  height: 250px;
+  border-radius: 50%; /* Circular image */
+  object-fit: cover; /* Ensure the image fits within the circle */
+  border: 3px solid #ffffff; /* Optional: Adds a border */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adds a shadow */
+  transition: transform 0.3s ease-in-out; /* Smooth animation on hover */
+}
+
+.home-page .profile-photo-container:hover .profile-photo {
+  transform: scale(1.2); /* Slightly enlarges the photo on hover */
+}
+
+/* Hero Text */
+.home-page .hero-text {
+  max-width: 800px; /* Restrict text width */
+}
+
+.home-page .hero-text h1 {
+  font-size: 2.5em;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.home-page .hero-text span {
+  color: #feb47b; /* Highlighted color for emphasis */
+}
+
+.home-page .hero-text p {
+  font-size: 1.2em;
+  color: #aaa;
+}
+
+/* Portfolio Section */
+.home-page .portfolio {
+  background-color: #222;
+  padding: 50px 20px;
+  text-align: center;
+}
+
+.home-page .portfolio h2 {
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+
+.home-page .portfolio .categories {
+  color: #888;
+  margin-bottom: 30px;
+}
+
+.home-page .portfolio .categories a {
+  margin: 0 15px;
+  color: #888;
+  text-decoration: none;
+  font-size: 0.9em;
+}
+
+.home-page .portfolio .gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.home-page .portfolio .gallery-item {
+  width: 200px;
+  background-color: #333;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.home-page .portfolio .gallery-item img {
+  width: 100%;
+  border-radius: 5px;
+}
+
+/* Responsive Hero Section */
 @media (max-width: 768px) {
-  .hero-content {
+  .home-page .hero-content {
     flex-direction: column; /* Stack the photo and text vertically */
   }
 
-  .profile-photo {
+  .home-page .profile-photo {
     width: 200px; /* Smaller size for smaller screens */
     height: 200px;
   }
 
-  .hero-text h1 {
+  .home-page .hero-text h1 {
     font-size: 2em; /* Reduce text size */
   }
 
-  .hero-text p {
+  .home-page .hero-text p {
     font-size: 1em;
   }
 }
