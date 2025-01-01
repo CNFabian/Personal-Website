@@ -1,24 +1,22 @@
 /* General Styles */
 /* Make sure to scope the entire page to this unique class */
+@font-face {
+  font-family: 'palatino';
+  src: url('../assets/palr45w.ttf') format('truetype');
+}
 
 .about-page {
-  font-family: 'inter-bold';
+  font-family: 'palatino';
   line-height: 1.6;
   background: linear-gradient(to bottom, #D2A679, #C48C5A, #A36F4D, #8B5E3C);
   margin: 0;
   padding: 0;
+  color: #ffffff; /* Set a default font color for the entire page */
 }
 
 .about-page .hero {
+  padding: 3rem 1rem;
   text-align: center;
-  color: #ffffff;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  font-family: 'inter-bold';
 }
 
 .about-page .hero img.picture {
@@ -33,14 +31,16 @@
   font-size: 2.5rem;
   margin-top: 1rem;
   margin-bottom: 0;
-  font: #ffffff;
+  color: #ffffff; /* Ensure consistent white font */
 }
+
 .about-page .hero p {
-  font: #ffffff;
   font-size: 1.5rem;
-  margin-top: 1rem;
-  margin-bottom: 0;
-  
+  margin-bottom: 1rem;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  color: #ffffff; /* Ensure consistent white font */
 }
 
 .about-page .personal-life {
@@ -49,15 +49,18 @@
 }
 
 .about-page .personal-life h2 {
-  font-size: 2rem;
+  font-size: 2.5rem;
   margin-bottom: 1rem;
+  color: #ffffff; /* Ensure consistent white font */
 }
 
 .about-page .personal-life p {
+  font-size: 1.5rem;
   margin-bottom: 1rem;
   max-width: 700px;
   margin-left: auto;
   margin-right: auto;
+  color: #ffffff; /* Ensure consistent white font */
 }
 
 .about-page .fun-facts {
@@ -66,8 +69,9 @@
 }
 
 .about-page .fun-facts h2 {
-  font-size: 2rem;
+  font-size: 2.5rem;
   margin-bottom: 1rem;
+  color: #ffffff; /* Ensure consistent white font */
 }
 
 .about-page .fun-facts ul {
@@ -76,12 +80,13 @@
 }
 
 .about-page .fun-facts li {
+  font-size: 1.25rem;
   margin: 10px auto;
   padding: 15px;
   border-radius: 8px;
   max-width: 500px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-  color: #f5f5f5;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  color: #ffffff; /* Ensure consistent white font */
 }
 
 .about-page .gallery {
@@ -92,6 +97,7 @@
   font-size: 2rem;
   text-align: center;
   margin-bottom: 1rem;
+  color: #ffffff; /* Ensure consistent white font */
 }
 
 .about-page .gallery-content {
@@ -103,12 +109,42 @@
 
 .about-page .gallery-item {
   margin: 15px;
+  position: relative; /* Ensures the tooltip is positioned relative to this item */
 }
 
 .about-page .gallery-item img {
-  width: 200px;
-  height: 200px;
-  object-fit: cover;
+  width: 150px; /* Set a consistent width */
+  height: 150px; /* Set a consistent height */
+  object-fit: cover; /* Ensure the image scales to fill the box without distortion */
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+
+.about-page .tooltip {
+  display: none;
+  position: absolute;
+  bottom: 110%; /* Position the tooltip above the image */
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  white-space: normal; /* Allow the text to wrap */
+  min-width: 150px; /* Limit the width of the tooltip */
+  word-wrap: break-word; /* Ensure long words break to fit within the width */
+  z-index: 10;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+  text-align: center; /* Center-align the text for better appearance */
+}
+
+
+.about-page .gallery-item:hover .tooltip {
+  display: block;
+  opacity: 1;
+  visibility: visible;
 }

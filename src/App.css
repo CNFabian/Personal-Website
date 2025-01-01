@@ -13,6 +13,11 @@
   min-height: 100vh;
 }
 
+html, body, #root {
+  background-color: #0d0d0d; /* Black background */
+}
+
+
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
