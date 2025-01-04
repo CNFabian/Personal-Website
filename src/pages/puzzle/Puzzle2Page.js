@@ -8,8 +8,8 @@ const Puzzle2Page = () => {
     ['', '', '', ''],
     ['X', '', '', 'X']
   ]);
-  const [hint, setHint] = useState('');
-  const [isHintRevealed, setIsHintRevealed] = useState(false);
+  const [piece, setpiece] = useState('');
+  const [ispieceRevealed, setIspieceRevealed] = useState(false);
   const [fadedNumbers, setFadedNumbers] = useState([]); // State to track which numbers have been entered
 
   const validConfigurations = [
@@ -62,8 +62,8 @@ const Puzzle2Page = () => {
       )
     );
   
-    if (isMatch && !isHintRevealed) {
-      revealHint();
+    if (isMatch && !ispieceRevealed) {
+      revealpiece();
     } else {
       alert('Incorrect configuration. Please try again.');
       resetPuzzle(); // Reset the puzzle grid after checking the configuration
@@ -72,10 +72,10 @@ const Puzzle2Page = () => {
    
   };
   
-  const revealHint = (index, hintText) => {
-    setHint(hintText);
-    setIsHintRevealed(true);
-    localStorage.setItem('hint2', 'The path you’ve uncovered is only one of many.'); // Store the hint
+  const revealpiece = (index, pieceText) => {
+    setpiece(pieceText);
+    setIspieceRevealed(true);
+    localStorage.setItem('piece2', 'The path you’ve uncovered is only one of many.'); // Store the piece
 
     // Only set countdown start time if it's not already running
     const existingStartTime = localStorage.getItem('countdownStartTime');
@@ -93,20 +93,28 @@ const Puzzle2Page = () => {
       ['', '', '', ''],
       ['X', '', '', 'X']
     ]);
-    setHint('');
-    setIsHintRevealed(false);
+    setpiece('');
+    setIspieceRevealed(false);
     setFadedNumbers([]);
   };
 
   return (
-    <div className="puzzle-container">
+    <div className="puzzle-container"
+    style={{ paddingTop: '40px' }}
+    >
       <h1 className="puzzle-title">
         <Link to="/puzzle1" className="back-icon">&lt;</Link>
         Puzzle 2
         <Link to="/puzzle3" className="next-icon">&gt;</Link>
         </h1>
       <p className="instructions">
-        <strong>Rule:</strong> Fill the grid with single-digit numbers (1-9) according to the puzzle's rules. There are multiple correct configurations.
+        <strong>Rule:</strong> Fill the grid with single-digit numbers (1-8) such that consequtive numbers do not touch, (not even corners!)
+        <br />
+      <strong>
+        Example: 1 cannot touch 2, and 5 cannot touch 4 or 6.
+      </strong>
+        <br />
+        There are multiple correct configurations.
       </p>
 
       <div className="number-row">
@@ -141,14 +149,26 @@ const Puzzle2Page = () => {
         ))}
       </div>
 
-      {isHintRevealed && (
-        <div className="hint">
-          <h2>Hint Revealed</h2>
-          <p>{hint}</p>
+      <button className="submit-button" onClick={checkForValidConfiguration}>Submit</button>
+
+      {ispieceRevealed && (
+        <div className="piece">
+          <h2>Piece Revealed</h2>
+          <p>{piece}</p>
         </div>
       )}
+      
 
-      <button className="submit-button" onClick={checkForValidConfiguration}>Submit</button>
+      <p className='secret-page-link' 
+      style={{ paddingBottom: '50px' }}
+      >
+                <Link
+                  to="/secret"
+                >
+                  Go to the Secret Page
+                </Link>
+              </p>
+
     </div>
   );
 };

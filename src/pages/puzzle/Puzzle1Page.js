@@ -4,8 +4,8 @@ import './puzzle-shared.css';
 
 const Puzzle1Page = () => {
   const [grid, setGrid] = useState(Array(3).fill().map(() => Array(3).fill('')));
-  const [hint, setHint] = useState('');
-  const [isHintRevealed, setIsHintRevealed] = useState(false);
+  const [piece, setpiece] = useState('');
+  const [ispieceRevealed, setIspieceRevealed] = useState(false);
   const [fadedNumbers, setFadedNumbers] = useState([]); // State to track which numbers have been entered
   
   const validConfigurations = [
@@ -75,18 +75,18 @@ const Puzzle1Page = () => {
       )
     );
   
-    if (isMatch && !isHintRevealed) {
-      revealHint(); // Show the hint
+    if (isMatch && !ispieceRevealed) {
+      revealpiece(); // Show the piece
     } else {
       alert('Incorrect configuration. Please try again.');
       resetPuzzle(); // Only reset the grid if the configuration is incorrect
     }
   };
   
-  const revealHint = (index, hintText) => {
-    setHint(hintText);
-    setIsHintRevealed(true);
-    localStorage.setItem('hint1', 'The path you’ve uncovered is only one of many.'); // Puzzle 1 hint
+  const revealpiece = (index, pieceText) => {
+    setpiece(pieceText);
+    setIspieceRevealed(true);
+    localStorage.setItem('piece1', 'The path you’ve uncovered is only one of many.'); // Puzzle 1 piece
     
     // Only set countdown start time if it's not already running
     const existingStartTime = localStorage.getItem('countdownStartTime');
@@ -100,8 +100,8 @@ const Puzzle1Page = () => {
 
   const resetPuzzle = () => {
     setGrid(Array(3).fill().map(() => Array(3).fill('')));
-    setHint('');
-    setIsHintRevealed(false);
+    setpiece('');
+    setIspieceRevealed(false);
     setFadedNumbers([]);
   };
 
@@ -112,7 +112,8 @@ const Puzzle1Page = () => {
         <Link to="/puzzle2" className="next-icon">&gt;</Link>
         </h1>
       <p className="instructions">
-        <strong>Rule:</strong> Fill the 3x3 grid with single-digit numbers (1-9) such that the sum of every row, every column, and both diagonals equals <strong>15</strong>. There are multiple correct configurations.
+        <strong>Rule:</strong> Fill the 3x3 grid with single-digit numbers (1-9) such that the sum of every row, 
+        every column, and both diagonals equals <strong>15</strong>. There are multiple correct configurations.
       </p>
 
       <div className="number-row">
@@ -143,14 +144,24 @@ const Puzzle1Page = () => {
         ))}
       </div>
 
-      {isHintRevealed && (
-        <div className="hint">
-          <h2>Hint Revealed</h2>
-          <p>{hint}</p>
+      <button className="submit-button" onClick={checkForValidConfiguration}>Submit</button>
+
+      {ispieceRevealed && (
+        <div className="piece">
+          <h2>Piece Revealed</h2>
+          <p>{piece}</p>
         </div>
       )}
 
-      <button className="submit-button" onClick={checkForValidConfiguration}>Submit</button>
+    
+    <p className='secret-page-link'>
+                    <Link
+                      to="/secret"
+                    >
+                      Go to the Secret Page
+                    </Link>
+                  </p>
+
     </div>
   );
 };

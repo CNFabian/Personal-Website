@@ -199,7 +199,7 @@
     transform: scale(0.95);
 }
 
-/* Keyframes for flickering hint effect */
+/* Keyframes for flickering piece effect */
 @keyframes flicker {
     0% { box-shadow: 0 0 15px 2px #550000; }
     20% { box-shadow: 0 0 25px 5px #770000; }
@@ -234,18 +234,18 @@
         padding: 10px 20px;
     }
 
-    .hint {
+    .piece {
         font-size: 1rem;
         padding: 10px 15px;
     }
 
-    .hint p {
+    .piece p {
         font-size: 1rem;
     }
 }
 
-/* Hint Section Styles */
-.hint {
+/* piece Section Styles */
+.piece {
     margin-top: 20px;
     padding: 15px 20px;
     background-color: #222; /* Dark background for contrast */
@@ -254,10 +254,10 @@
     border-radius: 5px;
     text-align: center;
     box-shadow: 0 0 10px rgba(179, 51, 51, 0.5); /* Slight red glow */
-    animation: hint-fade-in 0.8s ease-out;
+    animation: piece-fade-in 0.8s ease-out;
   }
   
-  .hint h2 {
+  .piece h2 {
     font-size: 1.5rem;
     margin-bottom: 10px;
     color: #ff5555; /* Highlight the title in a brighter red */
@@ -265,14 +265,14 @@
     letter-spacing: 1px;
   }
   
-  .hint p {
+  .piece p {
     font-size: 1.1rem;
     line-height: 1.5;
     color: #f0f0f0; /* Slightly brighter for the main text */
   }
   
   /* Fade-in Animation */
-  @keyframes hint-fade-in {
+  @keyframes piece-fade-in {
     0% {
       opacity: 0;
       transform: translateY(-10px);
@@ -281,4 +281,16 @@
       opacity: 1;
       transform: translateY(0);
     }
+  }
+
+  .secret-page-link {
+    margin-top: 50px;
+  }
+
+  .secret-page-link a {
+    color: #b33333;
+  }
+
+  .secret-page-link a:hover{
+    color: #e60000;
   }

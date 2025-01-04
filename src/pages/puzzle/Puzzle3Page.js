@@ -1,49 +1,83 @@
 import React, { useState } from 'react';
 import './puzzle-shared.css'; // Import shared CSS file
+import { Link } from 'react-router-dom';
 
 const Puzzle3Page = () => {
-  const [userAnswer, setUserAnswer] = useState('');
-  const [message, setMessage] = useState('');
-  const correctAnswer = '42'; // Example puzzle solution
+  const [input, setInput] = useState('');
+  const [isCorrect, setIsCorrect] = useState(false);
 
   const handleInputChange = (e) => {
-    setUserAnswer(e.target.value);
+    setInput(e.target.value);
   };
 
-  const handleSubmit = () => {
-    if (userAnswer === correctAnswer) {
-      localStorage.setItem('hint1', 'The answer is life'); // Store the hint
-      setMessage({ text: 'Correct! The hint has been unlocked.', type: 'success' });
+  const checkPassword = () => {
+    if (input.toLowerCase() === 'hidden') {
+      localStorage.setItem('piece3', 'Secret Code (Fill in Later');
+      setIsCorrect(true);
+      const existingStartTime = localStorage.getItem('countdownStartTime');
+      if (!existingStartTime) {
+        const startTime = Date.now();
+        localStorage.setItem('countdownStartTime', startTime.toString()); // Set countdown start time
+        localStorage.setItem('countdownTime', '600'); // Store countdown duration (600 seconds = 10 min)
+      }
     } else {
-      setMessage({ text: 'Incorrect answer. Try again.', type: 'error' });
+      alert('Incorrect code. Try again.');
     }
   };
 
   return (
-    <div className="puzzle-container">
-      <h1 className="puzzle-title">Puzzle 3</h1>
-      <p>What is the "Answer to the Ultimate Question of Life, the Universe, and Everything"?</p>
+    <div
+    className="puzzle-container"
+    style={{ paddingBottom: '230px' }}
+  >
+    <h1 className="puzzle-title">
+      <Link to="/puzzle2" className="back-icon">&lt;</Link>
+      Puzzle 3
+    </h1>
 
-      <input 
-        type="text" 
-        placeholder="Enter your answer..." 
-        value={userAnswer} 
-        onChange={handleInputChange} 
-        className="puzzle-input"
-      />
+    <p className="instructions">
+      Enter the code to receive the final piece.
 
-      <button onClick={handleSubmit} className="submit-button">
-        Submit
-      </button>
+      <br />
 
-      {message.text && (
-        <p className={`feedback-message ${message.type}`}>
-          {message.text}
+      Hint: I tend to double type some characters. Take a closer look and learn {' '}
+            <Link to="/about" style={{ color: '#ff5555', textDecoration: 'underline' }}>
+              About Me
+            </Link>.
+    </p>
+
+    {/* Input Box and Submit Button */}
+    <input
+      type="text"
+      className="cell"
+      value={input}
+      onChange={handleInputChange}
+      placeholder="Enter Code"
+      style={{
+        width: '400px',
+        textAlign: 'center',
+        marginBottom: '20px',
+        fontSize: '1.5rem',
+      }}
+    />
+    <button className="submit-button" onClick={checkPassword}>
+      Submit
+    </button>
+        {/* Display Visible piece Above the Input */}
+        {isCorrect && (
+      <div className="piece">
+        <h2>Piece is Revealed</h2>
+      </div>
+    )}
+
+        <p className='secret-page-link'>
+          <Link
+            to="/secret"
+          >
+            Go to the Secret Page
+          </Link>
         </p>
-      )}
-
-      <a href="/secret" className="back-link">Back to Secret Page</a>
-    </div>
+  </div>
   );
 };
 
