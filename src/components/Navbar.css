@@ -27,7 +27,7 @@
 }
 
 .resume-nav {
-  background-color: #8bc34a !important; 
+  background-color: #38343c !important; 
 }
 
 .portfolio-nav {
@@ -35,7 +35,7 @@
 }
 
 .secret-nav {
-  background-color: #b33333 !important; 
+  background-color: #181414 !important; 
 }
 
 .home-nav {
@@ -90,7 +90,7 @@
 }
 
 .nav-link.active-link {
-  border-bottom: 2px solid #ff0000;
+  border-bottom: 2px solid #1386ce;
 }
 
 .about-page .nav-link.active-link {

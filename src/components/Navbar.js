@@ -32,10 +32,10 @@ const Navbar = () => {
           </Link>
         </li>
         <li>
-          <Link to="/portfolio" className={`nav-link ${location.pathname.startsWith('/portfolio') ? 'active-link' : ''}`} 
-            data-tooltip="View my portfolio" 
+          <Link to="/about" className={`nav-link ${location.pathname.startsWith('/about') ? 'active-link' : ''}`} 
+            data-tooltip="Learn more about me" 
             onClick={closeMenu}>
-            Portfolio
+            About
           </Link>
         </li>
         <li>
@@ -46,10 +46,10 @@ const Navbar = () => {
           </Link>
         </li>
         <li>
-          <Link to="/about" className={`nav-link ${location.pathname.startsWith('/about') ? 'active-link' : ''}`} 
-            data-tooltip="Learn more about me" 
+          <Link to="/contact" className={`nav-link ${location.pathname.startsWith('/contact') ? 'active-link' : ''}`} 
+            data-tooltip="Reach out for inquires" 
             onClick={closeMenu}>
-            About
+            Contact
           </Link>
         </li>
         <li> 

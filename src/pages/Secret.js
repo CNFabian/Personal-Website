@@ -142,6 +142,11 @@ const Secret = () => {
             onKeyDown={handleKeyDown} 
             ref={inputRef} 
           />
+
+          <p className="ominous-list">
+            Connect all pieces with no spaces in between
+          </p>
+
           <button className="reveal-button" onClick={handleRevealSecret}>Reveal</button>
           <div className={`error-message ${isFlashingError ? 'flash-error' : ''}`}>
             <p>{errorMessage}</p>

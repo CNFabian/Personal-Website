@@ -82,7 +82,7 @@ const Puzzle2Page = () => {
     if (!existingStartTime) {
       const startTime = Date.now();
       localStorage.setItem('countdownStartTime', startTime.toString()); // Set countdown start time
-      localStorage.setItem('countdownTime', '600'); // Store countdown duration (600 seconds = 10 min)
+      localStorage.setItem('countdownTime', '1800'); // Store countdown duration (600 seconds = 10 min)
     }
 };
 

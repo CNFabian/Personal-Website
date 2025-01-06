@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import About from './pages/About';
 import Resume from './pages/Resume';
 import Secret from './pages/Secret';
+import Contact from './pages/Contact';
 
 import './App.css';
 
@@ -28,6 +29,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/secret" element={<Secret />} />
         <Route path="/resume" element={<Resume />} />
         <Route path="/puzzle1" element={<Puzzle1Page />} />
