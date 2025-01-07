@@ -27,7 +27,7 @@ const Contact = () => {
             message: e.target.message.value,
         };
     
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzXrVaicNN3X5ZehbACfH13CpExVo8iy0EOkdBCSlcbN7AxY-WJfYmE-TSCBMCqJC4xNQ/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxtoUdj7G2xMBA5FUpYX0tW2sogWP3BOzreklmk98yTDQ6t_SzMqqQkl708HlWXe7mjrQ/exec'; // Replace with your Apps Script Web App URL
     
         try {
             const response = await fetch(scriptURL, {
@@ -49,7 +49,6 @@ const Contact = () => {
             alert('There was an error. Please try again.');
         }
     };
-    
     
 
     return (
