@@ -27,7 +27,8 @@ const Contact = () => {
             message: e.target.message.value,
         };
     
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyICRIqNvcAl6FJxhWhI4jL4Hwq6EitlpvU708MOfnwAh9F3m0pvV2lfIu6BVhbVTKasA/exec'
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwd8UHxgVhZfs_Ia1gW6GPSpniUioCkfOPfH7kvqb-9r5EhDHphcPwo2wXwaGodCjht1Q/exec';
+    
         try {
             const response = await fetch(scriptURL, {
                 method: 'POST',
@@ -40,11 +41,15 @@ const Contact = () => {
             const result = await response.json();
             if (result.status === 'success') {
                 alert('Message sent successfully!');
+            } else {
+                alert(result.message || 'An error occurred.');
             }
         } catch (error) {
+            console.error('Error:', error);
             alert('There was an error. Please try again.');
         }
     };
+    
     
 
     return (
