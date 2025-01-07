@@ -27,7 +27,7 @@ const Contact = () => {
             message: e.target.message.value,
         };
     
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbwS6y_NMIyFhdqMa-r7W69ZtRaJwFnMRc0q6IvFV1R2h7aF2KSjUloXbF3NDzwqe70x/exec'
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyICRIqNvcAl6FJxhWhI4jL4Hwq6EitlpvU708MOfnwAh9F3m0pvV2lfIu6BVhbVTKasA/exec'
         try {
             const response = await fetch(scriptURL, {
                 method: 'POST',
