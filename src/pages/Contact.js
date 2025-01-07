@@ -1,91 +1,48 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import './Contact.css';
 
 const Contact = () => {
-    const [formData, setFormData] = useState({
-        name: '',
-        subject: '',
-        message: ''
-    });
-
+    const formRef = useRef(null); // Create a ref for the form
     const [confirmation, setConfirmation] = useState(false);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
-        });
-    };
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxXuAzWvy-2hlyeimUN8RT0z3zCk-fWBfJ2LB3hoeXtpaFfYBZFQfRHBDll5JyhV7XR-g/exec';
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-    
-        const formData = {
-            name: e.target.name.value,
-            subject: e.target.subject.value,
-            message: e.target.message.value,
-        };
-    
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbxtoUdj7G2xMBA5FUpYX0tW2sogWP3BOzreklmk98yTDQ6t_SzMqqQkl708HlWXe7mjrQ/exec'; // Replace with your Apps Script Web App URL
-    
-        try {
-            const response = await fetch(scriptURL, {
-                method: 'POST',
-                body: JSON.stringify(formData),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+    const handleSubmit = (e) => {
+        e.preventDefault(); // Prevent the default form submission
+
+        const form = formRef.current; // Access the form element using the ref
+
+        fetch(scriptURL, {
+            method: 'POST',
+            body: new FormData(form), // Use FormData to send the form data
+        })
+            .then((response) => {
+                if (response.ok) {
+                    setConfirmation(true);
+                    alert('Thank you! Form is submitted successfully.');
+                    form.reset(); // Reset the form after submission
+                } else {
+                    alert('There was an issue submitting your form. Please try again.');
+                }
+            })
+            .catch((error) => {
+                console.error('Error!', error.message);
+                alert('An error occurred while submitting the form. Please try again.');
             });
-    
-            const result = await response.json();
-            if (result.status === 'success') {
-                alert('Message sent successfully!');
-            } else {
-                alert(result.message || 'An error occurred.');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('There was an error. Please try again.');
-        }
     };
-    
 
     return (
         <div className="contact-container">
             <h1>Contact Me</h1>
-            <form onSubmit={handleSubmit} className="contact-form">
+            <form ref={formRef} onSubmit={handleSubmit} className="contact-form" name="contact-form">
                 <label htmlFor="name">Name:</label>
-                <input 
-                    type="text" 
-                    id="name" 
-                    name="name" 
-                    value={formData.name} 
-                    onChange={handleChange} 
-                    placeholder="Your name" 
-                    required 
-                />
+                <input type="text" id="name" name="Name" placeholder="Your name" required />
 
                 <label htmlFor="subject">Subject:</label>
-                <input 
-                    type="text" 
-                    id="subject" 
-                    name="subject" 
-                    value={formData.subject} 
-                    onChange={handleChange} 
-                    placeholder="Subject of your message" 
-                    required 
-                />
+                <input type="text" id="subject" name="Subject" placeholder="Subject of your message" required />
 
                 <label htmlFor="message">Message:</label>
-                <textarea 
-                    id="message" 
-                    name="message" 
-                    value={formData.message} 
-                    onChange={handleChange} 
-                    placeholder="Your message" 
-                    required 
-                />
+                <textarea id="message" name="Message" placeholder="Your message" required></textarea>
 
                 <button type="submit">Send Message</button>
             </form>

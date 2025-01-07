@@ -30,8 +30,8 @@
   background-color: #38343c !important; 
 }
 
-.portfolio-nav {
-  background-color: #ff9800 !important; 
+.contact-nav {
+  background-color: linear-gradient(135deg, #232526, #414345) !important; 
 }
 
 .secret-nav {
@@ -85,12 +85,12 @@
 }
 
 .nav-link:hover {
-  color: #ce5b13;
+  color: #ec950c;
   transform: scale(1.1); /* Scale up the hovered nav link */
 }
 
 .nav-link.active-link {
-  border-bottom: 2px solid #1386ce;
+  border-bottom: 2px solid #0C62EC;
 }
 
 .about-page .nav-link.active-link {
@@ -116,7 +116,7 @@
   top: 120%; 
   left: 50%; 
   transform: translateX(-50%); 
-  background-color: #ce5b13;
+  background-color: #ec950c;
   color: #fff;
   padding: 5px 10px;
   border-radius: 10px;
@@ -193,7 +193,7 @@
   }
 
   .nav-link:hover {
-    color: #ce5b13;
+    color: #ec950c;
     transform: translateX(-20px); 
   }
 }
