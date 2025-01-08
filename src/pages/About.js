@@ -32,10 +32,11 @@ const About = () => {
         <section className="fun-facts">
           <h2>Fun Facts</h2>
           <ul>
-            <li>I love ddiscovering new music and curating playlists for different moods.</li>
+            <li>I love ddiscovering new music and curating playlists for different moods. My current favorite artist is Kendrick Lamar.</li>
             <li>Problem-solving isn't just for codding — 
-              I enjoy puzzles and logic games in my free time.</li>
-            <li>I’m always on the lookout for interesting documentaries or thought-provoking conspiracy theories.</li>
+              I enjoy puzzles and logic games in my free time. I know how to solve a rubiks cube in under 1 minute. And can say I put up a good competition in Monopoly</li>
+              <li>I’m always on the lookout for interesting documentaries or thought-provoking conspiracy theories. Am a firm believer in aliens and an open to the idea of the paranormal.</li>
+            <li>I enjoy the peacefulness nature and when I am not in front of a computer I can be found indulging in one of Stephen King's many pieces of literature.</li>
           </ul>
         </section>
 
@@ -48,7 +49,7 @@ const About = () => {
             </div>
             <div className="gallery-item">
               <img src={familyPhoto} alt="A memorable moment with family" className="hover-image" />
-              <span className="tooltip">A memorable momeent with family, fishing at lake Tahoe, I sadly did not catch any</span>
+              <span className="tooltip">A memorable momeent with family, fishing at lake Tahoe, we sadly did not catch any</span>
             </div>
             <div className="gallery-item">
               <img src={drawingPhoto} alt="One of my favorite places to relax" className="hover-image" />
@@ -56,7 +57,7 @@ const About = () => {
             </div>
             <div className="gallery-item">
               <img src={chowPhoto} alt="A memorable moment with family" className="hover-image" />
-              <span className="tooltip">An early moment with my first cat Chow</span>
+              <span className="tooltip">An early moment with my first pet cat, Chow</span>
             </div>
             <div className="gallery-item">
               <img src={momPhoto} alt="One of my favorite places to relax" className="hover-image" />

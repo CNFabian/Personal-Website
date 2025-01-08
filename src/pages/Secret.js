@@ -8,19 +8,19 @@ const Secret = () => {
   const [isShaking, setIsShaking] = useState(false); 
   const [isFlashing, setIsFlashing] = useState(false); 
   const [isFlashingError, setIsFlashingError] = useState(false); 
-  const [pieces, setpieces] = useState(['???', '???', '???']);
-  const [hasRevealedpiece, setHasRevealedpiece] = useState(false);
+  const [pieces, setPieces] = useState(['???', '???', '???']);
+  const [hasRevealedPiece, setHasRevealedPiece] = useState(false);
   const [countdownTime, setCountdownTime] = useState(1800); 
   const [flickerStyle, setFlickerStyle] = useState({ color: '#ff0000', textShadow: '0px 0px 30px #ff0000' });
   const inputRef = useRef(null);
-  const correctPassword = 'open-sesame'; 
+  const correctPasswords = ['tacosking0', 'TacosKing0', 'tacosKing0', 'Tacosking0']; 
   let countdownTimer = useRef(null);
 
  
   const handleInputChange = (e) => setPassword(e.target.value);
 
   const handleRevealSecret = () => {
-    if (password === correctPassword) {
+    if (correctPasswords.includes(password)) {
       setIsRevealed(true);
       setErrorMessage('');
     } else {
@@ -44,12 +44,12 @@ const Secret = () => {
   };
 
   useEffect(() => {
-    const storedpieces = [
+    const storedPieces = [
       localStorage.getItem('piece1') || '???',
       localStorage.getItem('piece2') || '???',
       localStorage.getItem('piece3') || '???'
     ];
-    setpieces(storedpieces);
+    setPieces(storedPieces);
   }, []);
 
   useEffect(() => {
@@ -62,20 +62,20 @@ const Secret = () => {
       
       if (remainingTime > 0) {
         setCountdownTime(remainingTime);
-        setHasRevealedpiece(true); // Force the piece to be revealed immediately
+        setHasRevealedPiece(true); // Force the piece to be revealed immediately
       } else {
-        clearpiecesAndCountdown();
+        clearPiecesAndCountdown();
       }
     }
   }, []);
 
   useEffect(() => {
-    if (hasRevealedpiece) {
+    if (hasRevealedPiece) {
       clearInterval(countdownTimer.current);
       countdownTimer.current = setInterval(() => {
         setCountdownTime((prevTime) => {
           if (prevTime <= 1) {
-            clearpiecesAndCountdown();
+            clearPiecesAndCountdown();
             return 0;
           }
           
@@ -87,23 +87,23 @@ const Secret = () => {
 
       return () => clearInterval(countdownTimer.current);
     }
-  }, [hasRevealedpiece]);
+  }, [hasRevealedPiece]);
 
-  const clearpiecesAndCountdown = () => {
+  const clearPiecesAndCountdown = () => {
     clearInterval(countdownTimer.current);
     localStorage.removeItem('piece1');
     localStorage.removeItem('piece2');
     localStorage.removeItem('piece3');
     localStorage.removeItem('countdownStartTime');
     localStorage.removeItem('countdownTime');
-    setpieces(['???', '???', '???']);
-    setHasRevealedpiece(false);
+    setPieces(['???', '???', '???']);
+    setHasRevealedPiece(false);
   };
 
-  const revealpiece = (index, pieceText) => {
+  const revealPiece = (index, pieceText) => {
     const updatedpieces = [...pieces];
-    updatedpieces[index] = pieceText;
-    setpieces(updatedpieces);
+    updatedPieces[index] = pieceText;
+    setPieces(updatedPieces);
     localStorage.setItem(`piece${index + 1}`, pieceText);
 
     const existingStartTime = localStorage.getItem('countdownStartTime');
@@ -111,7 +111,7 @@ const Secret = () => {
       const startTime = Date.now();
       localStorage.setItem('countdownStartTime', startTime.toString());
       localStorage.setItem('countdownTime', '1800');
-      setHasRevealedpiece(true);
+      setHasRevealedPiece(true);
       setCountdownTime(1800);
     }
   };
@@ -127,20 +127,20 @@ const Secret = () => {
       <h1 className="ominous-title" style={flickerStyle}>
         The Secret Awaits...
       </h1>
-      <div className={`countdown-timer ${hasRevealedpiece ? 'visible' : 'hidden'}`}>
-        {hasRevealedpiece && <p>Time Remaining: {formatTime(countdownTime)}</p>}
+      <div className={`countdown-timer ${hasRevealedPiece ? 'visible' : 'hidden'}`}>
+        {hasRevealedPiece && <p>Time Remaining: {formatTime(countdownTime)}</p>}
       </div>
       {!isRevealed ? (
         <div className={`password-box ${isShaking ? 'shake' : ''}`}>
           <p className="ominous-instructions">Enter the password to reveal the secret:</p>
           <input 
-            type="password" 
             className="password-input" 
             placeholder="Enter password..." 
             value={password} 
             onChange={handleInputChange} 
             onKeyDown={handleKeyDown} 
             ref={inputRef} 
+            maxLength={10}
           />
 
           <p className="ominous-list">
@@ -155,7 +155,16 @@ const Secret = () => {
       ) : (
         <div className="secret-message">
           <h2 className="secret-title">You Have Unlocked the Secret!</h2>
-          <p className="secret-content">The secret is... <strong>You are destined for greatness.</strong></p>
+          <p>
+          <a 
+              href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="prize-link"
+            >
+              Claim your prize
+            </a>
+          </p>
         </div>
       )}
       <div className="pieces-container">

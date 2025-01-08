@@ -86,7 +86,7 @@ const Puzzle1Page = () => {
   const revealpiece = (index, pieceText) => {
     setpiece(pieceText);
     setIspieceRevealed(true);
-    localStorage.setItem('piece1', 'The path you’ve uncovered is only one of many.'); // Puzzle 1 piece
+    localStorage.setItem('piece1', 'A hispanic food that was consumed after a hispanic event'); // Puzzle 1 piece
     
     // Only set countdown start time if it's not already running
     const existingStartTime = localStorage.getItem('countdownStartTime');

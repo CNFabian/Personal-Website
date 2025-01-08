@@ -12,7 +12,7 @@ const Puzzle3Page = () => {
 
   const checkPassword = () => {
     if (input.toLowerCase() === 'hidden') {
-      localStorage.setItem('piece3', 'Secret Code (Fill in Later');
+      localStorage.setItem('piece3', 'In a fishing trip of all men, how many fish are caught between them?');
       setIsCorrect(true);
       const existingStartTime = localStorage.getItem('countdownStartTime');
       if (!existingStartTime) {
