@@ -17,12 +17,12 @@ const Home = () => {
             {/* Text Content */}
             <div className="hero-text">
               <h1>Hello, I'm <span>Christopher N Fabian</span></h1>
-              <p>Presenting my Resume!</p>
+              <p>Presenting my Website!</p>
             </div>
           </div>
         </section>
 
-        {/* Portfolio Section */}
+        {/* Portfolio Section
         <section className="portfolio" id="portfolio">
           <h2>Featured Portfolio</h2>
           <div className="categories">
@@ -33,6 +33,7 @@ const Home = () => {
             <a href="#photography">Photography</a>
           </div>
         </section>
+        */}
       </div>
     </>
   );
