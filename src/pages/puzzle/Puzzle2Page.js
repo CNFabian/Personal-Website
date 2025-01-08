@@ -8,8 +8,8 @@ const Puzzle2Page = () => {
     ['', '', '', ''],
     ['X', '', '', 'X']
   ]);
-  const [piece, setpiece] = useState('');
-  const [ispieceRevealed, setIspieceRevealed] = useState(false);
+  const [piece, setPiece] = useState('');
+  const [isPieceRevealed, setIsPieceRevealed] = useState(false);
   const [fadedNumbers, setFadedNumbers] = useState([]); // State to track which numbers have been entered
 
   const validConfigurations = [
@@ -62,8 +62,8 @@ const Puzzle2Page = () => {
       )
     );
   
-    if (isMatch && !ispieceRevealed) {
-      revealpiece();
+    if (isMatch && !isPieceRevealed) {
+      revealPiece();
     } else {
       alert('Incorrect configuration. Please try again.');
       resetPuzzle(); // Reset the puzzle grid after checking the configuration
@@ -72,10 +72,10 @@ const Puzzle2Page = () => {
    
   };
   
-  const revealpiece = (index, pieceText) => {
-    setpiece(pieceText);
-    setIspieceRevealed(true);
-    localStorage.setItem('piece2', 'The last name of an author who\'s books are not read on a screen'); // Store the piece
+  const revealPiece = (index, pieceText) => {
+    setPiece(pieceText);
+    setIsPieceRevealed(true);
+    localStorage.setItem('piece2', 'The last name of an author who\'s books are not read on a screen'); // Store the Piece
 
     // Only set countdown start time if it's not already running
     const existingStartTime = localStorage.getItem('countdownStartTime');
@@ -93,8 +93,8 @@ const Puzzle2Page = () => {
       ['', '', '', ''],
       ['X', '', '', 'X']
     ]);
-    setpiece('');
-    setIspieceRevealed(false);
+    setPiece('');
+    setIsPieceRevealed(false);
     setFadedNumbers([]);
   };
 

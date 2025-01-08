@@ -101,7 +101,7 @@ const Secret = () => {
   };
 
   const revealPiece = (index, pieceText) => {
-    const updatedpieces = [...pieces];
+    const updatedPieces = [...pieces];
     updatedPieces[index] = pieceText;
     setPieces(updatedPieces);
     localStorage.setItem(`piece${index + 1}`, pieceText);
@@ -123,53 +123,39 @@ const Secret = () => {
   };
 
   return (
-    <div className={`secret-container ${isFlashing ? 'flash' : ''}`}>
+<div className={`secret-container ${isFlashing ? 'flash' : ''}`}>
+  {!isRevealed && (
+    <>
       <h1 className="ominous-title" style={flickerStyle}>
         The Secret Awaits...
       </h1>
-      <div className={`countdown-timer ${hasRevealedPiece ? 'visible' : 'hidden'}`}>
+      <div className="countdown-timer">
         {hasRevealedPiece && <p>Time Remaining: {formatTime(countdownTime)}</p>}
       </div>
-      {!isRevealed ? (
-        <div className={`password-box ${isShaking ? 'shake' : ''}`}>
-          <p className="ominous-instructions">Enter the password to reveal the secret:</p>
-          <input 
-            className="password-input" 
-            placeholder="Enter password..." 
-            value={password} 
-            onChange={handleInputChange} 
-            onKeyDown={handleKeyDown} 
-            ref={inputRef} 
-            maxLength={10}
-          />
-
-          <p className="ominous-list">
-            Connect all pieces with no spaces in between
-          </p>
-
-          <button className="reveal-button" onClick={handleRevealSecret}>Reveal</button>
-          <div className={`error-message ${isFlashingError ? 'flash-error' : ''}`}>
-            <p>{errorMessage}</p>
-          </div>
+      <div className={`password-box ${isShaking ? 'shake' : ''}`}>
+        <p className="ominous-instructions">Enter the password to reveal the secret:</p>
+        <input 
+          className="password-input" 
+          placeholder="Enter password..." 
+          value={password} 
+          onChange={handleInputChange} 
+          onKeyDown={handleKeyDown} 
+          ref={inputRef} 
+          maxLength={10}
+        />
+        <p className="ominous-list">Connect all pieces with no spaces in between</p>
+        <button className="reveal-button" onClick={handleRevealSecret}>
+          Reveal
+        </button>
+        <div className={`error-message ${isFlashingError ? 'flash-error' : ''}`}>
+          <p>{errorMessage}</p>
         </div>
-      ) : (
-        <div className="secret-message">
-          <h2 className="secret-title">You Have Unlocked the Secret!</h2>
-          <p>
-          <a 
-              href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="prize-link"
-            >
-              Claim your prize
-            </a>
-          </p>
-        </div>
-      )}
+      </div>
       <div className="pieces-container">
         <h2>Puzzle Pieces</h2>
-        {pieces.map((piece, index) => <p key={index}>Piece {index + 1}: {piece}</p>)}
+        {pieces.map((piece, index) => (
+          <p key={index}>Piece {index + 1}: {piece}</p>
+        ))}
         <div className="warning-message">
           <p>Warning: Pieces will be cleared automatically after 30 minutes.</p>
         </div>
@@ -177,7 +163,25 @@ const Secret = () => {
       <a className="puzzle-link" href="/puzzle1">Solve Puzzle 1</a>
       <a className="puzzle-link" href="/puzzle2">Solve Puzzle 2</a>
       <a className="puzzle-link" href="/puzzle3">Solve Puzzle 3</a>
+    </>
+  )}
+  {isRevealed && (
+    <div className="secret-message green">
+      <h2 className="secret-title">You Have Unlocked the Secret!</h2>
+      <p>
+        <a 
+          href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="prize-link"
+        >
+          Claim your prize
+        </a>
+      </p>
     </div>
+  )}
+</div>
+
   );
 };
 

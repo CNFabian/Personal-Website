@@ -63,7 +63,7 @@ const Puzzle3Page = () => {
     <button className="submit-button" onClick={checkPassword}>
       Submit
     </button>
-        {/* Display Visible piece Above the Input */}
+        {/* Display Visible Piece Above the Input */}
         {isCorrect && (
       <div className="piece">
         <h2>Piece is Revealed</h2>

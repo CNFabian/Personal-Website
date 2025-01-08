@@ -4,8 +4,8 @@ import './puzzle-shared.css';
 
 const Puzzle1Page = () => {
   const [grid, setGrid] = useState(Array(3).fill().map(() => Array(3).fill('')));
-  const [piece, setpiece] = useState('');
-  const [ispieceRevealed, setIspieceRevealed] = useState(false);
+  const [piece, setPiece] = useState('');
+  const [isPieceRevealed, setIsPieceRevealed] = useState(false);
   const [fadedNumbers, setFadedNumbers] = useState([]); // State to track which numbers have been entered
   
   const validConfigurations = [
@@ -75,17 +75,17 @@ const Puzzle1Page = () => {
       )
     );
   
-    if (isMatch && !ispieceRevealed) {
-      revealpiece(); // Show the piece
+    if (isMatch && !isPieceRevealed) {
+      revealPiece(); // Show the Piece
     } else {
       alert('Incorrect configuration. Please try again.');
       resetPuzzle(); // Only reset the grid if the configuration is incorrect
     }
   };
   
-  const revealpiece = (index, pieceText) => {
-    setpiece(pieceText);
-    setIspieceRevealed(true);
+  const revealPiece = (index, pieceText) => {
+    setPiece(pieceText);
+    setIsPieceRevealed(true);
     localStorage.setItem('piece1', 'A hispanic food that was consumed after a hispanic event'); // Puzzle 1 piece
     
     // Only set countdown start time if it's not already running
@@ -100,8 +100,8 @@ const Puzzle1Page = () => {
 
   const resetPuzzle = () => {
     setGrid(Array(3).fill().map(() => Array(3).fill('')));
-    setpiece('');
-    setIspieceRevealed(false);
+    setPiece('');
+    setIsPieceRevealed(false);
     setFadedNumbers([]);
   };
 
@@ -146,7 +146,7 @@ const Puzzle1Page = () => {
 
       <button className="submit-button" onClick={checkForValidConfiguration}>Submit</button>
 
-      {ispieceRevealed && (
+      {isPieceRevealed && (
         <div className="piece">
           <h2>Piece Revealed</h2>
           <p>{piece}</p>
