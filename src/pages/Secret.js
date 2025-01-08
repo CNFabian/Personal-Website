@@ -62,7 +62,7 @@ const Secret = () => {
       
       if (remainingTime > 0) {
         setCountdownTime(remainingTime);
-        setHasRevealedPiece(true); // Force the piece to be revealed immediately
+        setHasRevealedPiece(true);
       } else {
         clearPiecesAndCountdown();
       }
@@ -71,21 +71,19 @@ const Secret = () => {
 
   useEffect(() => {
     if (hasRevealedPiece) {
-      clearInterval(countdownTimer.current);
       countdownTimer.current = setInterval(() => {
         setCountdownTime((prevTime) => {
           if (prevTime <= 1) {
             clearPiecesAndCountdown();
             return 0;
           }
-          
           const newTime = prevTime - 1;
           localStorage.setItem('countdownTime', newTime);
           return newTime;
         });
       }, 1000);
-
-      return () => clearInterval(countdownTimer.current);
+  
+      return () => clearInterval(countdownTimer.current); // Cleanup
     }
   }, [hasRevealedPiece]);
 
@@ -98,6 +96,7 @@ const Secret = () => {
     localStorage.removeItem('countdownTime');
     setPieces(['???', '???', '???']);
     setHasRevealedPiece(false);
+    setCountdownTime(1800);
   };
 
   const revealPiece = (index, pieceText) => {
@@ -105,16 +104,31 @@ const Secret = () => {
     updatedPieces[index] = pieceText;
     setPieces(updatedPieces);
     localStorage.setItem(`piece${index + 1}`, pieceText);
-
+  
     const existingStartTime = localStorage.getItem('countdownStartTime');
     if (!existingStartTime) {
       const startTime = Date.now();
       localStorage.setItem('countdownStartTime', startTime.toString());
       localStorage.setItem('countdownTime', '1800');
-      setHasRevealedPiece(true);
       setCountdownTime(1800);
     }
+  
+    // Start the countdown timer explicitly
+    setHasRevealedPiece(true);
+    clearInterval(countdownTimer.current);
+    countdownTimer.current = setInterval(() => {
+      setCountdownTime((prevTime) => {
+        if (prevTime <= 1) {
+          clearPiecesAndCountdown();
+          return 0;
+        }
+        const newTime = prevTime - 1;
+        localStorage.setItem('countdownTime', newTime);
+        return newTime;
+      });
+    }, 1000);
   };
+  
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -129,19 +143,20 @@ const Secret = () => {
       <h1 className="ominous-title" style={flickerStyle}>
         The Secret Awaits...
       </h1>
-      <div className="countdown-timer">
+      {/* Countdown Timer or Placeholder */}
+      <div className={`countdown-timer ${hasRevealedPiece ? 'visible' : 'hidden'}`}>
         {hasRevealedPiece && <p>Time Remaining: {formatTime(countdownTime)}</p>}
       </div>
       <div className={`password-box ${isShaking ? 'shake' : ''}`}>
         <p className="ominous-instructions">Enter the password to reveal the secret:</p>
         <input 
+          type="password" 
           className="password-input" 
           placeholder="Enter password..." 
           value={password} 
           onChange={handleInputChange} 
           onKeyDown={handleKeyDown} 
           ref={inputRef} 
-          maxLength={10}
         />
         <p className="ominous-list">Connect all pieces with no spaces in between</p>
         <button className="reveal-button" onClick={handleRevealSecret}>
@@ -166,7 +181,7 @@ const Secret = () => {
     </>
   )}
   {isRevealed && (
-    <div className="secret-message green">
+    <div className="secret-message">
       <h2 className="secret-title">You Have Unlocked the Secret!</h2>
       <p>
         <a 
@@ -181,7 +196,6 @@ const Secret = () => {
     </div>
   )}
 </div>
-
   );
 };
 
