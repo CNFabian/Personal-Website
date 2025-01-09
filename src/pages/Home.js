@@ -45,6 +45,7 @@ const Home = () => {
               <span>Christopher N Fabian</span>
             </div>
           </div>
+          <p>I challenge you to discover my secret!</p>
         </section>
       </div>
     </>

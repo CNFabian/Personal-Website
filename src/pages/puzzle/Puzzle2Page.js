@@ -151,7 +151,7 @@ const Puzzle2Page = () => {
 
       <button className="submit-button" onClick={checkForValidConfiguration}>Submit</button>
 
-      {ispieceRevealed && (
+      {isPieceRevealed && (
         <div className="piece">
           <h2>Piece Revealed</h2>
           <p>{piece}</p>
