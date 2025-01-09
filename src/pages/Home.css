@@ -1,4 +1,3 @@
-/* General Reset */
 @font-face {
   font-family: 'inter-bold';
   src: url('../assets/Inter_28pt-SemiBold.ttf') format('truetype');
@@ -18,7 +17,7 @@
 
 /* Hero Section */
 .home-page .hero {
-  min-height: 75vh;
+  min-height: 82vh;
   background-size: cover;
   background-position: center;
   display: flex;
@@ -79,18 +78,60 @@
   font-size: 2.5em;
   font-weight: bold;
   margin-bottom: 10px;
+  display: inline-block;
 }
 
 .home-page .hero-text span {
   color: #EC950C; /* Highlighted color for emphasis */
+  display: inline-block;
+  border-right: 2px solid #EC950C; /* Blinking cursor effect */
+  animation: typing 3.7s steps(22) 1s infinite alternate, blink 0.7s step-end infinite; 
+  overflow: hidden; /* Hide overflowing text */
+  white-space: nowrap; /* Prevent text wrapping */
+  width: 0; /* Start with no visible width */
 }
 
-.home-page .hero-text p {
-  font-size: 1.2em;
-  color: #aaa;
+/* Typing Animation */
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
 }
 
-/* Portfolio Section */
+/* Blinking Cursor Animation */
+@keyframes blink {
+  from, to {
+    border-color: transparent;
+  }
+  50% {
+    border-color: #EC950C;
+  }
+}
+
+/* Responsive Hero Section */
+@media (max-width: 768px) {
+  .home-page .hero-content {
+    flex-direction: column; /* Stack the photo and text vertically */
+  }
+
+  .home-page .profile-photo {
+    width: 200px; /* Smaller size for smaller screens */
+    height: 200px;
+  }
+
+  .home-page .hero-text h1 {
+    font-size: 2em; /* Reduce text size */
+  }
+
+  .home-page .hero-text p {
+    font-size: 1em;
+  }
+}
+
+{/* Portfolio Section 
 .home-page .portfolio {
   background-color: #222;
   padding: 50px 20px;
@@ -132,23 +173,5 @@
   width: 100%;
   border-radius: 5px;
 }
+*/}
 
-/* Responsive Hero Section */
-@media (max-width: 768px) {
-  .home-page .hero-content {
-    flex-direction: column; /* Stack the photo and text vertically */
-  }
-
-  .home-page .profile-photo {
-    width: 200px; /* Smaller size for smaller screens */
-    height: 200px;
-  }
-
-  .home-page .hero-text h1 {
-    font-size: 2em; /* Reduce text size */
-  }
-
-  .home-page .hero-text p {
-    font-size: 1em;
-  }
-}

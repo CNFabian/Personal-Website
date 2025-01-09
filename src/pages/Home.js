@@ -1,12 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './Home.css'; // Import CSS file for styles
 import profilePhoto from '../assets/profile.jpg'; // Replace with the actual path to your profile photo
 
 const Home = () => {
+  const [typedName, setTypedName] = useState('');
+  const fullName = "Christopher N Fabian";
+  const typingSpeed = 100; // Typing speed in ms
+
+  useEffect(() => {
+    let currentIndex = 0;
+  
+    const typingInterval = setInterval(() => {
+      if (currentIndex < fullName.length) {
+        setTypedName((prev) => prev + fullName[currentIndex]);
+        currentIndex++;
+      } else {
+        clearInterval(typingInterval);
+  
+        // Reset after a delay
+        setTimeout(() => {
+          setTypedName('');
+          currentIndex = 0;
+        }, 2000); // Delay before restarting
+      }
+    }, typingSpeed);
+  
+    return () => clearInterval(typingInterval);
+  }, [fullName, typingSpeed]);
+
   return (
     <>
       {/* Hero Section */}
-      <div className='home-page'>
+      <div className="home-page">
         <section className="hero" id="home">
           <div className="hero-content">
             {/* Profile Photo */}
@@ -21,19 +46,6 @@ const Home = () => {
             </div>
           </div>
         </section>
-
-        {/* Portfolio Section
-        <section className="portfolio" id="portfolio">
-          <h2>Featured Portfolio</h2>
-          <div className="categories">
-            <a href="#all">All</a>
-            <a href="#packaging">Packaging</a>
-            <a href="#mockup">Mockup</a>
-            <a href="#typography">Typography</a>
-            <a href="#photography">Photography</a>
-          </div>
-        </section>
-        */}
       </div>
     </>
   );

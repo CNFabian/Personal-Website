@@ -3,7 +3,7 @@
   background-color: #121212;
   color: #f5f5f5;
   text-align: center;
-  padding: 2rem 0;
+  padding: 1rem 0;
   width: 100%;
 }
 
@@ -38,6 +38,7 @@
 
 .footer-social-links i {
   font-size: 2rem; /* Size of the icons */
+  padding-bottom: 10px;
 }
 
 @media (max-width: 600px) {
@@ -46,6 +47,6 @@
   }
 
   .footer-social-links li {
-    margin-bottom: 10px;
+    padding-bottom: 20px;
   }
 }

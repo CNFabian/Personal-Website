@@ -21,10 +21,12 @@
 
 .about-page .hero img.picture {
   width: 100%;
-  height: 400px;
-  object-fit: cover;
+  height: 400px; /* Sets a fixed height for larger screens */
+  object-fit: contain; /* Ensures the image covers the area without stretching */
+  object-position: center top;
   margin-top: 0;
   margin-bottom: 0;
+  max-width: 1500px;
 }
 
 .about-page .hero h1 {
@@ -44,7 +46,7 @@
 }
 
 .about-page .personal-life {
-  padding: 3rem 1rem;
+  padding: 1rem 1rem;
   text-align: center;
 }
 
