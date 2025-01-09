@@ -21,7 +21,7 @@ const Home = () => {
         setTimeout(() => {
           setTypedName('');
           currentIndex = 0;
-        }, 2000); // Delay before restarting
+        }, 5000); // Delay before restarting
       }
     }, typingSpeed);
   
@@ -41,8 +41,8 @@ const Home = () => {
 
             {/* Text Content */}
             <div className="hero-text">
-              <h1>Hello, I'm <span>Christopher N Fabian</span></h1>
-              <p>Presenting my Website!</p>
+              <h1>Hello, I'm</h1>
+              <span>Christopher N Fabian</span>
             </div>
           </div>
         </section>

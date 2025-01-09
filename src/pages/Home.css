@@ -69,39 +69,48 @@
   transform: scale(1.2); /* Slightly enlarges the photo on hover */
 }
 
-/* Hero Text */
 .home-page .hero-text {
-  max-width: 800px; /* Restrict text width */
+  position: relative;
+  right: 180px;
 }
 
 .home-page .hero-text h1 {
   font-size: 2.5em;
   font-weight: bold;
-  margin-bottom: 10px;
   display: inline-block;
+  white-space: nowrap;
+  margin: 0;
+  
 }
 
 .home-page .hero-text span {
-  color: #EC950C; /* Highlighted color for emphasis */
+  position: absolute;
+  left: calc(100% + 10px);
+  color: #EC950C;
   display: inline-block;
-  border-right: 2px solid #EC950C; /* Blinking cursor effect */
-  animation: typing 3.7s steps(22) 1s infinite alternate, blink 0.7s step-end infinite; 
-  overflow: hidden; /* Hide overflowing text */
-  white-space: nowrap; /* Prevent text wrapping */
-  width: 0; /* Start with no visible width */
+  border-right: 2px solid #EC950C;
+  animation: typing 7s steps(15, end) 1s infinite, blink 0.7s step-end infinite;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 2.5em;
+  width: 0;
 }
 
-/* Typing Animation */
 @keyframes typing {
-  from {
+  0% {
     width: 0;
   }
-  to {
-    width: 100%;
+  30% {
+    width: 15ch; /* Fully typed */
+  }
+  85% {
+    width: 15ch; /* Pause briefly while fully typed */
+  }
+  100% {
+    width: 0; /* Backspace to erase */
   }
 }
 
-/* Blinking Cursor Animation */
 @keyframes blink {
   from, to {
     border-color: transparent;
@@ -110,6 +119,7 @@
     border-color: #EC950C;
   }
 }
+
 
 /* Responsive Hero Section */
 @media (max-width: 768px) {
@@ -123,6 +133,9 @@
   }
 
   .home-page .hero-text h1 {
+    font-size: 2em; /* Reduce text size */
+  }
+  .home-page .hero-text span {
     font-size: 2em; /* Reduce text size */
   }
 
