@@ -54,20 +54,22 @@ const Secret = () => {
 
   useEffect(() => {
     const storedStartTime = localStorage.getItem('countdownStartTime');
-    const storedCountdownTime = parseInt(localStorage.getItem('countdownTime'), 10);
-
-    if (storedStartTime && storedCountdownTime) {
-      const timeElapsed = Math.floor((Date.now() - parseInt(storedStartTime, 10)) / 1000);
-      const remainingTime = storedCountdownTime - timeElapsed;
-      
+    const totalCountdownDuration = 1800; // Total countdown time in seconds
+  
+    if (storedStartTime) {
+      const elapsedTime = Math.floor((Date.now() - parseInt(storedStartTime, 10)) / 1000);
+      const remainingTime = Math.max(totalCountdownDuration - elapsedTime, 0);
+  
       if (remainingTime > 0) {
         setCountdownTime(remainingTime);
         setHasRevealedPiece(true);
       } else {
-        clearPiecesAndCountdown();
+        clearPiecesAndCountdown(); // Timer has expired
       }
     }
   }, []);
+  
+  
 
   useEffect(() => {
     if (hasRevealedPiece) {
@@ -105,6 +107,7 @@ const Secret = () => {
     setPieces(updatedPieces);
     localStorage.setItem(`piece${index + 1}`, pieceText);
   
+    // Set or update the countdown start time
     const existingStartTime = localStorage.getItem('countdownStartTime');
     if (!existingStartTime) {
       const startTime = Date.now();
@@ -113,21 +116,23 @@ const Secret = () => {
       setCountdownTime(1800);
     }
   
-    // Start the countdown timer explicitly
     setHasRevealedPiece(true);
+  
+    // Clear and restart the countdown timer
     clearInterval(countdownTimer.current);
     countdownTimer.current = setInterval(() => {
       setCountdownTime((prevTime) => {
-        if (prevTime <= 1) {
+        const newTime = prevTime - 1;
+        if (newTime <= 0) {
           clearPiecesAndCountdown();
           return 0;
         }
-        const newTime = prevTime - 1;
         localStorage.setItem('countdownTime', newTime);
         return newTime;
       });
     }, 1000);
   };
+  
   
 
   const formatTime = (seconds) => {
