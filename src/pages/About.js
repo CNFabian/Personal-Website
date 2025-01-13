@@ -14,8 +14,8 @@ const About = () => {
         <section className="hero">
           <img src={beachPhoto} alt="Profile picture of Christopher" className="picture" />
           <h1>About Me</h1>
-          <p>Hey there! I'm Christopher Fabian, someone whho appreciates creativity, learning, 
-            and personal growth. I love connecting with people, exploring new ideas, and fiinding
+          <p>Hey there! I'm Christopher Fabian, someone wHo appreciates creativity, learning, 
+            and personal growth. I love connecting with people, exploring new ideas, and fInding
              joy in the little things that make life exciting.</p>
         </section>
 
@@ -32,8 +32,8 @@ const About = () => {
         <section className="fun-facts">
           <h2>Fun Facts</h2>
           <ul>
-            <li>I love ddiscovering new music and curating playlists for different moods. My current favorite artist is Kendrick Lamar.</li>
-            <li>Problem-solving isn't just for codding — 
+            <li>I love Discovering new music and curating playlists for different moods. My current favorite artist is Kendrick Lamar.</li>
+            <li>Problem-solving isn't just for coDing — 
               I enjoy puzzles and logic games in my free time. I know how to solve a rubiks cube in under 1 minute. And can say I put up a good competition in Monopoly</li>
               <li>I’m always on the lookout for interesting documentaries or thought-provoking conspiracy theories. Am a firm believer in aliens and an open to the idea of the paranormal.</li>
             <li>I enjoy the peacefulness nature and when I am not in front of a computer I can be found indulging in one of Stephen King's many pieces of literature.</li>
@@ -49,11 +49,11 @@ const About = () => {
             </div>
             <div className="gallery-item">
               <img src={familyPhoto} alt="A memorable moment with family" className="hover-image" />
-              <span className="tooltip">A memorable momeent with family, fishing at lake Tahoe, we sadly did not catch any</span>
+              <span className="tooltip">A memorable momEnt with family, fishing at lake Tahoe, we sadly did not catch any</span>
             </div>
             <div className="gallery-item">
               <img src={drawingPhoto} alt="One of my favorite places to relax" className="hover-image" />
-              <span className="tooltip">Showcasing my art which I use as an outlet for my creativity and to relax my brainn</span>
+              <span className="tooltip">Showcasing my art which I use as an outlet for my creativity and to relax my braiN</span>
             </div>
             <div className="gallery-item">
               <img src={chowPhoto} alt="A memorable moment with family" className="hover-image" />
@@ -61,7 +61,7 @@ const About = () => {
             </div>
             <div className="gallery-item">
               <img src={momPhoto} alt="One of my favorite places to relax" className="hover-image" />
-              <span className="tooltip">My Hispanic Graduation Ceremony featuring my Mom and Significant Other, we had tacos after!</span>
+              <span className="tooltip">My hispanic graduation ceremony featuring my Mom and significant other, we had tacos after!</span>
             </div>
           </div> 
         </section>
