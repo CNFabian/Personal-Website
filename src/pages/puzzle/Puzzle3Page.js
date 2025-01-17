@@ -21,7 +21,8 @@ const Puzzle3Page = () => {
         localStorage.setItem('countdownTime', '1800'); // Store countdown duration (600 seconds = 10 min)
       }
     } else {
-      alert('Incorrect code. Try again.');
+      alert('Incorrect code. Try again.')
+      setInput('');
     }
   };
 
