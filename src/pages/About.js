@@ -1,11 +1,11 @@
 import React from 'react';
 import './About.css';
-import beachPhoto from '../assets/beach.png';
-import scenicPhoto from '../assets/scenic_view.png';
-import familyPhoto from '../assets/family.png';
-import drawingPhoto from '../assets/drawing.png';
-import chowPhoto from '../assets/chow.png'
-import momPhoto from '../assets/mom.png'
+import beachPhoto from '../assets/images/beach.png';
+import scenicPhoto from '../assets/images/scenic_view.png';
+import familyPhoto from '../assets/images/family.png';
+import drawingPhoto from '../assets/images/drawing.png';
+import chowPhoto from '../assets/images/chow.png'
+import momPhoto from '../assets/images/mom.png'
 
 const About = () => {
   return (

@@ -2,7 +2,7 @@
 /* Make sure to scope the entire page to this unique class */
 @font-face {
   font-family: 'palatino';
-  src: url('../assets/palr45w.ttf') format('truetype');
+  src: url('../assets/fonts/palr45w.ttf') format('truetype');
 }
 
 .about-page {
