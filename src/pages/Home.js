@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import { Canvas, useFrame, useThree} from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import Room from "../models/Room";
 import * as THREE from "three";
+
+// Helper to convert degrees to radians
+const toRadians = (degrees) => degrees * (Math.PI / 180);
 
 const Scene = ({ setCameraInfo }) => {
   const { camera } = useThree();
@@ -15,41 +18,34 @@ const Scene = ({ setCameraInfo }) => {
         z: camera.position.z.toFixed(2),
       },
       rotation: {
-        x: camera.rotation.x.toFixed(2),
-        y: camera.rotation.y.toFixed(2),
-        z: camera.rotation.z.toFixed(2),
+        x: THREE.MathUtils.radToDeg(camera.rotation.x).toFixed(2),
+        y: THREE.MathUtils.radToDeg(camera.rotation.y).toFixed(2),
+        z: THREE.MathUtils.radToDeg(camera.rotation.z).toFixed(2),
       },
     });
   });
 
   const handleWheel = (event) => {
-    const zoomSpeed = 1; // Adjust zoom speed
+    const zoomSpeed = 1;
 
-    // Move the camera along its forward direction
     const direction = new THREE.Vector3();
     camera.getWorldDirection(direction);
-    direction.multiplyScalar(event.deltaY * -0.01 * zoomSpeed); // Scale movement by wheel delta
+    direction.multiplyScalar(event.deltaY * -0.01 * zoomSpeed);
     const newPosition = camera.position.clone().add(direction);
 
-    // Ensure the camera stays within a valid range
-    if (newPosition.length() > 0.01 && newPosition.length() < 5000) {
+    if (newPosition.length() > 0.1 && newPosition.length() < 5000) {
       camera.position.copy(newPosition);
     }
   };
 
   return (
-    <group onWheel={handleWheel}>
-      {/* Lights */}
+    <group onWheel={handleWheel} tabIndex={0}>
       <hemisphereLight intensity={0.8} groundColor="white" skyColor="lightblue" />
       <pointLight position={camera.position} intensity={1} />
       <ambientLight intensity={1.5} />
       <directionalLight position={[15, 25, 15]} intensity={2} />
-
-      {/* 3D Model */}
       <Room position={[0, 0, 0]} />
-
-      {/* Controls */}
-      <OrbitControls enableZoom={false} />
+      <OrbitControls makeDefault target={[0, 70, 0]} />
     </group>
   );
 };
@@ -61,12 +57,16 @@ const Home = () => {
   });
 
   return (
-    <div style={{ height: "100vh", width: "100%", backgroundColor: "#d0d1d1" }}>
+    <div
+      style={{ height: "100vh", width: "100%", backgroundColor: "#d0d1d1" }}
+      tabIndex={0}
+    >
       <Canvas
         camera={{
-          position: [188, 300, 162],
+          position: [325, 140, 5], // Default position
+          rotation: [0, 0, 0], // Default rotation
           fov: 50,
-          near: 0.01,
+          near: 0.1,
           far: 5000,
         }}
       >
@@ -90,7 +90,7 @@ const Home = () => {
         <p><strong>Camera Position:</strong></p>
         <p>{`x: ${cameraInfo.position.x}, y: ${cameraInfo.position.y}, z: ${cameraInfo.position.z}`}</p>
         <p><strong>Camera Rotation:</strong></p>
-        <p>{`x: ${cameraInfo.rotation.x}, y: ${cameraInfo.rotation.y}, z: ${cameraInfo.rotation.z}`}</p>
+        <p>{`x: ${cameraInfo.rotation.x}°, y: ${cameraInfo.rotation.y}°, z: ${cameraInfo.rotation.z}°`}</p>
       </div>
     </div>
   );
