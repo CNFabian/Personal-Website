@@ -1,96 +1,72 @@
-import React, { useState } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import React, { useState, useEffect } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
 import Room from "../models/Room";
-import * as THREE from "three";
+import './Home.css';
 
-// Helper to convert degrees to radians
-const toRadians = (degrees) => degrees * (Math.PI / 180);
+const Home = () => {
+  const [camera, setCamera] = useState(null); // Store the Blender camera
 
-const Scene = ({ setCameraInfo }) => {
-  const { camera } = useThree();
+  const UpdateCamera = () => {
+    const { set } = useThree();
 
-  useFrame(() => {
-    setCameraInfo({
-      position: {
-        x: camera.position.x.toFixed(2),
-        y: camera.position.y.toFixed(2),
-        z: camera.position.z.toFixed(2),
-      },
-      rotation: {
-        x: THREE.MathUtils.radToDeg(camera.rotation.x).toFixed(2),
-        y: THREE.MathUtils.radToDeg(camera.rotation.y).toFixed(2),
-        z: THREE.MathUtils.radToDeg(camera.rotation.z).toFixed(2),
-      },
-    });
-  });
+    useEffect(() => {
+      if (camera) {
+        // Set the imported camera as the default for the Canvas
+        set({ camera });
 
-  const handleWheel = (event) => {
-    const zoomSpeed = 1;
+        // Update camera aspect ratio on resize
+        const handleResize = () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+        };
 
-    const direction = new THREE.Vector3();
-    camera.getWorldDirection(direction);
-    direction.multiplyScalar(event.deltaY * -0.01 * zoomSpeed);
-    const newPosition = camera.position.clone().add(direction);
+        window.addEventListener("resize", handleResize);
 
-    if (newPosition.length() > 0.1 && newPosition.length() < 5000) {
-      camera.position.copy(newPosition);
-    }
+        // Cleanup the event listener
+        return () => {
+          window.removeEventListener("resize", handleResize);
+        };
+      }
+    }, [camera, set]);
+
+    return null;
   };
 
   return (
-    <group onWheel={handleWheel} tabIndex={0}>
-      <hemisphereLight intensity={0.8} groundColor="white" skyColor="lightblue" />
-      <pointLight position={camera.position} intensity={1} />
-      <ambientLight intensity={1.5} />
-      <directionalLight position={[15, 25, 15]} intensity={2} />
-      <Room position={[0, 0, 0]} />
-      <OrbitControls makeDefault target={[0, 70, 0]} />
-    </group>
-  );
-};
-
-const Home = () => {
-  const [cameraInfo, setCameraInfo] = useState({
-    position: { x: 0, y: 0, z: 0 },
-    rotation: { x: 0, y: 0, z: 0 },
-  });
-
-  return (
     <div
-      style={{ height: "100vh", width: "100%", backgroundColor: "#d0d1d1" }}
+      style={{ height: "100vh", width: "100%", backgroundColor: "#c1c2c2" }}
       tabIndex={0}
     >
-      <Canvas
-        camera={{
-          position: [325, 140, 5], // Default position
-          rotation: [0, 0, 0], // Default rotation
-          fov: 50,
-          near: 0.1,
-          far: 5000,
-        }}
-      >
-        <Scene setCameraInfo={setCameraInfo} />
+      <Canvas>
+        {/* Dynamically update the camera */}
+        {camera && <UpdateCamera />}
+
+        {/* Render Room and pass handleSetCamera */}
+        <Room setCamera={setCamera} />
+
+        {/* Lights */}
+        <ambientLight intensity={1.5} />
+        <directionalLight position={[15, 25, 15]} intensity={2} />
       </Canvas>
 
-      {/* Fixed Camera Logger */}
+      {/* Centered Top Overlay */}
       <div
         style={{
           position: "fixed",
-          top: "10px",
-          left: "10px",
-          background: "rgba(0, 0, 0, 0.5)",
+          top: "20px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          background: "rgba(0, 0, 0, 0.6)",
           color: "white",
-          padding: "10px",
+          padding: "10px 20px",
           borderRadius: "5px",
-          fontSize: "14px",
+          fontSize: "20px",
+          fontWeight: "bold",
           zIndex: 1000,
+          textAlign: "center",
         }}
       >
-        <p><strong>Camera Position:</strong></p>
-        <p>{`x: ${cameraInfo.position.x}, y: ${cameraInfo.position.y}, z: ${cameraInfo.position.z}`}</p>
-        <p><strong>Camera Rotation:</strong></p>
-        <p>{`x: ${cameraInfo.rotation.x}°, y: ${cameraInfo.rotation.y}°, z: ${cameraInfo.rotation.z}°`}</p>
+        Hello and Welcome to my Website
       </div>
     </div>
   );

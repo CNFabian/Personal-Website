@@ -1,12 +1,6 @@
 @font-face {
   font-family: 'inter-bold';
-  src: url('../assets/Inter_28pt-SemiBold.ttf') format('truetype');
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  src: url('../assets/fonts/Inter_28pt-SemiBold.ttf') format('truetype');
 }
 
 .home-page {
