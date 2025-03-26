@@ -29,7 +29,7 @@ const App = () => {
     <>
       <Navbar />
       <Routes>
-        <Route path="/" element={<Home />} />
+        {/*<Route path="/" element={<Home />} />*/}
         <Route path="/about" element={<About />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/contact" element={<Contact />} />
@@ -39,7 +39,7 @@ const App = () => {
         <Route path="/puzzle2" element={<Puzzle2Page />} />
         <Route path="/puzzle3" element={<Puzzle3Page />} />
 
-        <Route path="/newHome" element={<NewHome />} />
+        <Route path="/" element={<NewHome />} />
       </Routes>
       <Footer /> 
     </>

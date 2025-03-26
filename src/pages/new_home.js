@@ -16,9 +16,14 @@ const newHome = () => {
           <div className="projects-section">
             <h2 className="section-title">RECENT PROJECTS</h2>
             <ul className="project-list">
-              <li className="project-item">CASA REDESIGN</li>
-              <li className="project-item">AI CHATBOT</li>
-              <li className="project-item">MOBILE LEARNING APP</li>
+              <li className="project-item">
+                <a href="/projects" className="project-link">CASA REDESIGN</a>
+              </li>
+              <li className="project-item">
+                <a href='/secret' className="project-link">Secret Page</a>
+                </li>
+              <li className="project-item">
+              <a href='/projects' className="project-link">MOBILE LEARNING APP</a></li>
             </ul>
           </div>
           

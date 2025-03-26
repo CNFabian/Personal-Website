@@ -122,15 +122,16 @@ body {
 }
 
 .profile-photo-container {
-  width: 520px;
-  height: 520px;
+  width: 540px;
+  height: 540px;
   border-radius: 50%;
-  overflow: visible; /* Keep this as hidden */
+  overflow: visible;
   background: linear-gradient(to bottom, #8a5d50 55%, black 100%);
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
+  margin-bottom: 200px;
 }
 
 .profile-photo {
@@ -167,24 +168,28 @@ body {
   transform: scale(0.4);
   bottom: 290px;
   right: 20px;
+  z-index: 1;
 }
 
 .icon-circle2 {
   transform: scale(0.4);
   bottom: 190px;
   right: 120px;
+  z-index: 1;
 }
 
 .icon-circle3 {
   transform: scale(0.4);
   bottom: 140px;
   right: 250px;
+  z-index: 1;
 }
 
 .icon-circle4 {
   transform: scale(0.4);
   bottom: 145px;
   right: 390px;
+  z-index: 1;
 }
 
 /* Fix for hover (currently targeting wrong class) */
@@ -302,6 +307,15 @@ body {
   fill: #1572b6;
 }
 
+@media (max-width: 1480px) {
+  .profile-photo-container {
+    width: 450px;
+    height: 450px;
+    margin-bottom: 200px;
+  }
+}
+
+
 /* Responsive adjustments */
 @media (max-width: 992px) {
 
@@ -373,11 +387,6 @@ body {
   }
 }
 
-@media (max-width: 1280px) {
-  .profile-photo-container {
-    width: 
-  }
-}
 
 @media (max-width: 576px) {
 

@@ -175,3 +175,54 @@
     left: 21px;
   }
 }
+
+.video-timeline-item {
+  margin-top: -40px; /* Adjust to align with the website redesign item */
+}
+
+.video-content {
+  padding: 20px;
+}
+
+.video-container {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin: 15px 0;
+}
+
+.video-container iframe {
+  display: block;
+  border: none;
+}
+
+.video-caption {
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.project-link {
+  color: inherit;
+  text-decoration: none;
+  display: block;
+}
+
+/* Ensure video timeline item fits correctly in the layout */
+@media (max-width: 768px) {
+  .video-timeline-item {
+    margin-top: 0; /* Reset the negative margin on smaller screens */
+  }
+  
+  .video-container iframe {
+    height: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .video-container iframe {
+    height: 180px;
+  }
+}
