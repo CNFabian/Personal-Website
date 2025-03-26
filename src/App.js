@@ -5,6 +5,8 @@ import About from './pages/About';
 import Resume from './pages/Resume';
 import Secret from './pages/Secret';
 import Contact from './pages/Contact';
+import NewHome from './pages/new_home';
+import Projects from './pages/Projects';
 
 import './App.css';
 
@@ -29,12 +31,15 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
+        <Route path="/projects" element={<Projects />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/secret" element={<Secret />} />
         <Route path="/resume" element={<Resume />} />
         <Route path="/puzzle1" element={<Puzzle1Page />} />
         <Route path="/puzzle2" element={<Puzzle2Page />} />
         <Route path="/puzzle3" element={<Puzzle3Page />} />
+
+        <Route path="/newHome" element={<NewHome />} />
       </Routes>
       <Footer /> 
     </>

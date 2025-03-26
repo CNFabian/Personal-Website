@@ -1,0 +1,199 @@
+/* Font Definition */
+@font-face {
+  font-family: 'inter-bold';
+  src: url('../assets/Inter_28pt-SemiBold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'pixel times';
+  src: url('../assets/Pixel\ Times.ttf') format('truetype');
+}
+
+/* Navigation Styles */
+/* Default Navbar */
+.navigation {
+  background-color: #2e2e2e;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+  height: 60px; 
+  position: relative;
+}
+
+/* Page-Specific Colors */
+.about-nav {
+  background-color: #D2A679 !important; 
+}
+
+.resume-nav {
+  background-color: #323639 !important;
+}
+
+.contact-nav {
+  background-color: linear-gradient(135deg, #232526, #414345) !important; 
+}
+
+.secret-nav {
+  background-color: #181414 !important; 
+}
+
+.home-nav {
+  background-color: #2e2e2e !important; 
+}
+
+
+.navbar-header {
+  display: none; 
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+/* Hamburger Button */
+.hamburger {
+  display: none;
+  font-size: 2rem;
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+.hamburger.open {
+  color: #ce5b13; 
+}
+
+/* Nav Links */
+.nav-links {
+  display: flex; 
+  justify-content: center; 
+  list-style: none; 
+  width: 100%;
+  padding: 0; 
+}
+
+.nav-link {
+  display: inline-block;
+  color: #fff;
+  margin: 0 15px;
+  text-decoration: none;
+  font-size: 1.5rem; 
+  position: relative; 
+  transition: transform 0.3s ease, color 0.3s ease; 
+  font-family: 'inter-bold';
+}
+
+.nav-link:hover {
+  color: #ec950c;
+  transform: scale(1.1); /* Scale up the hovered nav link */
+}
+
+.nav-link.active-link {
+  border-bottom: 2px solid #0C62EC;
+}
+
+.about-page .nav-link.active-link {
+  border-bottom: 2px solid #ff0000;
+}
+
+.resume-page .nav-link.active-link {
+  border-bottom: 2px solid #ff0000;
+}
+
+.portfolio-page .nav-link.active-link {
+  border-bottom: 2px solid #ff0000;
+}
+
+.secret-page .nav-link.active-link {
+  border-bottom: 2px solid #ff0000;
+}
+
+/* Tooltip Styles for Large Screens */
+.nav-link::after {
+  content: attr(data-tooltip); 
+  position: absolute;
+  top: 120%; 
+  left: 50%; 
+  transform: translateX(-50%); 
+  background-color: #ec950c;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  opacity: 0; 
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.nav-link:hover::after {
+  opacity: 1; 
+  transform: translateX(-50%) translateY(5px); 
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .navbar-header {
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    width: 100%;
+  }
+
+  .hamburger {
+    display: block; 
+    position: absolute; 
+    top: 15px; 
+    z-index: 1100; 
+  }
+
+  .nav-links {
+    display: none; 
+    flex-direction: column; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100vh; 
+    background-color: rgba(0, 0, 0, 0.95); 
+    justify-content: center; 
+    align-items: center; 
+    transition: all 0.3s ease-in-out;
+  }
+
+  .nav-links.show {
+    display: flex; 
+  }
+
+  .nav-link {
+    padding: 20px 0;
+    font-size: 1.5rem; 
+  }
+
+  /* Tooltip Styles for Small Screens */
+  .nav-link::after {
+    top: 50%; 
+    left: 100%; 
+    transform: translateX(10px) translateY(-50%);
+    background-color: #ce5b13;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    opacity: 0; 
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .nav-link:hover::after {
+    opacity: 1; 
+    transform: translateX(15px) translateY(-50%);
+  }
+
+  .nav-link:hover {
+    color: #ec950c;
+    transform: translateX(-20px); 
+  }
+}
