@@ -60,7 +60,9 @@ const About = () => {
       <section className="hero-about">
         <div className="hero-content-about">
           <h1>About Me</h1>
-          <p>Hey there! I'm Christopher Fabian, someone who appreciates creativity, learning, 
+          <p>Hey there! I'm Christopher Fabian, someone w
+            <span className="underlined-span">h</span>
+            o appreciates creativity, learning, 
             and personal growth. I love connecting with people, exploring new ideas, and finding 
             joy in the little things that make life exciting.</p>
         </div>
@@ -72,10 +74,14 @@ const About = () => {
         <img src={familyPhoto} alt="Family fishing trip" className="edge-image bottom-right" />
         <div className="content">
           <h2>Who I Am</h2>
-          <p>I’m a person who values insightful logic, conscious decision-making, and honest feedback. 
+          <p>I’m a person who values insightful log
+          <span className="underlined-span">i</span>
+            c, conscious decision-making, and honest feedback. 
             My journey has been shaped by my experiences as a first-generation college graduate, 
             and I believe those experiences have taught me to be more conscious of how I navigate the world.</p>
-          <p>When I’m not working on projects or coding, I enjoy spending time with family, 
+          <p>When I’m not working on projects or co
+          <span className="underlined-span">d</span>
+            ing, I enjoy spending time with family, 
             reading books, drawing, or watching a good TV series. I enjoy and find relief in simple moments and 
             believe every experience has something to teach us.</p>
         </div>
@@ -88,10 +94,16 @@ const About = () => {
         <div className="content">
           <h2>Fun Facts</h2>
           <ul>
-            <li>I love discovering new music and curating playlists for different moods. My current favorite artist is Kendrick Lamar.</li>
+            <li>I love discovering new music and curating playlists for 
+            <span className="underlined-span">d</span>
+              ifferent moods. My current favorite artist is Kendrick Lamar.</li>
             <li>Problem-solving isn't just for coding — I enjoy puzzles and logic games in my free time. I know how to solve a Rubik's cube in under one minute and can put up a good competition in Monopoly.</li>
-            <li>I’m always on the lookout for interesting documentaries or thought-provoking conspiracy theories. I am a firm believer in aliens and am open to the idea of the paranormal.</li>
-            <li>I enjoy the peacefulness of nature, and when I am not in front of a computer, I can be found indulging in one of Stephen King's many pieces of literature.</li>
+            <li>I’m always on the lookout for interesting documentaries or thought-provoking conspiracy theories. I am a firm b
+            <span className="underlined-span">e</span>
+              liever in aliens and am open to the idea of the paranormal.</li>
+            <li>I enjoy the peacefulness of nature, and when I am not in front of a computer, I can be found indulging in o
+            <span className="underlined-span">n</span>
+              e of Stephen King's many pieces of literature.</li>
           </ul>
         </div>
       </section>

@@ -41,7 +41,7 @@ const Puzzle3Page = () => {
 
       <br />
 
-      Hint: I tend to press SHIFT when I shouldn't. Take a closer look and learn {' '}
+      Hint: I tend to underline letters when I shouldn't. Take a closer look and learn {' '}
             <Link to="/about" style={{ color: '#ff5555', textDecoration: 'underline' }}>
               About Me
             </Link>.

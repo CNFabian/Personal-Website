@@ -139,6 +139,22 @@ body, html {
   transition: transform 0.3s ease-in-out;
 }
 
+.underlined-span {
+  display: inline-block;
+  position: relative;
+  margin: 0 2px;
+}
+
+.underlined-span::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: #ffbb00; /* Change to match your theme */
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   .edge-image {
