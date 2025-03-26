@@ -79,6 +79,7 @@ const Secret = () => {
             clearPiecesAndCountdown();
             return 0;
           }
+          
           const newTime = prevTime - 1;
           localStorage.setItem('countdownTime', newTime);
           return newTime;
@@ -115,7 +116,7 @@ const Secret = () => {
       localStorage.setItem('countdownTime', '1800');
       setCountdownTime(1800);
     }
-  
+   
     setHasRevealedPiece(true);
   
     // Clear and restart the countdown timer
