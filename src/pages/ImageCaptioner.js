@@ -4,7 +4,7 @@ import './ImageCaptioner.css';
 
 const ImageCaptioner = () => {
   // Replace with your actual API Gateway URL from AWS Lambda
-  const API_ENDPOINT = 'https://4wt9202b30.execute-api.us-west-1.amazonaws.com/prod';
+  const API_ENDPOINT = 'https://4wt9202b30.execute-api.us-west-1.amazonaws.com/prod/caption';
   
   const [selectedFile, setSelectedFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
