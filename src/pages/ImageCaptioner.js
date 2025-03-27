@@ -4,7 +4,7 @@ import './ImageCaptioner.css';
 
 const ImageCaptioner = () => {
   // Replace with your actual API Gateway URL from AWS Lambda
-  const API_ENDPOINT = 'https://cr38k72lgk.execute-api.us-west-1.amazonaws.com/Production';
+  const API_ENDPOINT = 'https://4wt9202b30.execute-api.us-west-1.amazonaws.com/prod';
   
   const [selectedFile, setSelectedFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -93,24 +93,57 @@ const ImageCaptioner = () => {
       // Get base64 data from preview
       const imageData = imagePreview.split(',')[1];
       
+      // Log truncated version of the data to debug
+      console.log("Sending image data to API...");
+      console.log("API Endpoint:", API_ENDPOINT);
+      
+      // Create the request body
+      const requestBody = JSON.stringify({
+        image: imageData
+      });
+      
+      console.log("Request payload size:", Math.round(requestBody.length / 1024), "KB");
+      
       // Send to API
       const response = await fetch(API_ENDPOINT, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          image: imageData
-        })
+        body: requestBody
       });
       
+      console.log("Response status:", response.status);
+      console.log("Response status text:", response.statusText);
+      
       if (!response.ok) {
+        const errorText = await response.text().catch(e => "Could not read error response");
+        console.error("Error response:", errorText);
         throw new Error(`Error: ${response.status} ${response.statusText}`);
       }
       
-      const data = await response.json();
-      setCaption(data.caption);
+      const responseText = await response.text();
+      console.log("Raw response:", responseText.substring(0, 100) + (responseText.length > 100 ? '...' : ''));
+      
+      // Try to parse the response
+      let data;
+      try {
+        data = JSON.parse(responseText);
+        console.log("Parsed response data:", data);
+      } catch (parseError) {
+        console.error("Error parsing JSON response:", parseError);
+        throw new Error(`Error parsing response: ${parseError.message}`);
+      }
+      
+      if (data && data.caption) {
+        console.log("Caption found:", data.caption);
+        setCaption(data.caption);
+      } else {
+        console.error("No caption in response:", data);
+        throw new Error('No caption found in the response');
+      }
     } catch (error) {
+      console.error("Full error:", error);
       setError(`Error: ${error.message}`);
     } finally {
       setLoading(false);
