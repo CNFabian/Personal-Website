@@ -16,6 +16,8 @@ import Puzzle1Page from './pages/puzzle/Puzzle1Page';
 import Puzzle2Page from './pages/puzzle/Puzzle2Page';
 import Puzzle3Page from './pages/puzzle/Puzzle3Page';
 
+import ImageCaptioner from './pages/ImageCaptioner';
+
 const App = () => {
   const location = useLocation();
 
@@ -40,6 +42,7 @@ const App = () => {
         <Route path="/puzzle3" element={<Puzzle3Page />} />
 
         <Route path="/" element={<NewHome />} />
+        <Route path="/image_captioner" element={<ImageCaptioner />} />
       </Routes>
       <Footer /> 
     </>
