@@ -168,9 +168,12 @@ const Secret = () => {
         <button className="reveal-button" onClick={handleRevealSecret}>
           Reveal
         </button>
-        <div className={`error-message ${isFlashingError ? 'flash-error' : ''}`}>
-          <p>{errorMessage}</p>
-        </div>
+        {/* Replace your existing error message div with this */}
+{errorMessage && (
+  <div className={`error-message ${isFlashingError ? 'flash-error' : ''}`}>
+    <p>{errorMessage}</p>
+  </div>
+)}
       </div>
       <div className="pieces-container">
         <h2>Puzzle Pieces</h2>
