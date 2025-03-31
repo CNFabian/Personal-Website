@@ -11,6 +11,177 @@ body {
   color: #8a7a70;
 }
 
+/* Animation keyframes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px); /* Add scale to initial state */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(0.5); /* Keep scale in final state */
+  }
+}
+
+/* Apply initial state for animation elements */
+.left-section,
+.right-section,
+.profile-photo,
+.tech-icons,
+.icon-circle1,
+.icon-circle2,
+.icon-circle3,
+.icon-circle4 {
+  opacity: 0;
+}
+
+/* Animation triggers */
+.left-section.animate-in {
+  animation: fadeInLeft 0.8s ease-out forwards;
+}
+
+.right-section.animate-in {
+  animation: fadeInRight 0.8s ease-out forwards;
+}
+
+.profile-photo.animate-in {
+  animation: scaleIn 1s ease-out 0.3s forwards;
+}
+
+.tech-icons.animate-in {
+  animation: fadeInRight 0.8s ease-out 0.6s forwards;
+}
+
+/* Staggered animation for titles */
+.title-first {
+  opacity: 0;
+  animation: fadeInLeft 0.6s ease-out 0.1s forwards;
+}
+
+.title-second {
+  opacity: 0;
+  animation: fadeInLeft 0.6s ease-out 0.3s forwards;
+}
+
+.title-third {
+  opacity: 0;
+  animation: fadeInLeft 0.6s ease-out 0.5s forwards;
+}
+
+/* Project section animation */
+.projects-section.animate-in {
+  opacity: 0;
+  animation: fadeInUp 0.8s ease-out 0.8s forwards;
+}
+
+.icon-circle1.animate-in {
+  animation: slideInDown 0.6s ease-out 0.9s forwards;
+}
+
+.icon-circle2.animate-in {
+  animation: slideInDown 0.6s ease-out 1.1s forwards;
+}
+
+.icon-circle3.animate-in {
+  animation: slideInDown 0.6s ease-out 1.3s forwards;
+}
+
+.icon-circle4.animate-in {
+  animation: slideInDown 0.6s ease-out 1.5s forwards;
+}
+
+/* Individual tech icons animation */
+.tech-icons.animate-in .tech-icon:nth-child(1) {
+  opacity: 0;
+  animation: fadeInRight 0.4s ease-out 0.6s forwards;
+}
+
+.tech-icons.animate-in .tech-icon:nth-child(2) {
+  opacity: 0;
+  animation: fadeInRight 0.4s ease-out 0.7s forwards;
+}
+
+.tech-icons.animate-in .tech-icon:nth-child(3) {
+  opacity: 0;
+  animation: fadeInRight 0.4s ease-out 0.8s forwards;
+}
+
+.tech-icons.animate-in .tech-icon:nth-child(4) {
+  opacity: 0;
+  animation: fadeInRight 0.4s ease-out 0.9s forwards;
+}
+
+.tech-icons.animate-in .tech-icon:nth-child(5) {
+  opacity: 0;
+  animation: fadeInRight 0.4s ease-out 1s forwards;
+}
+
+.tech-icons.animate-in .tech-icon:nth-child(6) {
+  opacity: 0;
+  animation: fadeInRight 0.4s ease-out 1.1s forwards;
+}
+
+/* Project item animation */
+.projects-section.animate-in .project-item:nth-child(1) {
+  opacity: 0;
+  animation: fadeInLeft 0.5s ease-out 1s forwards;
+}
+
+.projects-section.animate-in .project-item:nth-child(2) {
+  opacity: 0;
+  animation: fadeInLeft 0.5s ease-out 1.2s forwards;
+}
+
+.projects-section.animate-in .project-item:nth-child(3) {
+  opacity: 0;
+  animation: fadeInLeft 0.5s ease-out 1.4s forwards;
+}
+
+/* Original CSS below */
 .home-container {
   top: 100px;
   max-width: 1400px;
@@ -135,11 +306,11 @@ body {
 }
 
 .profile-photo {
-  width: 100%; /* Change to 100% */
-  height: auto; /* Change to auto to maintain aspect ratio */
-  object-fit: contain; /* Change from cover to contain */
-  max-height: 100%; /* Add this to ensure some padding inside the circle */
-  max-width: 95%; /* Add this to ensure some padding inside the circle */
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  max-height: 100%;
+  max-width: 95%;
   margin-bottom: 80px;
 }
 
@@ -152,49 +323,40 @@ body {
 }
 
 .icon-circle1, .icon-circle2, .icon-circle3, .icon-circle4 {
-  position: absolute; /* Change from fixed to absolute */
-  width: 100px;
-  height: 100px;
+  position: absolute;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  display: flex;
+  display: flex; /* Added display:flex - this was missing */
   justify-content: center;
   align-items: center;
   transition: transform 0.3s ease;
   cursor: pointer;
 }
 
-/* Update positioning relative to profile-photo-container */
+/* Set scale for each individual icon - make sure ALL of them use scale(0.2) */
 .icon-circle1 {
-  transform: scale(0.4);
   bottom: 290px;
   right: 20px;
   z-index: 1;
 }
 
 .icon-circle2 {
-  transform: scale(0.4);
   bottom: 190px;
   right: 120px;
   z-index: 1;
 }
 
 .icon-circle3 {
-  transform: scale(0.4);
   bottom: 140px;
   right: 250px;
   z-index: 1;
 }
 
 .icon-circle4 {
-  transform: scale(0.4);
   bottom: 145px;
   right: 390px;
   z-index: 1;
-}
-
-/* Fix for hover (currently targeting wrong class) */
-.icon-circle1:hover, .icon-circle2:hover, .icon-circle3:hover, .icon-circle4:hover {
-  transform: scale(0.45);
 }
 
 .icon {
@@ -318,6 +480,18 @@ body {
 
 /* Responsive adjustments */
 @media (max-width: 992px) {
+  /* Adjust animations for smaller screens */
+  .left-section.animate-in,
+  .right-section.animate-in {
+    animation-duration: 0.6s;
+  }
+
+  .icon-circle1.animate-in,
+  .icon-circle2.animate-in,
+  .icon-circle3.animate-in,
+  .icon-circle4.animate-in {
+    animation-duration: 0.4s;
+  }
 
   .icon-description {
     width: 120px;
@@ -339,28 +513,34 @@ body {
   }
 
   .icon-circle1, .icon-circle2, .icon-circle3, .icon-circle4{
-    width: 60px;
-    height: 60px;
+    width: 40px;     /* Further reduced from 50px */
+    height: 40px;    /* Further reduced from 50px */
   }
 
+  /* Reposition icon circles to spread them out more */
   .icon-circle1 {
-    top: 200px;
-    right: 70px;
+    top: 150px;
+    right: -80px;
+    transform: scale(0.2);
   }
   
   .icon-circle2 {
-    top: 270px;
-    right: 120px;
+    top: 250px;
+    right: -40px;
+    transform: scale(0.2);
   }
   
   .icon-circle3 {
-    top: 270px;
-    left: 120px;
+    top: 250px;
+    left: -40px;
+    transform: scale(0.2);
   }
   
   .icon-circle4 {
-    top: 200px;
-    left: 80px;  }
+    top: 150px;
+    left: -80px;
+    transform: scale(0.2);
+  }
   
   .left-section {
     text-align: center;
@@ -389,6 +569,34 @@ body {
 
 
 @media (max-width: 576px) {
+  /* Further adjust animations for mobile */
+  @keyframes fadeInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes fadeInRight {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .title-first, 
+  .title-second, 
+  .title-third {
+    animation-duration: 0.4s;
+  }
 
   .icon-description {
     width: 100px;
@@ -406,18 +614,43 @@ body {
     height: 250px;
   }
   
-  .icon-circle1, .icon-circle2, .icon-circle3, .icon-circle4{
+  .icon-circle1, .icon-circle2, .icon-circle3, .icon-circle4 {
     width: 60px;
     height: 60px;
+  }
+  
+  /* Reposition icon circles to spread them out more */
+  .icon-circle1 {
+    top: 150px;
+    right: -45px;
+    transform: scale(0.2);
+  }
+  
+  .icon-circle2 {
+    top: 240px;
+    right: 25px;
+    transform: scale(0.2);
+  }
+  
+  .icon-circle3 {
+    top: 240px;
+    left: 25px;
+    transform: scale(0.2);
+  }
+  
+  .icon-circle4 {
+    top: 150px;
+    left: -45px;
+    transform: scale(0.2);
   }
   
   .icon {
     width: 30px;
     height: 30px;
   }
+  
   .tech-icons {
     width: 20px;
     height: 20px;
   }
-
 }
