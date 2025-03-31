@@ -130,15 +130,6 @@ body, html {
   left: 20px;
 }
 
-.stickman {
-  position: absolute;
-  top: 50px; /* Initial position */
-  left: 5vw;
-  width: 80px;
-  height: auto;
-  transition: transform 0.3s ease-in-out;
-}
-
 .underlined-span {
   display: inline-block;
   position: relative;
@@ -153,6 +144,133 @@ body, html {
   bottom: -2px;
   left: 0;
   background-color: #ffbb00; /* Change to match your theme */
+}
+
+/* Inside Tooltip Styles */
+
+/* Base tooltip styling */
+.image-tooltip {
+  background: linear-gradient(135deg, rgba(139, 94, 60, 0.95), rgba(163, 111, 77, 0.95)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+  
+  /* Better typography */
+  font-family: 'Palatino', serif !important;
+  font-size: 0.95rem !important;
+  letter-spacing: 0.5px !important;
+  
+  /* Rounded corners */
+  border-radius: 8px !important;
+  padding: 10px 16px !important;
+  
+  /* Fixed position instead of absolute */
+  position: absolute;
+  color: white;
+  pointerEvents: none;
+  zIndex: 1000;
+  whiteSpace: normal;
+  maxWidth: 220px;
+}
+
+/* Animation for inside tooltips */
+@keyframes tooltipInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes tooltipInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Direction-specific tooltip animations */
+.image-tooltip.left {
+  animation: tooltipInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+  transform-origin: left center;
+}
+
+.image-tooltip.right {
+  animation: tooltipInLeft 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+  transform-origin: right center;
+}
+
+/* Arrow styling for inside tooltips */
+.tooltip-arrow {
+  position: absolute;
+  width: 12px !important;
+  height: 12px !important;
+  background: rgba(139, 94, 60, 0.95) !important;
+  transform: rotate(45deg) !important;
+}
+
+/* Arrow positions */
+.tooltip-arrow.left {
+  left: -6px !important;
+  top: 50% !important;
+  margin-top: -6px !important;
+}
+
+.tooltip-arrow.right {
+  right: -6px !important;
+  top: 50% !important;
+  margin-top: -6px !important;
+}
+
+/* Enhanced tooltip content */
+.tooltip-content {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.tooltip-icon {
+  font-size: 18px !important;
+}
+
+.tooltip-text {
+  display: inline-block !important;
+}
+
+/* Image hover effect */
+.edge-image {
+  transition: transform 0.4s ease-out, box-shadow 0.4s ease-out !important;
+}
+
+.edge-image:hover {
+  transform: scale(1.05) !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
+  z-index: 5 !important;
+}
+
+/* Pulse effect for active image */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 187, 0, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 187, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 187, 0, 0);
+  }
+}
+
+.edge-image.pulse {
+  animation: pulse 2s infinite;
 }
 
 /* Responsive Adjustments */

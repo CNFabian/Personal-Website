@@ -13,7 +13,7 @@ const Secret = () => {
   const [countdownTime, setCountdownTime] = useState(1800); 
   const [flickerStyle, setFlickerStyle] = useState({ color: '#ff0000', textShadow: '0px 0px 30px #ff0000' });
   const inputRef = useRef(null);
-  const correctPasswords = ['tacosking0', 'TacosKing0', 'tacosKing0', 'Tacosking0']; 
+  const correctPasswords = ['chowking0', 'ChowKing0', 'chowKing0', 'Chowking0']; 
   let countdownTimer = useRef(null);
 
  
