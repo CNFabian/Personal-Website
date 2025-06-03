@@ -188,7 +188,7 @@ body {
   margin: 0 auto;
   padding: 20px;
   min-height: 83vh;
-  position: relative;
+  position: flex;
 }
 
 .content-wrapper {
