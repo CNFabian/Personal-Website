@@ -32,6 +32,7 @@ const App = () => {
       <Navbar />
       <Routes>
         {/*<Route path="/" element={<Home />} />*/}
+        <Route path="/" element={<NewHome />} />
         <Route path="/about" element={<About />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/contact" element={<Contact />} />
@@ -40,8 +41,6 @@ const App = () => {
         <Route path="/puzzle1" element={<Puzzle1Page />} />
         <Route path="/puzzle2" element={<Puzzle2Page />} />
         <Route path="/puzzle3" element={<Puzzle3Page />} />
-
-        <Route path="/" element={<NewHome />} />
         <Route path="/image_captioner" element={<ImageCaptioner />} />
       </Routes>
       <Footer /> 
