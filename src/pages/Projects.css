@@ -112,6 +112,7 @@
 .timeline-location {
   font-size: 0.9rem;
   color: #6c757d;
+  margin-top: 1.5rem;
   margin-bottom: 1.5rem;
   display: flex;
   align-items: center;

@@ -160,6 +160,9 @@ const Projects = () => {
               <div className="timeline-date">March 2025</div>
               <h3 className="timeline-role">🍳 Pantry Pal - Smart Kitchen Management Platform</h3>
               <h4 className="timeline-company">Full-Stack Web Application</h4>
+           
+              <a href="https://foodpantry-pal.netlify.app/" className="link">Pantry Pal Prototype</a>
+          
               <div className="timeline-location">
                 <MapPin size={16} />
                 Personal Project
