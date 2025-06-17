@@ -189,6 +189,11 @@ body {
   padding: 20px;
   min-height: 83vh;
   position: flex;
+  /* Add these properties to fix the positioning */
+  padding-top: 80px; /* Account for navbar height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .content-wrapper {
@@ -197,6 +202,8 @@ body {
   align-items: center;
   flex-wrap: wrap;
   gap: 20px;
+  width: 100%;
+  max-width: 1200px; /* Add max-width for better control */
 }
 
 /* Left section styles */
@@ -302,7 +309,8 @@ body {
   justify-content: center;
   align-items: center;
   position: relative;
-  margin-bottom: 200px;
+  margin-bottom: 100px; /* Reduce this value */
+  margin-top: 40px; /* Add some top margin */
 }
 
 .profile-photo {
@@ -481,6 +489,24 @@ body {
 /* Responsive adjustments */
 @media (max-width: 992px) {
   /* Adjust animations for smaller screens */
+    .home-container {
+    padding-top: 60px; /* Reduce for mobile */
+    min-height: 90vh; /* Adjust height for mobile */
+  }
+  
+  .content-wrapper {
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 40px; /* Increase gap between sections */
+  }
+  
+  .profile-photo-container {
+    width: 300px;
+    height: 300px;
+    margin-bottom: 120px; /* Adjust for mobile */
+    margin-top: 20px;
+  }
+
   .left-section.animate-in,
   .right-section.animate-in {
     animation-duration: 0.6s;
@@ -570,6 +596,18 @@ body {
 
 @media (max-width: 576px) {
   /* Further adjust animations for mobile */
+
+  .home-container {
+    padding-top: 40px; /* Further reduce for small mobile */
+  }
+  
+  .profile-photo-container {
+    width: 250px;
+    height: 250px;
+    margin-bottom: 100px;
+    margin-top: 10px;
+  }
+  
   @keyframes fadeInLeft {
     from {
       opacity: 0;

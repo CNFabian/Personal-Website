@@ -155,34 +155,33 @@ const Projects = () => {
       <h2 className="section-heading">Professional Experience</h2>
       
       <div className="timeline">
-      <div className="timeline-item timeline-item-left">
-        <div className="timeline-content">
-              <div className="timeline-date">January 2025 - March 2025</div>
-              <h3 className="timeline-role">Website Redesign & Development Contractor</h3>
-              <h4 className="timeline-company">Mitchell First Circuit CASA</h4>
-              <div className="timeline-location">
-                <MapPin size={16} />
-                Remote
-              </div>
-              
-              <div className="skill-tags">
-                <span className="skill-tag">HTML</span>
-                <span className="skill-tag">CSS</span>
-                <span className="skill-tag">JavaScript</span>
-                <span className="skill-tag">Figma</span>
-                <span className="skill-tag">Adobe After Effects</span>
-              </div>
-              
-              <ul className="timeline-achievements">
-                <li>Redesigned and developed a responsive website using HTML, CSS, and JavaScript, improving accessibility and user experience.</li>
-                <li>Used Figma to design the site's layout and visual elements, ensuring a user-friendly experience.</li>
-                <li>Enhanced navigation and added interactive elements to effectively engage volunteers and donors.</li>
-                <li>Created a video in Adobe After Effects to showcase the redesign process.</li>
-              </ul>
+        <div className="timeline-item timeline-item-left">
+          <div className="timeline-content">
+            <div className="timeline-date">January 2025 - March 2025</div>
+            <h3 className="timeline-role">Website Redesign & Development Contractor</h3>
+            <h4 className="timeline-company">Mitchell First Circuit CASA</h4>
+            <div className="timeline-location">
+              <MapPin size={16} />
+              Remote
             </div>
-   
-      
+            
+            <div className="skill-tags">
+              <span className="skill-tag">HTML</span>
+              <span className="skill-tag">CSS</span>
+              <span className="skill-tag">JavaScript</span>
+              <span className="skill-tag">Figma</span>
+              <span className="skill-tag">Adobe After Effects</span>
+            </div>
+            
+            <ul className="timeline-achievements">
+              <li>Redesigned and developed a responsive website using HTML, CSS, and JavaScript, improving accessibility and user experience.</li>
+              <li>Used Figma to design the site's layout and visual elements, ensuring a user-friendly experience.</li>
+              <li>Enhanced navigation and added interactive elements to effectively engage volunteers and donors.</li>
+              <li>Created a video in Adobe After Effects to showcase the redesign process.</li>
+            </ul>
+          </div>
         </div>
+        
         <div className="timeline-item timeline-item-left video-timeline-item">
           <div className="timeline-content video-content">
             <h3 className="timeline-role">Project Showcase Video</h3>
@@ -202,6 +201,47 @@ const Projects = () => {
         </div>
 
         <div className="timeline-item timeline-item-right">
+          <div className="timeline-content">
+            <div className="timeline-date">March 2025</div>
+            <h3 className="timeline-role">🍳 Pantry Pal - Smart Kitchen Management Platform</h3>
+            <h4 className="timeline-company">Full-Stack Web Application</h4>
+            <div className="timeline-location">
+              <MapPin size={16} />
+              Personal Project
+            </div>
+            
+            <div className="skill-tags">
+              <span className="skill-tag">React 19</span>
+              <span className="skill-tag">Firebase</span>
+              <span className="skill-tag">Google Gemini AI</span>
+              <span className="skill-tag">Tailwind CSS</span>
+              <span className="skill-tag">Vite</span>
+              <span className="skill-tag">PWA</span>
+              <span className="skill-tag">JavaScript ES6+</span>
+            </div>
+            
+            <p className="project-description">
+              Developed an intelligent cooking companion that revolutionizes kitchen inventory management and recipe discovery. The platform combines modern web technologies with <span className="skill-highlight">AI-powered recipe generation</span> to reduce food waste and spark culinary creativity.
+            </p>
+            
+            <ul className="timeline-achievements">
+              <li>Built using <span className="skill-highlight">React 19 and Vite</span> for optimal performance, with <span className="skill-highlight">Firebase</span> handling real-time data synchronization and user authentication.</li>
+              <li>Integrated <span className="skill-highlight">Google's Gemini 2.0 Flash API</span> to drive intelligent recipe generation based on available ingredients, dietary restrictions, and cuisine preferences.</li>
+              <li>Developed a robust <span className="skill-highlight">Firestore database architecture</span> featuring user-specific data isolation, batch operations, and automated cleanup routines.</li>
+              <li>Implemented <span className="skill-highlight">PWA functionality</span> with offline capabilities through service workers and intelligent unit conversion system.</li>
+              <li>Created features including smart inventory management, expiration monitoring, interactive cooking mode, and real-time recipe validation.</li>
+              <li>Designed responsive interface with mobile-first approach, achieving consistent experience across desktop, tablet, and mobile platforms.</li>
+            </ul>
+            
+            <div style={{ marginTop: '15px', padding: '10px', backgroundColor: 'rgba(138, 122, 112, 0.1)', borderRadius: '6px' }}>
+              <p style={{ margin: 0, fontStyle: 'italic', fontSize: '0.9rem' }}>
+                <strong>Future Development:</strong> Planning to develop an iOS app version with enhanced features and more robust functionality building upon this prototype foundation.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="timeline-item timeline-item-left">
           <div className="timeline-content">
             <div className="timeline-date">March 2025</div>
             <h3 className="timeline-role">AI Image Captioning</h3>
@@ -286,35 +326,31 @@ const Projects = () => {
             </ul>
           </div>
         </div>
-
-      
         
-        <div className="timeline-item timeline-item-left">
-
-        <div className="timeline-content">
-                <div className="timeline-date">May 2024 - July 2024</div>
-                <h3 className="timeline-role">Solutions Developer</h3>
-                <h4 className="timeline-company">Leading Edge Construction</h4>
-                <div className="timeline-location">
-                  <MapPin size={16} />
-                  Los Banos, CA
-                </div>
-                
-                <div className="skill-tags">
-                  <span className="skill-tag">AI Solutions</span>
-                  <span className="skill-tag">Presentations</span>
-                  <span className="skill-tag">Workflow Integration</span>
-                </div>
-                
-                <ul className="timeline-achievements">
-                  <li>Conducted presentations to the office team on <span className="skill-highlight">AI applications</span> in the workplace; currently discussing <span className="skill-highlight">AI integration</span> into their workflow.</li>
-                </ul>
-              </div>
-        
+        <div className="timeline-item timeline-item-right">
+          <div className="timeline-content">
+            <div className="timeline-date">May 2024 - July 2024</div>
+            <h3 className="timeline-role">Solutions Developer</h3>
+            <h4 className="timeline-company">Leading Edge Construction</h4>
+            <div className="timeline-location">
+              <MapPin size={16} />
+              Los Banos, CA
+            </div>
+            
+            <div className="skill-tags">
+              <span className="skill-tag">AI Solutions</span>
+              <span className="skill-tag">Presentations</span>
+              <span className="skill-tag">Workflow Integration</span>
+            </div>
+            
+            <ul className="timeline-achievements">
+              <li>Conducted presentations to the office team on <span className="skill-highlight">AI applications</span> in the workplace; currently discussing <span className="skill-highlight">AI integration</span> into their workflow.</li>
+            </ul>
+          </div>
         </div>
 
-        <div className="timeline-item timeline-item-right">
-        <div className="timeline-content">
+        <div className="timeline-item timeline-item-left">
+          <div className="timeline-content">
             <div className="timeline-date">November 2023 - April 2024</div>
             <h3 className="timeline-role">Application Developer</h3>
             <h4 className="timeline-company">Equity Justice and Inclusive Excellence Department at UC Merced</h4>
@@ -336,9 +372,8 @@ const Projects = () => {
           </div>
         </div>
         
-        <div className="timeline-item timeline-item-left">
-
-        <div className="timeline-content">
+        <div className="timeline-item timeline-item-right">
+          <div className="timeline-content">
             <div className="timeline-date">August 2023 - December 2023</div>
             <h3 className="timeline-role">Web App Developer</h3>
             <h4 className="timeline-company">Sunburst Agri Biotech Solutions LLC</h4>
@@ -360,14 +395,7 @@ const Projects = () => {
               <li>Integrated image processing and machine learning techniques into a <span className="skill-highlight">cross-platform application</span> for Sunburst Agri Biotech Solutions LLC, delivering a <span className="skill-highlight">user-friendly web and desktop solution</span> for real-time pathogen identification.</li>
             </ul>
           </div>
-
-       
-       
-
-       
         </div>
-
-
       </div>
     </div>
   );
