@@ -27,7 +27,7 @@ body, html {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 60vh;
+  height: 80vh;
   color: #fff;
   text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
 }
@@ -39,7 +39,6 @@ body, html {
   position: absolute;
   top: 50%;
 }
-
 .hero-about h1 {
   font-size: 3rem;
 }

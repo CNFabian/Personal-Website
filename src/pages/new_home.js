@@ -30,13 +30,13 @@ const newHome = () => {
             <h2 className="section-title">RECENT PROJECTS</h2>
             <ul className="project-list">
               <li className="project-item">
-                <a href="/projects" className="project-link">CASA REDESIGN</a>
+                <a href='/projects' className="project-link">Pantry Pall Full Stack Web App</a>
+              </li>
+              <li className="project-item">
+                <a href="/projects" className="project-link">CASA Website Redesign</a>
               </li>
               <li className="project-item">
                 <a href='/secret' className="project-link">Secret Page</a>
-              </li>
-              <li className="project-item">
-                <a href='/projects' className="project-link">MOBILE LEARNING APP</a>
               </li>
             </ul>
           </div>
