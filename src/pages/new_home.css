@@ -436,7 +436,7 @@ body {
 .tech-icons {
   position: absolute;
   right: 20px;
-  top: 20px;
+  top: 100px;
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -607,7 +607,7 @@ body {
     margin-bottom: 100px;
     margin-top: 10px;
   }
-  
+
   @keyframes fadeInLeft {
     from {
       opacity: 0;
