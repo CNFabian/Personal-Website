@@ -112,6 +112,70 @@ const newHome = () => {
           </svg>
         </div>
       </div>
+
+      {/* Character Select Section */}
+      <div className={`character-select-section ${isLoaded ? 'animate-in' : ''}`}>
+        <div className="character-select-header">
+          <h2 className="character-select-title">Select Your Developer</h2>
+          <p className="character-select-subtitle">Choose your programming companion</p>
+        </div>
+        
+        <div className="character-container">
+          <div className="character-card">
+            <img 
+              src={require('../assets/profile-photo.png')} 
+              alt="Christopher Fabian" 
+              className="character-image"
+            />
+            <h3 className="character-name">Christopher</h3>
+            <p className="character-class">Full-Stack Developer</p>
+            
+            <div className="character-stats">
+              <div className="stat-item">
+                <div className="stat-label">Creativity</div>
+                <div className="stat-value">95/100</div>
+              </div>
+              <div className="stat-item">
+                <div className="stat-label">Problem Solving</div>
+                <div className="stat-value">92/100</div>
+              </div>
+              <div className="stat-item">
+                <div className="stat-label">Code Quality</div>
+                <div className="stat-value">88/100</div>
+              </div>
+              <div className="stat-item">
+                <div className="stat-label">Team Work</div>
+                <div className="stat-value">94/100</div>
+              </div>
+            </div>
+            
+            <div className="character-skills">
+              <div className="skills-title">Special Abilities</div>
+              <div className="skills-list">
+                <span className="skill-badge">React Mastery</span>
+                <span className="skill-badge">Python Expert</span>
+                <span className="skill-badge">AI Integration</span>
+                <span className="skill-badge">UX Design</span>
+                <span className="skill-badge">Debug Master</span>
+              </div>
+            </div>
+            
+            <button className="select-button" onClick={() => window.location.href = '/contact'}>
+              Recruit Developer
+            </button>
+          </div>
+        </div>
+        
+        <div className="character-extras">
+          <div className="achievement-badge">
+            🏆 Code Ninja Achievement Unlocked
+          </div>
+          <div className="level-indicator">
+            ⭐ Level 25 Developer
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 };
