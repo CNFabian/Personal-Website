@@ -184,9 +184,9 @@ body {
 /* Original CSS below */
 .home-container {
   bottom: 100px;
-  max-width: 1400px;
+  width: 100vw; /* Change from max-width: 1400px to full viewport width */
   margin: 0 auto;
-  padding: 20px;
+  padding: 20px 40px; /* Increase horizontal padding */
   min-height: 83vh;
   position: flex;
   /* Add these properties to fix the positioning */
@@ -203,7 +203,8 @@ body {
   flex-wrap: wrap;
   gap: 20px;
   width: 100%;
-  max-width: 1200px; /* Add max-width for better control */
+  max-width: none; /* Remove max-width restriction */
+  padding: 0 60px; /* Add more horizontal padding */
 }
 
 /* Left section styles */
@@ -728,33 +729,32 @@ body {
   /* Final adjustments for ultra-wide screens */
   .icon-circle1 {
     bottom: 12rem;
-    right: -2rem;
+    right: 6rem;
   }
 
   .icon-circle2 {
     bottom: 7rem;
-    right: 3rem;
+    right: 10rem;
   }
 
   .icon-circle3 {
     bottom: 3.5rem;
-    right: 10rem;
+    right: 15rem;
   }
 
   .icon-circle4 {
     bottom: 2rem;
-    right: 17rem;
+    right: 21rem;
   }
 }
 
 /* Character Select Section - Updated with new color palette */
 .character-select-section {
-  width: 100%;
-  max-width: 1400px;
+  width: 100vw; /* Change from max-width: 1400px to full viewport width */
   margin: 100px auto 0;
-  padding: 60px 20px;
+  padding: 60px 80px; /* Increase horizontal padding */
   background: linear-gradient(135deg, #1f0322 0%, #8A5D50 100%);
-  border-radius: 20px;
+  border-radius: 0; /* Remove border-radius for full-width effect */
   box-shadow: 0 20px 40px rgba(31, 3, 34, 0.4);
   position: relative;
   overflow: hidden;
