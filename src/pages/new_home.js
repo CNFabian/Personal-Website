@@ -233,6 +233,10 @@ useEffect(() => {
         <button className="recruit-button" onClick={() => window.location.href = '/contact'}>
           Recruit Developer
         </button>
+
+        <button className="resume-button" onClick={() => window.location.href = '/resume'}>
+          Download Resume
+        </button>
       </div>
     </>
   );
