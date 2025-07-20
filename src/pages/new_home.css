@@ -984,7 +984,7 @@ body {
   box-shadow: 0 5px 15px rgba(255, 163, 15, 0.4);
   position: absolute;
   bottom: 2rem;
-  left: 80%;
+  left: 85%;
   transform: translateX(-50%);
   z-index: 4;
 }
