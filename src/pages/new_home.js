@@ -14,12 +14,12 @@ const newHome = () => {
     name: "Christopher",
     class: "Frontend Developer",
     image: require('../assets/casualman.png'),
-    stats: {
-      creativity: "+S",
-      problemSolving: "A",
-      codeQuality: "-A",
-      teamWork: " A"
-    },
+    stats: [
+      { label: "Creativity", value: "+S" },
+      { label: "Problem Solving", value: "A" },
+      { label: "Code Quality", value: "-A" },
+      { label: "Team Work", value: " A" }
+    ],
     skills: ["React Mastery", "UI/UX Design", "Animation", "Figma Expert", "API Integration"]
   },
   {
@@ -27,26 +27,26 @@ const newHome = () => {
     name: "Chris",
     class: "The Hobbyist",
     image: require('../assets/seriousman.png'),
-    stats: {
-      drawing: "A",
-      reading: "-A",
-      cooking: "B",
-      anime: "-A"
-    },
-    skills: ["TV Watching", "DIY Crafting", "Trying New Things", "Resourceful", "Good Vibes"]
+    stats: [
+      { label: "Drawing", value: "A" },
+      { label: "Reading", value: "-A" },
+      { label: "Cooking", value: "B" },
+      { label: "Anime", value: "-A" }
+    ],
+    skills: ["Card Collecting", "DIY Crafting", "Trying New Things", "Resourceful", "Good Vibes"]
   },
   {
     id: 2,
     name: "C. Fabian",
     class: "All Business",
     image: require('../assets/businessman.png'),
-    stats: {
-      leadership: "+B",
-      communication: "-A",
-      networking: "B",
-      decisionMaking: "S"
-    },
-    skills: ["Crypto Investing", "Negotiation", "Personal Development", "Graphic Design", "Prototyping"]
+    stats: [
+      { label: "Leadership", value: "+B" },
+      { label: "Communication", value: "-A" },
+      { label: "Networking", value: "B" },
+      { label: "Decision Making", value: "S" }
+    ],
+    skills: ["Crypto Investing", "Negotiation", "Personal Development", "Strategic Planning", "Risk Management"]
   }
 ];
 
@@ -170,32 +170,19 @@ useEffect(() => {
       <div className={`character-select-section ${isLoaded ? 'animate-in' : ''}`}>
         <div className="character-select-header">
           <h2 className="character-select-title">Select Your Developer</h2>
-          <p className="character-select-subtitle">Choose your programming companion</p>
         </div>
         
         <div className="character-display-area">
           <div className="character-info-left">
             <div className="character-stats-side">
-              <div className="stats-title">Stats</div>
-              <div className="stat-item-side">
-                <div className="stat-label-side">Creativity</div>
-                <div className="stat-value-side">{characterVariations[selectedCharacter].stats.creativity}</div>
-              </div>
-              <div className="stat-item-side">
-                <div className="stat-label-side">Problem Solving</div>
-                <div className="stat-value-side">{characterVariations[selectedCharacter].stats.problemSolving}</div>
-              </div>
-              <div className="stat-item-side">
-                <div className="stat-label-side">Code Quality</div>
-                <div className="stat-value-side">{characterVariations[selectedCharacter].stats.codeQuality}</div>
-              </div>
-              <div className="stat-item-side">
-                <div className="stat-label-side">Team Work</div>
-                <div className="stat-value-side">{characterVariations[selectedCharacter].stats.teamWork}
-
-                </div>
-              </div>
-            </div>
+  <div className="stats-title">Stats</div>
+  {characterVariations[selectedCharacter].stats.map((stat, index) => (
+    <div key={index} className="stat-item-side">
+      <div className="stat-label-side">{stat.label}</div>
+      <div className="stat-value-side">{stat.value}</div>
+    </div>
+  ))}
+</div>
           </div>
 
           <div className="character-center">
