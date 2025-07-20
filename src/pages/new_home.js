@@ -193,42 +193,6 @@ useEffect(() => {
               alt={characterVariations[selectedCharacter].name}
               className={`character-main-image ${isCharacterRevealed ? 'revealed' : ''}`}
             />
-            <h3 className="character-name">Christopher</h3>
-            <p className="character-class">Full-Stack Developer</p>
-            
-            <div className="character-stats">
-              <div className="stat-item">
-                <div className="stat-label">Creativity</div>
-                <div className="stat-value">95/100</div>
-              </div>
-              <div className="stat-item">
-                <div className="stat-label">Problem Solving</div>
-                <div className="stat-value">92/100</div>
-              </div>
-              <div className="stat-item">
-                <div className="stat-label">Code Quality</div>
-                <div className="stat-value">88/100</div>
-              </div>
-              <div className="stat-item">
-                <div className="stat-label">Team Work</div>
-                <div className="stat-value">94/100</div>
-              </div>
-            </div>
-            
-            <div className="character-skills">
-              <div className="skills-title">Special Abilities</div>
-              <div className="skills-list">
-                <span className="skill-badge">React Mastery</span>
-                <span className="skill-badge">Python Expert</span>
-                <span className="skill-badge">AI Integration</span>
-                <span className="skill-badge">UX Design</span>
-                <span className="skill-badge">Debug Master</span>
-              </div>
-            </div>
-            
-            <button className="select-button" onClick={() => window.location.href = '/contact'}>
-              Recruit Developer
-            </button>
           </div>
 
           <div className="character-info-right">
