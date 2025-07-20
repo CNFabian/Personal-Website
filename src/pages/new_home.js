@@ -5,7 +5,58 @@ import './new_home.css';
 const newHome = () => {
   // State to control animation triggers
   const [isLoaded, setIsLoaded] = useState(false);
+  const [selectedCharacter, setSelectedCharacter] = useState(0);
+  const [isCharacterRevealed, setIsCharacterRevealed] = useState(false);
   
+  const characterVariations = [
+  {
+    id: 0,
+    name: "Christopher",
+    class: "Frontend Developer",
+    image: require('../assets/casualman.png'),
+    stats: [
+      { label: "Creativity", value: "+S" },
+      { label: "Problem Solving", value: "A" },
+      { label: "Code Quality", value: "-A" },
+      { label: "Team Work", value: " A" }
+    ],
+    skills: ["React Mastery", "UI/UX Design", "Animation", "Figma Expert", "API Integration"]
+  },
+  {
+    id: 1,
+    name: "Chris",
+    class: "The Hobbyist",
+    image: require('../assets/seriousman.png'),
+    stats: [
+      { label: "Drawing", value: "A" },
+      { label: "Reading", value: "-A" },
+      { label: "Cooking", value: "B" },
+      { label: "Anime", value: "-A" }
+    ],
+    skills: ["Card Collecting", "DIY Crafting", "Trying New Things", "Resourceful", "Good Vibes"]
+  },
+  {
+    id: 2,
+    name: "C. Fabian",
+    class: "All Business",
+    image: require('../assets/businessman.png'),
+    stats: [
+      { label: "Leadership", value: "+B" },
+      { label: "Communication", value: "-A" },
+      { label: "Networking", value: "B" },
+      { label: "Decision Making", value: "S" }
+    ],
+    skills: ["Crypto Investing", "Negotiation", "Personal Development", "Strategic Planning", "Risk Management"]
+  }
+];
+
+useEffect(() => {
+  const timer = setTimeout(() => {
+    setIsCharacterRevealed(true);
+  }, 1000);
+  return () => clearTimeout(timer);
+}, []);
+
   // Trigger animations after component mount
   useEffect(() => {
     // Small delay to ensure DOM is fully rendered
@@ -119,15 +170,28 @@ const newHome = () => {
       <div className={`character-select-section ${isLoaded ? 'animate-in' : ''}`}>
         <div className="character-select-header">
           <h2 className="character-select-title">Select Your Developer</h2>
-          <p className="character-select-subtitle">Choose your programming companion</p>
         </div>
         
-        <div className="character-container">
-          <div className="character-card">
+        <div className="character-display-area">
+          <div className="character-info-left">
+            <div className="character-stats-side">
+  <div className="stats-title">Stats</div>
+  {characterVariations[selectedCharacter].stats.map((stat, index) => (
+    <div key={index} className="stat-item-side">
+      <div className="stat-label-side">{stat.label}</div>
+      <div className="stat-value-side">{stat.value}</div>
+    </div>
+  ))}
+</div>
+          </div>
+
+          <div className="character-center">
+            <h3 className="character-name-display">{characterVariations[selectedCharacter].name}</h3>
+            <p className="character-class-display">{characterVariations[selectedCharacter].class}</p>
             <img 
-              src={require('../assets/profile-photo.png')} 
-              alt="Christopher Fabian" 
-              className="character-image"
+              src={characterVariations[selectedCharacter].image}
+              alt={characterVariations[selectedCharacter].name}
+              className={`character-main-image ${isCharacterRevealed ? 'revealed' : ''}`}
             />
             <h3 className="character-name">Christopher</h3>
             <p className="character-class">Full-Stack Developer</p>
@@ -166,16 +230,38 @@ const newHome = () => {
               Recruit Developer
             </button>
           </div>
+
+          <div className="character-info-right">
+            <div className="character-skills-side">
+              <div className="skills-title-side">Special Abilities</div>
+              <div className="skills-list-side">
+                {characterVariations[selectedCharacter].skills.map((skill, index) => (
+                  <span key={index} className="skill-badge-side">{skill}</span>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
         
-        <div className="character-extras">
-          <div className="achievement-badge">
-            🏆 Code Ninja Achievement Unlocked
-          </div>
-          <div className="level-indicator">
-            ⭐ Level 25 Developer
-          </div>
+        <div className="character-variations">
+          {characterVariations.map((character, index) => (
+            <img
+              key={character.id}
+              src={character.image}
+              alt={character.name}
+              className={`variation-option ${selectedCharacter === index ? 'selected' : ''}`}
+              onClick={() => setSelectedCharacter(index)}
+            />
+          ))}
         </div>
+
+        <button className="recruit-button" onClick={() => window.location.href = '/contact'}>
+          Recruit Developer
+        </button>
+
+        <button className="resume-button" onClick={() => window.location.href = '/resume'}>
+          Download Resume
+        </button>
       </div>
     </>
   );
