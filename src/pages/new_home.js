@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import {Link} from 'react-router-dom'
 import { FaGithub, FaLinkedin, FaInstagram, FaInfoCircle } from 'react-icons/fa';
 import './new_home.css';
 
@@ -75,7 +76,11 @@ useEffect(() => {
             <div className="name-container">
               <h1 className="title title-first">I'M</h1>
               <h1 className="title title-second">CHRISTOPHER</h1>
-              <h1 className="title title-third">FABIAN <FaInfoCircle className="info-icon" /></h1>
+              <h1 className="title title-third">FABIAN 
+                <Link to="/about" className="info-icon-link">
+                  <FaInfoCircle className="info-icon"/>
+                </Link>
+              </h1>
             </div>
             
             <div className={`projects-section ${isLoaded ? 'animate-in' : ''}`}>
