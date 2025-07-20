@@ -12,41 +12,41 @@ const newHome = () => {
   {
     id: 0,
     name: "Christopher",
-    class: "Full-Stack Developer",
-    image: require('../assets/profile-photo.png'),
+    class: "Frontend Developer",
+    image: require('../assets/casualman.png'),
     stats: {
-      creativity: 95,
-      problemSolving: 92,
-      codeQuality: 88,
-      teamWork: 94
+      creativity: "+S",
+      problemSolving: "A",
+      codeQuality: "-A",
+      teamWork: " A"
     },
-    skills: ["React Mastery", "Python Expert", "AI Integration", "UX Design", "Debug Master"]
+    skills: ["React Mastery", "UI/UX Design", "Animation", "Figma Expert", "API Integration"]
   },
   {
     id: 1,
     name: "Chris",
-    class: "AI Specialist",
-    image: require('../assets/profile-photo.png'), // For now, same image
+    class: "The Hobbyist",
+    image: require('../assets/seriousman.png'),
     stats: {
-      creativity: 88,
-      problemSolving: 98,
-      codeQuality: 85,
-      teamWork: 90
+      drawing: "A",
+      reading: "-A",
+      cooking: "B",
+      anime: "-A"
     },
-    skills: ["Machine Learning", "Neural Networks", "Data Analysis", "Python Expert", "Research"]
+    skills: ["TV Watching", "DIY Crafting", "Trying New Things", "Resourceful", "Good Vibes"]
   },
   {
     id: 2,
     name: "C. Fabian",
-    class: "Creative Developer",
-    image: require('../assets/profile-photo.png'), // For now, same image
+    class: "All Business",
+    image: require('../assets/businessman.png'),
     stats: {
-      creativity: 99,
-      problemSolving: 85,
-      codeQuality: 90,
-      teamWork: 92
+      leadership: "+B",
+      communication: "-A",
+      networking: "B",
+      decisionMaking: "S"
     },
-    skills: ["UI/UX Design", "Creative Coding", "Animation", "Graphic Design", "Prototyping"]
+    skills: ["Crypto Investing", "Negotiation", "Personal Development", "Graphic Design", "Prototyping"]
   }
 ];
 
@@ -179,19 +179,21 @@ useEffect(() => {
               <div className="stats-title">Stats</div>
               <div className="stat-item-side">
                 <div className="stat-label-side">Creativity</div>
-                <div className="stat-value-side">{characterVariations[selectedCharacter].stats.creativity}/100</div>
+                <div className="stat-value-side">{characterVariations[selectedCharacter].stats.creativity}</div>
               </div>
               <div className="stat-item-side">
                 <div className="stat-label-side">Problem Solving</div>
-                <div className="stat-value-side">{characterVariations[selectedCharacter].stats.problemSolving}/100</div>
+                <div className="stat-value-side">{characterVariations[selectedCharacter].stats.problemSolving}</div>
               </div>
               <div className="stat-item-side">
                 <div className="stat-label-side">Code Quality</div>
-                <div className="stat-value-side">{characterVariations[selectedCharacter].stats.codeQuality}/100</div>
+                <div className="stat-value-side">{characterVariations[selectedCharacter].stats.codeQuality}</div>
               </div>
               <div className="stat-item-side">
                 <div className="stat-label-side">Team Work</div>
-                <div className="stat-value-side">{characterVariations[selectedCharacter].stats.teamWork}/100</div>
+                <div className="stat-value-side">{characterVariations[selectedCharacter].stats.teamWork}
+
+                </div>
               </div>
             </div>
           </div>
