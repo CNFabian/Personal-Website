@@ -1,5 +1,6 @@
 import React from 'react';
 import PixelCharacter from '../components/PixelCharacter';
+import SoloLevelingCharacter from '../components/Sololeveling';
 import './Footer.css';
 
 const Footer = () => {
@@ -12,7 +13,9 @@ const Footer = () => {
           <div className="grid-area grid-area-1">
             <PixelCharacter />
           </div>
-          <div className="grid-area grid-area-2"></div>
+          <div className="grid-area grid-area-2">
+             
+          </div>
           <div className="grid-area grid-area-3"></div>
         </div>
         
@@ -37,7 +40,9 @@ const Footer = () => {
         <div className="footer-grid-right">
           <div className="grid-area grid-area-4"></div>
           <div className="grid-area grid-area-5"></div>
-          <div className="grid-area grid-area-6"></div>
+          <div className="grid-area grid-area-6">
+             <SoloLevelingCharacter />
+          </div>
         </div>
       </div>
     </footer>

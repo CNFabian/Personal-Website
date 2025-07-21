@@ -41,3 +41,11 @@
   position: absolute;
   padding-bottom: 2rem;
 }
+
+.sword-strike-animation {
+  width: 9rem;
+  height: 9rem;
+  object-fit: contain;
+  z-index: 1000;
+  transform: translateY(-1rem);
+}
