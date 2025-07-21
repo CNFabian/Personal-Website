@@ -1,10 +1,10 @@
-/* Footer Styles */
 .footer {
   background-color: #121212;
   color: #f5f5f5;
   text-align: center;
   padding: 1rem 0;
   width: 100%;
+  position: relative;
 }
 
 .footer p {
@@ -28,132 +28,28 @@
 .footer-social-links a {
   color: #f5f5f5;
   text-decoration: none;
-  font-size: 1.5rem; /* Icon size */
+  font-size: 1.5rem;
   transition: color 0.3s ease;
 }
 
 .footer-social-links a:hover {
-  color: #feb47b; /* Custom highlight color */
+  color: #feb47b;
 }
 
 .footer-social-links i {
-  font-size: 2rem; /* Size of the icons */
+  font-size: 2rem;
   padding-bottom: 10px;
 }
 
-/* Footer character area */
-.footer-character-area {
+.character-hover-area {
   position: absolute;
-  bottom: 10px;
+  bottom: 20px;
   right: 20px;
-  width: 80px;
-  height: 80px;
+  width: 150px;
+  height: 150px;
+  background: rgba(255, 0, 0, 0.1);
   cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.footer-character-area:hover {
-  opacity: 1;
-}
-
-/* Hover trigger area - invisible but larger for easier hovering */
-.footer-character-area::before {
-  content: '';
-  position: absolute;
-  top: -20px;
-  left: -20px;
-  right: -20px;
-  bottom: -20px;
-  background: transparent;
-  cursor: pointer;
-}
-
-.footer-character-area::after {
-  content: '?';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: rgba(255, 255, 255, 0.1);
-  font-size: 24px;
-  font-weight: bold;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-}
-
-.footer-character-area:hover::after {
-  opacity: 0;
-}
-
-/* Make footer relative positioned to contain the absolute character */
-.footer {
-  position: relative;
-}
-
-/* Footer character area - contained within footer bounds */
-.footer-character-area {
-  position: absolute;
-  bottom: 10px;
-  right: 10px; /* Reduced from 20px */
-  width: 60px; /* Reduced from 80px */
-  height: 60px; /* Reduced from 80px */
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  overflow: hidden; /* Prevent overflow */
-}
-
-.footer-character-area:hover {
-  opacity: 1;
-}
-
-/* Remove the large hover area that might extend beyond bounds */
-.footer-character-area::before {
-  content: '';
-  position: absolute;
-  top: -10px; /* Reduced from -20px */
-  left: -10px; /* Reduced from -20px */
-  right: -10px; /* Reduced from -20px */
-  bottom: -10px; /* Reduced from -20px */
-  background: transparent;
-  cursor: pointer;
-}
-
-/* Make footer relative positioned and ensure no overflow */
-.footer {
-  position: relative;
-  overflow: hidden; /* Prevent any child elements from extending beyond */
-  box-sizing: border-box;
-}
-
-/* Subtle pulsing hint - make sure it stays within bounds */
-.footer-character-area::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 4px; /* Smaller hint dot */
-  height: 4px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  animation: subtlePulse 3s ease-in-out infinite;
-}
-
-.footer-character-area:hover::after {
-  display: none;
-}
-
-@keyframes subtlePulse {
-  0%, 100% {
-    opacity: 0.3;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    opacity: 0.7;
-    transform: translate(-50%, -50%) scale(1.2); /* Reduced scale */
-  }
+  z-index: 1000;
 }
 
 @media (max-width: 600px) {
