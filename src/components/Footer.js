@@ -1,4 +1,5 @@
 import React from 'react';
+import PixelCharacter from '../components/PixelCharacter';
 import './Footer.css';
 
 const Footer = () => {
@@ -22,6 +23,19 @@ const Footer = () => {
         </li>
       </ul>
       <p>&copy; {new Date().getFullYear()} Christopher Fabian.</p>
+      {/* Add before the closing </> */}
+       <div className="footer-character-area">
+        <PixelCharacter
+          initialGif="/assets/gifs/idle.gif"
+          animations={{
+            wave: "/assets/gifs/wave.gif",
+            dance: "/assets/gifs/dance.gif",
+            surprise: "/assets/gifs/surprise.gif"
+          }}
+          scale={1.5}
+          isFooterCharacter={true}
+        />
+      </div>
     </footer>
   );
 };

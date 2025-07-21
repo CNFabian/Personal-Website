@@ -1,0 +1,51 @@
+/* Footer-specific character styles - ensure no overflow */
+.pixel-character.footer-character {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  pointer-events: all;
+  max-width: 50px; /* Constrain size */
+  max-height: 50px;
+}
+
+.pixel-character.footer-character.visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.2); /* Reduced scale */
+}
+
+.pixel-character.footer-character:hover {
+  transform: translate(-50%, -50%) scale(1.4) !important; /* Reduced scale */
+}
+
+/* Footer character specific gif styling - smaller sizes */
+.footer-character .pixel-gif {
+  max-width: 40px !important; /* Reduced from 60px */
+  max-height: 40px !important; /* Reduced from 60px */
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.3));
+}
+
+.footer-character:hover .pixel-gif {
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+}
+
+/* Animation for appearing - smaller scales */
+@keyframes footerCharacterAppear {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3) rotate(-10deg);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.5) rotate(5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2) rotate(0deg);
+  }
+}
+
+.pixel-character.footer-character.visible {
+  animation: footerCharacterAppear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}

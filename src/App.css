@@ -1,5 +1,7 @@
 .App {
   text-align: center;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 .App-logo {
@@ -15,8 +17,14 @@
 
 html, body, #root {
   background-color: #ffffff; /* Black background */
+   overflow-x: hidden;
+  max-width: 100vw;
+  box-sizing: border-box;
 }
 
+* {
+  box-sizing: border-box;
+}
 
 
 @media (prefers-reduced-motion: no-preference) {
