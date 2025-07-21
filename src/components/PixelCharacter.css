@@ -7,9 +7,17 @@
   position: relative;
 }
 
-.pixel-animation {
-  width: 120px;
-  height: 120px;
+.lightning-animation {
+  width: 5.5rem;
+  height: 5.5rem;
   object-fit: contain;
   z-index: 1001;
+  transform: translateY(0.5rem);
+}
+
+.idle-image {
+  width: 4rem;
+  height: 4rem;
+  object-fit: contain;
+  z-index: 1000;
 }

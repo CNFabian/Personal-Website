@@ -2,7 +2,7 @@
   background-color: #121212;
   color: #f5f5f5;
   text-align: center;
-  padding: 1rem 0;
+  padding: 0.5rem 0;
   width: 100%;
   position: relative;
 }
@@ -10,7 +10,47 @@
 .footer p {
   margin: 0;
   font-size: 0.9rem;
-  line-height: 1.5;
+  line-height: 1.2;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 120px;
+  padding: 10px 40px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.footer-grid-left,
+.footer-grid-right {
+  display: flex;
+  gap: 50px;
+}
+
+.grid-area {
+  width: 80px;
+  height: 80px;
+  background: rgba(240, 248, 255, 0.1);
+  border: 1px solid rgba(240, 248, 255, 0.2);
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}
+
+.grid-area:hover {
+  background: rgba(240, 248, 255, 0.2);
+}
+
+.grid-area-1 {
+  position: relative;
 }
 
 .footer-social-links {
@@ -18,11 +58,12 @@
   justify-content: center;
   list-style: none;
   padding: 0;
-  margin: 1rem 0 0 0;
+  margin: 0;
+  gap: 40px;
 }
 
 .footer-social-links li {
-  margin: 0 15px;
+  margin: 0;
 }
 
 .footer-social-links a {
@@ -38,26 +79,63 @@
 
 .footer-social-links i {
   font-size: 2rem;
-  padding-bottom: 10px;
+  padding-bottom: 5px;
 }
 
-.character-hover-area {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  width: 150px;
-  height: 150px;
-  background: rgba(255, 0, 0, 0.1);
-  cursor: pointer;
-  z-index: 1000;
+@media (max-width: 1200px) {
+  .footer-content {
+    gap: 80px;
+  }
+  
+  .footer-grid-left,
+  .footer-grid-right {
+    gap: 35px;
+  }
+}
+
+@media (max-width: 768px) {
+  .footer-content {
+    flex-direction: column;
+    gap: 20px;
+    padding: 10px 20px;
+  }
+  
+  .footer-grid-left,
+  .footer-grid-right {
+    justify-content: center;
+    gap: 30px;
+  }
+  
+  .grid-area {
+    width: 60px;
+    height: 60px;
+  }
 }
 
 @media (max-width: 600px) {
+  .footer-content {
+    gap: 15px;
+    padding: 5px 20px;
+  }
+  
+  .footer-grid-left,
+  .footer-grid-right {
+    flex-wrap: wrap;
+    max-width: 250px;
+    gap: 20px;
+  }
+  
+  .grid-area {
+    width: 50px;
+    height: 50px;
+  }
+  
   .footer-social-links {
     flex-direction: column;
+    gap: 10px;
   }
 
   .footer-social-links li {
-    padding-bottom: 20px;
+    padding-bottom: 5px;
   }
 }
