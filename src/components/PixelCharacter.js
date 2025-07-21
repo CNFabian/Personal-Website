@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './PixelCharacter.css';
 
 const PixelCharacter = ({ 
-  initialGif = '/assets/gifs/idle.gif', 
+  initialGif = '/assets/zenitsu/lightning-landing.gif', 
   position = { x: 0, y: 0 },
   scale = 1,
   animations = {},
@@ -11,6 +11,8 @@ const PixelCharacter = ({
   const [currentGif, setCurrentGif] = useState(initialGif);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isVisible, setIsVisible] = useState(!isFooterCharacter);
+  const [hasLanded, setHasLanded] = useState(false);
+
 
   // Function to change animation
   const playAnimation = (animationName, duration = 2000) => {
@@ -52,15 +54,18 @@ const PixelCharacter = ({
 
   const handleMouseEnter = () => {
     if (isFooterCharacter) {
-      setIsVisible(true);
-      // Play a greeting animation when first revealed
-      setTimeout(() => {
-        if (animations.wave) {
-          playAnimation('wave', 1500);
+        setIsVisible(true);
+        // Play lighting_landing animation on first hover
+        if (!hasLanded) {
+        setTimeout(() => {
+            if (animations.lighting_landing) {
+            playAnimation('lighting_landing', 1500);
+            setHasLanded(true);
+            }
+        }, 200);
         }
-      }, 200);
     }
-  };
+    };
 
   const handleMouseLeave = () => {
     if (isFooterCharacter) {

@@ -3,6 +3,7 @@ import PixelCharacter from '../components/PixelCharacter';
 import './Footer.css';
 
 const Footer = () => {
+  
   return (
     <footer className="footer">
       <ul className="footer-social-links">
@@ -25,16 +26,19 @@ const Footer = () => {
       <p>&copy; {new Date().getFullYear()} Christopher Fabian.</p>
       {/* Add before the closing </> */}
        <div className="footer-character-area">
-        <PixelCharacter
-          initialGif="/assets/gifs/idle.gif"
-          animations={{
-            wave: "/assets/gifs/wave.gif",
-            dance: "/assets/gifs/dance.gif",
-            surprise: "/assets/gifs/surprise.gif"
-          }}
-          scale={1.5}
-          isFooterCharacter={true}
-        />
+      <PixelCharacter
+        initialGif="/assets/zenitsu/idle.png"
+        animations={{
+          lighting_landing: "/assets/zenitsu/lightning-landing.gif",
+          stance: "/assets/zenitsu/stance.gif",
+          large_charge: "/assets/zenitsu/large-charge.gif",
+          wave: "/assets/zenitsu/wave.gif",
+          dance: "/assets/zenitsu/dance.gif",
+          surprise: "/assets/zenitsu/surprise.gif"
+        }}
+        scale={1.5}
+        isFooterCharacter={true}
+      />
       </div>
     </footer>
   );
