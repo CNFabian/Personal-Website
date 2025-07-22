@@ -3,7 +3,7 @@ import './BowserJr.css';
 import idleGif from '../assets/bowserjr/idle.webp'
 import hoverGif from '../assets/bowserjr/dance.gif'
 
-const NewCharacter = () => {
+const BowserJr = () => {
   const [isHovered, setIsHovered] = useState(false);
 
   const handleMouseEnter = () => {
@@ -15,22 +15,22 @@ const NewCharacter = () => {
   };
 
   return (
-    <div className="new-character-container">
+    <div className="bowserjr-container">
       {!isHovered && (
-        <img 
+        <img
           src={idleGif}
-          alt="character-idle"
-          className="new-character-idle"
+          alt="bowserjr-idle"
+          className="bowserjr-idle"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         />
       )}
-      
+
       {isHovered && (
-        <img 
+        <img
           src={hoverGif}
-          alt="character-hover"
-          className="new-character-hover"
+          alt="bowserjr-hover"
+          className="bowserjr-hover"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         />
@@ -39,4 +39,4 @@ const NewCharacter = () => {
   );
 };
 
-export default NewCharacter;
+export default BowserJr;

@@ -3,6 +3,7 @@ import PixelCharacter from '../components/PixelCharacter';
 import SoloLevelingCharacter from '../components/Sololeveling';
 import Venom from '../components/Venom';
 import Patrick from '../components/Patrick';
+import BowserJr from '../components/BowserJr'
 import './Footer.css';
 
 const Footer = () => {
@@ -18,7 +19,9 @@ const Footer = () => {
           <div className="grid-area grid-area-2">
              <Venom />
           </div>
-          <div className="grid-area grid-area-3"></div>
+          <div className="grid-area grid-area-3">
+            <BowserJr />
+          </div>
         </div>
         
         <ul className="footer-social-links">
