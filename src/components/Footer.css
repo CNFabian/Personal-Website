@@ -5,6 +5,7 @@
   padding: 0.5rem 0;
   width: 100%;
   position: relative;
+  margin-bottom: 0;
 }
 
 .footer p {
@@ -35,8 +36,8 @@
 .grid-area {
   width: 80px;
   height: 80px;
-  background: rgba(240, 248, 255, 0.1);
-  border: 1px solid rgba(240, 248, 255, 0.2);
+  background: transparent;
+  border: none;
   border-radius: 8px;
   display: flex;
   justify-content: center;
@@ -46,7 +47,7 @@
 }
 
 .grid-area:hover {
-  background: rgba(240, 248, 255, 0.2);
+
 }
 
 .grid-area-1 {
