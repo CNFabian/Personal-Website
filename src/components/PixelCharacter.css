@@ -12,6 +12,7 @@
   height: 4rem;
   object-fit: contain;
   z-index: 1000;
+  transform: translateY(0.5rem);
 }
 
 .stance-animation {
@@ -21,6 +22,8 @@
   z-index: 1000;
   padding-bottom: 0.5rem;
   padding-left:0.3rem;
+  transform: translateY(0.5rem);
+
 }
 
 .large-charge-animation {
@@ -29,7 +32,7 @@
   object-fit: fill;
   z-index: 1000;
   position: absolute;
-  transform: scaleX(-1) translateY(0.5rem);
+  transform: scaleX(-1) translateY(1rem);
 }
 
 .lightning-animation-overlay {
@@ -43,9 +46,9 @@
 }
 
 .sword-strike-animation {
-  width: 9rem;
-  height: 9rem;
+  width: 9.5rem;
+  height: 9.5rem;
   object-fit: contain;
   z-index: 1000;
-  transform: translateY(-1rem);
+  transform: translateY(-0.45rem);
 }

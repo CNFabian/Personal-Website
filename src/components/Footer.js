@@ -1,6 +1,8 @@
 import React from 'react';
 import PixelCharacter from '../components/PixelCharacter';
 import SoloLevelingCharacter from '../components/Sololeveling';
+import Venom from '../components/Venom';
+import Patrick from '../components/Patrick';
 import './Footer.css';
 
 const Footer = () => {
@@ -14,7 +16,7 @@ const Footer = () => {
             <PixelCharacter />
           </div>
           <div className="grid-area grid-area-2">
-             
+             <Venom />
           </div>
           <div className="grid-area grid-area-3"></div>
         </div>
@@ -38,7 +40,9 @@ const Footer = () => {
         </ul>
         
         <div className="footer-grid-right">
-          <div className="grid-area grid-area-4"></div>
+          <div className="grid-area grid-area-4">
+            <Patrick />
+          </div>
           <div className="grid-area grid-area-5"></div>
           <div className="grid-area grid-area-6">
              <SoloLevelingCharacter />
