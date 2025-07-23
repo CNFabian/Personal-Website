@@ -1,0 +1,271 @@
+// Design System - OKLCH Colors & Rem Scale
+// This file should be created as src/styles/_design-system.scss
+
+// ============================================
+// OKLCH COLOR PALETTE
+// ============================================
+
+// Primary Colors (Browns/Warm tones)
+$color-primary-50: oklch(0.95 0.02 45);   // Very light warm beige
+$color-primary-100: oklch(0.92 0.03 45);  // Light warm beige  
+$color-primary-200: oklch(0.85 0.04 45);  // Warm beige
+$color-primary-300: oklch(0.75 0.06 45);  // Medium warm beige
+$color-primary-400: oklch(0.65 0.08 45);  // Darker warm beige
+$color-primary-500: oklch(0.55 0.1 45);   // Primary brown (#8a7a70 equivalent)
+$color-primary-600: oklch(0.45 0.12 45);  // Dark brown
+$color-primary-700: oklch(0.35 0.14 45);  // Darker brown (#512911 equivalent)
+$color-primary-800: oklch(0.25 0.16 45);  // Very dark brown
+$color-primary-900: oklch(0.15 0.18 45);  // Nearly black brown
+
+// Accent Colors (Orange/Gold)
+$color-accent-50: oklch(0.95 0.05 85);    // Very light orange
+$color-accent-100: oklch(0.90 0.08 85);   // Light orange
+$color-accent-200: oklch(0.85 0.12 85);   // Warm orange
+$color-accent-300: oklch(0.80 0.16 85);   // Medium orange
+$color-accent-400: oklch(0.75 0.20 85);   // Vibrant orange
+$color-accent-500: oklch(0.70 0.24 85);   // Primary accent (#FFA30F equivalent)
+$color-accent-600: oklch(0.65 0.22 80);   // Dark orange (#B37109 equivalent)
+$color-accent-700: oklch(0.55 0.20 75);   // Darker orange
+$color-accent-800: oklch(0.45 0.18 70);   // Very dark orange
+$color-accent-900: oklch(0.35 0.16 65);   // Nearly black orange
+
+// Neutral Colors
+$color-neutral-50: oklch(0.98 0.005 45);  // Nearly white
+$color-neutral-100: oklch(0.95 0.01 45);  // Very light gray
+$color-neutral-200: oklch(0.90 0.015 45); // Light gray
+$color-neutral-300: oklch(0.80 0.02 45);  // Medium light gray
+$color-neutral-400: oklch(0.65 0.025 45); // Medium gray
+$color-neutral-500: oklch(0.50 0.03 45);  // Medium dark gray
+$color-neutral-600: oklch(0.40 0.025 45); // Dark gray
+$color-neutral-700: oklch(0.30 0.02 45);  // Very dark gray
+$color-neutral-800: oklch(0.20 0.015 45); // Nearly black
+$color-neutral-900: oklch(0.10 0.01 45);  // Black
+
+// Semantic Colors
+$color-success: oklch(0.65 0.15 145);     // Green
+$color-warning: oklch(0.75 0.15 85);      // Orange/Yellow
+$color-error: oklch(0.60 0.20 25);        // Red
+$color-info: oklch(0.65 0.15 250);        // Blue
+
+// Special Effect Colors
+$color-purple-shadow: oklch(0.15 0.08 300); // #1f0322 equivalent
+$color-red-glow: oklch(0.55 0.25 25);       // Red for glows/effects
+
+// ============================================
+// SEMANTIC COLOR ASSIGNMENTS
+// ============================================
+
+// Primary Theme Colors
+$primary: $color-primary-500;
+$primary-dark: $color-primary-700;
+$primary-light: $color-primary-300;
+
+// Accent Theme Colors  
+$accent: $color-accent-500;
+$accent-dark: $color-accent-600;
+$accent-light: $color-accent-300;
+
+// Background Colors
+$bg-primary: $color-primary-50;
+$bg-secondary: $color-neutral-100;
+$bg-dark: $color-neutral-900;
+$bg-card: $color-neutral-50;
+
+// Text Colors
+$text-primary: $color-primary-500;
+$text-secondary: $color-primary-600;
+$text-light: $color-neutral-50;
+$text-dark: $color-neutral-800;
+$text-muted: $color-neutral-500;
+
+// Border Colors
+$border-light: $color-neutral-200;
+$border-medium: $color-neutral-300;
+$border-dark: $color-neutral-600;
+
+// ============================================
+// REM SPACING SCALE
+// ============================================
+
+// Base rem value (assuming 16px base font size)
+$base-font-size: 1rem; // 16px
+
+// Spacing Scale (based on 0.25rem increments)
+$space-0: 0;
+$space-px: 0.0625rem;  // 1px
+$space-0_5: 0.125rem;  // 2px
+$space-1: 0.25rem;     // 4px
+$space-1_5: 0.375rem;  // 6px
+$space-2: 0.5rem;      // 8px
+$space-2_5: 0.625rem;  // 10px
+$space-3: 0.75rem;     // 12px
+$space-3_5: 0.875rem;  // 14px
+$space-4: 1rem;        // 16px
+$space-5: 1.25rem;     // 20px
+$space-6: 1.5rem;      // 24px
+$space-7: 1.75rem;     // 28px
+$space-8: 2rem;        // 32px
+$space-9: 2.25rem;     // 36px
+$space-10: 2.5rem;     // 40px
+$space-11: 2.75rem;    // 44px
+$space-12: 3rem;       // 48px
+$space-14: 3.5rem;     // 56px
+$space-16: 4rem;       // 64px
+$space-20: 5rem;       // 80px
+$space-24: 6rem;       // 96px
+$space-28: 7rem;       // 112px
+$space-32: 8rem;       // 128px
+$space-36: 9rem;       // 144px
+$space-40: 10rem;      // 160px
+$space-44: 11rem;      // 176px
+$space-48: 12rem;      // 192px
+$space-52: 13rem;      // 208px
+$space-56: 14rem;      // 224px
+$space-60: 15rem;      // 240px
+$space-64: 16rem;      // 256px
+$space-72: 18rem;      // 288px
+$space-80: 20rem;      // 320px
+$space-96: 24rem;      // 384px
+
+// ============================================
+// FONT SIZES (REM)
+// ============================================
+
+$text-xs: 0.75rem;     // 12px
+$text-sm: 0.875rem;    // 14px
+$text-base: 1rem;      // 16px
+$text-lg: 1.125rem;    // 18px
+$text-xl: 1.25rem;     // 20px
+$text-2xl: 1.5rem;     // 24px
+$text-3xl: 1.875rem;   // 30px
+$text-4xl: 2.25rem;    // 36px
+$text-5xl: 3rem;       // 48px
+$text-6xl: 3.75rem;    // 60px
+$text-7xl: 4.5rem;     // 72px
+$text-8xl: 6rem;       // 96px
+$text-9xl: 8rem;       // 128px
+
+// ============================================
+// BREAKPOINTS (REM)
+// ============================================
+
+$breakpoint-xs: 36rem;    // 576px
+$breakpoint-sm: 48rem;    // 768px  
+$breakpoint-md: 62rem;    // 992px
+$breakpoint-lg: 75rem;    // 1200px
+$breakpoint-xl: 87.5rem;  // 1400px
+$breakpoint-2xl: 92.5rem; // 1480px
+
+// ============================================
+// BORDER RADIUS (REM)
+// ============================================
+
+$radius-none: 0;
+$radius-sm: 0.125rem;   // 2px
+$radius-base: 0.25rem;  // 4px
+$radius-md: 0.375rem;   // 6px
+$radius-lg: 0.5rem;     // 8px
+$radius-xl: 0.75rem;    // 12px
+$radius-2xl: 1rem;      // 16px
+$radius-3xl: 1.5rem;    // 24px
+$radius-full: 50%;
+
+// ============================================
+// SHADOWS
+// ============================================
+
+$shadow-sm: 0 $space-px $space-1 0 oklch(0 0 0 / 0.05);
+$shadow-base: 0 $space-px $space-1_5 0 oklch(0 0 0 / 0.1), 0 $space-px $space-1 0 oklch(0 0 0 / 0.06);
+$shadow-md: 0 $space-1 $space-1_5 -$space-0_5 oklch(0 0 0 / 0.1), 0 $space-1 $space-2_5 -$space-1 oklch(0 0 0 / 0.1);
+$shadow-lg: 0 $space-2_5 $space-6 -$space-3 oklch(0 0 0 / 0.1), 0 $space-1 $space-2 -$space-1 oklch(0 0 0 / 0.1);
+$shadow-xl: 0 $space-5 $space-6 -$space-3 oklch(0 0 0 / 0.1), 0 $space-1 $space-2 -$space-1 oklch(0 0 0 / 0.1);
+$shadow-2xl: 0 $space-6 $space-12 -$space-2 oklch(0 0 0 / 0.25);
+$shadow-inner: inset 0 $space-1 $space-1 0 oklch(0 0 0 / 0.06);
+
+// Colored shadows
+$shadow-accent: 0 $space-1 $space-6 oklch(from $accent l c h / 0.4);
+$shadow-accent-lg: 0 $space-2 $space-6 oklch(from $accent l c h / 0.6);
+$shadow-glow: 0 0 $space-5 oklch(from $accent l c h / 0.5);
+
+// ============================================
+// UTILITY MIXINS
+// ============================================
+
+@mixin absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin transition($properties: all, $duration: 0.3s, $timing: ease) {
+  transition: $properties $duration $timing;
+}
+
+@mixin media($breakpoint) {
+  @if $breakpoint == xs {
+    @media (max-width: $breakpoint-xs) { @content; }
+  }
+  @if $breakpoint == sm {
+    @media (max-width: $breakpoint-sm) { @content; }
+  }
+  @if $breakpoint == md {
+    @media (max-width: $breakpoint-md) { @content; }
+  }
+  @if $breakpoint == lg {
+    @media (max-width: $breakpoint-lg) { @content; }
+  }
+  @if $breakpoint == xl {
+    @media (max-width: $breakpoint-xl) { @content; }
+  }
+  @if $breakpoint == 2xl {
+    @media (max-width: $breakpoint-2xl) { @content; }
+  }
+}
+
+@mixin button-base {
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.0625rem;
+  border-radius: $radius-3xl;
+  @include transition();
+  
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 $space-1 oklch(from $accent l c h / 0.5);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Prevent horizontal scroll without hiding scrollbar
+html {
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+// Root container
+#root {
+  max-width: 100vw;
+  overflow-x: clip; // Modern alternative to hidden - allows internal scrolling
+}
+
+// Ensure all full-width containers respect viewport
+.full-width-container {
+  width: min(100%, 100vw);
+  max-width: 100%;
+}

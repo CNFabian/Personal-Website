@@ -1,0 +1,309 @@
+// Import design system
+@import '../styles/design-system';
+
+// Font face
+@font-face {
+  font-family: 'Palatino';
+  src: url('../assets/palr45w.ttf') format('truetype');
+}
+
+// Base styles
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Palatino', serif;
+  background: $bg-primary;
+}
+
+// Full-width sections
+.about-page section {
+  width: 100vw;
+  padding: $space-16 0;
+  text-align: center;
+  color: $text-light;
+  position: relative;
+}
+
+// Hero Section
+.hero-about {
+  background: url('../assets/beach.png') center/cover no-repeat;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
+  color: $text-light;
+  text-shadow: $space-0_5 $space-0_5 $space-2 oklch(from $bg-dark l c h / 0.5);
+  
+  h1 {
+    font-size: $text-5xl;
+  }
+
+  p {
+    font-size: $text-xl;
+    max-width: $space-96 - $space-16; // 43.75rem equivalent
+    margin: 0 auto;
+  }
+}
+
+.hero-content-about {
+  background: oklch(from $bg-dark l c h / 0.6);
+  padding: $space-8;
+  border-radius: $radius-xl;
+  position: absolute;
+  top: 50%;
+}
+
+// Section backgrounds using OKLCH
+.personal-life {
+  background: oklch(0.50 0.08 45); // Warm brown equivalent to #A36F4D
+  
+  .content {
+    max-width: $space-96 - $space-8; // 56.25rem equivalent
+    margin: 0 auto;
+    padding: $space-8;
+  }
+
+  h2 {
+    font-size: $text-4xl;
+    margin-bottom: $space-4;
+  }
+
+  p {
+    font-size: $text-lg;
+    line-height: 1.6;
+  }
+}
+
+.fun-facts {
+  background: oklch(0.45 0.1 45); // Darker brown equivalent to #8B5E3C
+  
+  .content {
+    max-width: $space-96 - $space-8;
+    margin: 0 auto;
+  }
+
+  h2 {
+    font-size: $text-4xl;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  li {
+    font-size: $text-lg;
+    background: oklch(from $text-light l c h / 0.2);
+    padding: $space-4;
+    border-radius: $radius-lg;
+    margin: $space-2_5 auto;
+    max-width: $space-96 - $space-20; // 37.5rem equivalent
+  }
+}
+
+// Edge Images (Positioned on the corners)
+.edge-image {
+  width: $space-44; // 11.25rem equivalent to 180px
+  height: auto;
+  position: absolute;
+  object-fit: cover;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-lg;
+  @include transition(transform, 0.4s, ease-out);
+  
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: $shadow-xl;
+    z-index: 5;
+  }
+  
+  &.pulse {
+    animation: pulse 2s infinite;
+  }
+}
+
+// Positioning variants using rem
+.top-left {
+  top: $space-5;
+  left: $space-5;
+}
+
+.top-right {
+  top: $space-5;
+  right: $space-5;
+}
+
+.bottom-right {
+  bottom: $space-5;
+  right: $space-5;
+}
+
+.bottom-left {
+  bottom: $space-5;
+  left: $space-5;
+}
+
+// Underlined span styling
+.underlined-span {
+  display: inline-block;
+  position: relative;
+  margin: 0 $space-0_5;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: $space-0_5;
+    bottom: -#{$space-0_5};
+    left: 0;
+    background-color: $accent;
+  }
+}
+
+// Tooltip system
+.image-tooltip {
+  background: linear-gradient(135deg, 
+    oklch(0.45 0.1 45 / 0.95), 
+    oklch(0.50 0.08 45 / 0.95)) !important;
+  border: $space-px solid oklch(from $text-light l c h / 0.2) !important;
+  box-shadow: $shadow-xl !important;
+  backdrop-filter: blur($space-1) !important;
+  -webkit-backdrop-filter: blur($space-1) !important;
+  
+  font-family: 'Palatino', serif !important;
+  font-size: $text-sm !important;
+  letter-spacing: $space-0_5 !important;
+  
+  border-radius: $radius-lg !important;
+  padding: $space-2_5 $space-4 !important;
+  
+  position: absolute;
+  color: $text-light;
+  pointer-events: none;
+  z-index: 1000;
+  white-space: normal;
+  max-width: $space-56; // 13.75rem equivalent to 220px
+}
+
+// Tooltip animations
+@keyframes tooltipInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-#{$space-2_5});
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes tooltipInRight {
+  0% {
+    opacity: 0;
+    transform: translateX($space-2_5);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// Direction-specific tooltip animations
+.image-tooltip {
+  &.left {
+    animation: tooltipInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+    transform-origin: left center;
+  }
+
+  &.right {
+    animation: tooltipInLeft 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+    transform-origin: right center;
+  }
+}
+
+// Arrow styling
+.tooltip-arrow {
+  position: absolute;
+  width: $space-3 !important;
+  height: $space-3 !important;
+  background: oklch(0.45 0.1 45 / 0.95) !important;
+  transform: rotate(45deg) !important;
+  
+  &.left {
+    left: -#{$space-1_5} !important;
+    top: 50% !important;
+    margin-top: -#{$space-1_5} !important;
+  }
+
+  &.right {
+    right: -#{$space-1_5} !important;
+    top: 50% !important;
+    margin-top: -#{$space-1_5} !important;
+  }
+}
+
+// Enhanced tooltip content
+.tooltip-content {
+  display: flex !important;
+  align-items: center !important;
+  gap: $space-2 !important;
+}
+
+.tooltip-icon {
+  font-size: $text-lg !important;
+}
+
+.tooltip-text {
+  display: inline-block !important;
+}
+
+// Pulse animation using OKLCH
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 oklch(from $accent l c h / 0.6); }
+  70% { box-shadow: 0 0 0 $space-2_5 oklch(from $accent l c h / 0); }
+  100% { box-shadow: 0 0 0 0 oklch(from $accent l c h / 0); }
+}
+
+// Responsive adjustments using design system breakpoints
+@include media(sm) {
+  .edge-image {
+    width: $space-28; // 7.5rem equivalent to 120px
+  }
+
+  .top-left, 
+  .top-right, 
+  .bottom-left, 
+  .bottom-right {
+    top: auto;
+    bottom: $space-2_5;
+  }
+  
+  .hero-about {
+    h1 {
+      font-size: $text-3xl;
+    }
+    
+    p {
+      font-size: $text-lg;
+      max-width: $space-80;
+    }
+  }
+  
+  .personal-life,
+  .fun-facts {
+    .content {
+      padding: $space-6;
+    }
+    
+    h2 {
+      font-size: $text-3xl;
+    }
+  }
+  
+  .fun-facts li {
+    font-size: $text-base;
+    padding: $space-3;
+    max-width: $space-72;
+  }
+}

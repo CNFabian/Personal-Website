@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {Link} from 'react-router-dom'
 import { FaGithub, FaLinkedin, FaInstagram, FaInfoCircle } from 'react-icons/fa';
-import './new_home.css';
+import './new_home.scss';
 
 const newHome = () => {
   // State to control animation triggers

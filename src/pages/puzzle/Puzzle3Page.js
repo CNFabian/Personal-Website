@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './puzzle-shared.css'; // Import shared CSS file
+import './puzzle-shared.scss'; // Import shared CSS file
 import { Link } from 'react-router-dom';
 
 const Puzzle3Page = () => {

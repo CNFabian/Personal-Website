@@ -1,0 +1,302 @@
+// Import design system
+@import '../../styles/design-system';
+
+// Font faces
+@font-face {
+  font-family: 'Pixel Times';
+  src: url('../../assets/Pixel Times.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Pixel Times Bold';
+  src: url('../../assets/Pixel Times Bold.ttf') format('truetype');
+} 
+
+@font-face {
+  font-family: 'gixel';
+  src: url('../../assets/Gixel.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'ps2p';
+  src: url('../../assets/PressStart2P.ttf') format('truetype');
+}
+
+// Puzzle color scheme using OKLCH
+$puzzle-bg: oklch(0.08 0.01 0);            // Very dark background
+$puzzle-text: oklch(0.85 0.02 45);         // Light text
+$puzzle-primary: oklch(0.45 0.15 15);      // Dark red
+$puzzle-glow: oklch(0.55 0.2 15);          // Bright red for effects
+$puzzle-border: oklch(0.45 0.15 15);       // Red border
+
+// Main container
+.puzzle-container {
+  min-height: 100vh;
+  @include flex-center;
+  background-color: $puzzle-bg;
+  color: $puzzle-text;
+  flex-direction: column;
+  font-family: 'ps2p';
+}
+
+// Title styling
+.puzzle-title {
+  font-size: $text-4xl;
+  color: $puzzle-primary;
+  margin-bottom: $space-12;
+  position: relative;
+}
+
+// Navigation icons
+.back-icon,
+.next-icon {
+  position: absolute;
+  font-size: $text-2xl;
+  text-decoration: none;
+  color: $puzzle-primary;
+  @include transition(transform);
+}
+
+.back-icon {
+  left: $space-24;
+  
+  &:hover {
+    transform: translateX(-#{$space-1_5});
+  }
+}
+
+.next-icon {
+  right: $space-24;
+  
+  &:hover {
+    transform: translateX($space-1_5);
+  }
+}
+
+// Instructions
+.instructions {
+  font-size: $text-base;
+  color: $puzzle-text;
+  margin-bottom: $space-12;
+  text-align: center;
+  width: 80%;
+  line-height: 1.5;
+}
+
+// Number row
+.number-row {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: $space-12;
+}
+
+.number {
+  font-size: $text-2xl;
+  color: $puzzle-primary;
+  @include transition(opacity, 0.5s);
+  padding-left: $space-1_5;
+  padding-right: $space-1_5;
+  
+  &.flicker-out {
+    animation: flicker-out 0.75s ease forwards;
+  }
+  
+  &.glow-up {
+    animation: glow-up 0.75s ease forwards;
+  }
+}
+
+// Animation keyframes
+@keyframes flicker-out {
+  0% { opacity: 1; }
+  25% { opacity: 0.4; }
+  50% { opacity: 1; }
+  60% { opacity: 0.3; }
+  70% { opacity: 0.8; }
+  85% { opacity: 0.2; }
+  100% { opacity: 0; }
+}
+
+@keyframes glow-up {
+  0% {
+    opacity: 0;
+    text-shadow: 0 0 $space-1_5 $puzzle-primary, 0 0 $space-2_5 $puzzle-primary, 0 0 $space-4 $puzzle-primary;
+  }
+  25% {
+    opacity: 0.5;
+    text-shadow: 0 0 $space-2_5 $puzzle-primary, 0 0 $space-5 $puzzle-primary, 0 0 $space-8 $puzzle-primary;
+  }
+  50% {
+    opacity: 0.8;
+    text-shadow: 0 0 $space-5 $puzzle-primary, 0 0 $space-8 $puzzle-primary, 0 0 $space-10 $puzzle-primary;
+  }
+  75% {
+    opacity: 1;
+    text-shadow: 0 0 $space-8 $puzzle-primary, 0 0 $space-10 $puzzle-primary, 0 0 $space-12 $puzzle-primary;
+  }
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 $space-10 $puzzle-primary, 0 0 $space-12 $puzzle-primary, 0 0 $space-16 $puzzle-primary;
+  }
+}
+
+// Grid layout
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, $space-16);
+  grid-template-rows: repeat(3, $space-16);
+  gap: 0;
+}
+
+// Cell styling
+.cell {
+  width: $space-16;
+  height: $space-16;
+  text-align: center;
+  font-size: $text-xl;
+  border: $space-0_5 solid $puzzle-border;
+  background-color: $puzzle-bg;
+  color: $puzzle-text;
+  border-radius: $space-px;
+  outline: none;
+  @include transition;
+  font-family: 'ps2p';
+  
+  &:focus {
+    border-color: $puzzle-glow;
+    background-color: oklch(0.12 0.02 0);
+  }
+}
+
+.empty-cell {
+  width: $space-16;
+  height: $space-16;
+  background-color: transparent;
+  border: $space-0_5 solid transparent;
+}
+
+// Submit button
+.submit-button {
+  background-color: $puzzle-primary;
+  color: $puzzle-text;
+  padding: $space-4 $space-8;
+  border-radius: $radius-md;
+  font-size: $text-lg;
+  font-weight: bold;
+  text-transform: uppercase;
+  border: none;
+  margin-top: $space-5;
+  cursor: pointer;
+  @include transition;
+  font-family: 'pixel times';
+  
+  &:hover {
+    background-color: $puzzle-glow;
+    transform: translateY(-#{$space-1});
+  }
+  
+  &:active {
+    background-color: oklch(0.50 0.18 15);
+    transform: scale(0.95);
+  }
+}
+
+// Piece section
+.piece {
+  margin-top: $space-5;
+  padding: $space-4 $space-5;
+  background-color: oklch(0.15 0.02 0);
+  color: $puzzle-text;
+  border: $space-0_5 solid $puzzle-primary;
+  border-radius: $radius-md;
+  text-align: center;
+  box-shadow: 0 0 $space-2_5 oklch(from $puzzle-primary l c h / 0.5);
+  animation: piece-fade-in 0.8s ease-out;
+  
+  h2 {
+    font-size: $text-xl;
+    margin-bottom: $space-2_5;
+    color: oklch(0.65 0.2 15);
+    text-transform: uppercase;
+    letter-spacing: $space-px;
+  }
+  
+  p {
+    font-size: $text-lg;
+    line-height: 1.5;
+    color: oklch(0.90 0.02 45);
+  }
+}
+
+@keyframes piece-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-#{$space-2_5});
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Secret page link
+.secret-page-link {
+  margin-top: $space-12;
+  
+  a {
+    color: $puzzle-primary;
+    @include transition(color);
+    
+    &:hover {
+      color: $puzzle-glow;
+    }
+  }
+}
+
+// Responsive design
+@include media(sm) {
+  .puzzle-title {
+    font-size: $text-2xl;
+  }
+  
+  .back-icon,
+  .next-icon {
+    left: $space-6;
+    right: $space-6;
+  }
+
+  .cell {
+    width: $space-16;
+    height: $space-16;
+    font-size: $text-xl;
+  }
+
+  .submit-button {
+    font-size: $text-sm;
+    padding: $space-2_5 $space-5;
+  }
+
+  .piece {
+    font-size: $text-base;
+    padding: $space-2_5 $space-4;
+    
+    p {
+      font-size: $text-base;
+    }
+  }
+  
+  .instructions {
+    font-size: $text-sm;
+    width: 90%;
+  }
+  
+  .number-row {
+    gap: $space-1;
+    flex-wrap: wrap;
+  }
+  
+  .number {
+    font-size: $text-lg;
+    padding: $space-1;
+  }
+}

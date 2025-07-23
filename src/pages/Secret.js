@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import './Secret.css';
+import './Secret.scss';
 
 const Secret = () => {
   const [password, setPassword] = useState('');

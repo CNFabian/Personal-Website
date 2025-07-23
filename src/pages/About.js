@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./About.css";
+import "./About.scss";
 import beachPhoto from '../assets/beach.png';
 import scenicPhoto from '../assets/scenic_view.png';
 import familyPhoto from '../assets/family.png';

@@ -1,0 +1,983 @@
+// Import design system
+@import '../styles/design-system';
+
+// Font face
+@font-face {
+  font-family: 'julianSans';
+  src: url('../assets/JuliusSansOne-Regular.ttf') format('truetype');
+}
+
+// Base styles using OKLCH
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'julianSans';
+  background-color: oklch(0.95 0.02 45);  // #f8f5f2 equivalent
+  color: oklch(0.55 0.1 45);              // #8a7a70 equivalent
+}
+
+// Animation keyframes
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY($space-8);      // 30px -> rem
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-#{$space-12});  // -50px -> rem
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX($space-12);      // 50px -> rem
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-#{$space-8}); // -30px -> rem
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(0.5);
+  }
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 oklch(from $text-light l c h / 0.4); }
+  70% { box-shadow: 0 0 0 $space-2_5 oklch(from $text-light l c h / 0); }
+  100% { box-shadow: 0 0 0 0 oklch(from $text-light l c h / 0); }
+}
+
+@keyframes selectedGlow {
+  from { 
+    box-shadow: 0 0 $space-6 oklch(0.70 0.24 85 / 0.6);
+    border-color: oklch(0.70 0.24 85);   // #FFA30F equivalent
+  }
+  to { 
+    box-shadow: 0 0 $space-10 oklch(0.70 0.24 85 / 0.9);
+    border-color: oklch(0.65 0.22 80);   // #B37109 equivalent
+  }
+}
+
+// Apply initial state for animation elements
+.left-section,
+.right-section,
+.profile-photo,
+.tech-icons,
+.icon-circle1,
+.icon-circle2,
+.icon-circle3,
+.icon-circle4 {
+  opacity: 0;
+}
+
+// Animation triggers
+.left-section.animate-in {
+  animation: fadeInLeft 0.8s ease-out forwards;
+}
+
+.right-section.animate-in {
+  animation: fadeInRight 0.8s ease-out forwards;
+}
+
+.profile-photo.animate-in {
+  animation: scaleIn 1s ease-out 0.3s forwards;
+}
+
+.tech-icons.animate-in {
+  animation: fadeInRight 0.8s ease-out 0.6s forwards;
+}
+
+// Staggered animation for titles
+.title-first {
+  opacity: 0;
+  animation: fadeInLeft 0.6s ease-out 0.1s forwards;
+}
+
+.title-second {
+  opacity: 0;
+  animation: fadeInLeft 0.6s ease-out 0.3s forwards;
+}
+
+.title-third {
+  opacity: 0;
+  animation: fadeInLeft 0.6s ease-out 0.5s forwards;
+}
+
+// Project section animation
+.projects-section.animate-in {
+  opacity: 0;
+  animation: fadeInUp 0.8s ease-out 0.8s forwards;
+}
+
+.icon-circle1.animate-in {
+  animation: slideInDown 0.6s ease-out 0.9s forwards;
+}
+
+.icon-circle2.animate-in {
+  animation: slideInDown 0.6s ease-out 1.1s forwards;
+}
+
+.icon-circle3.animate-in {
+  animation: slideInDown 0.6s ease-out 1.3s forwards;
+}
+
+.icon-circle4.animate-in {
+  animation: slideInDown 0.6s ease-out 1.5s forwards;
+}
+
+// Individual tech icons animation
+.tech-icons.animate-in .tech-icon {
+  @for $i from 1 through 6 {
+    &:nth-child(#{$i}) {
+      opacity: 0;
+      animation: fadeInRight 0.4s ease-out (0.5s + $i * 0.1s) forwards;
+    }
+  }
+}
+
+// Project item animation
+.projects-section.animate-in .project-item {
+  @for $i from 1 through 3 {
+    &:nth-child(#{$i}) {
+      opacity: 0;
+      animation: fadeInLeft 0.5s ease-out (0.8s + $i * 0.2s) forwards;
+    }
+  }
+}
+
+// Original CSS converted to SCSS with OKLCH and rem
+.home-container {
+  bottom: $space-24;                 // 100px -> rem
+  width: 100vw;
+  margin: 0 auto;
+  padding: $space-5 $space-10;      // 20px 40px -> rem
+  min-height: 83vh;
+  position: flex;
+  padding-top: $space-20;           // 80px -> rem
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.content-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: $space-5;                    // 20px -> rem
+  width: 100%;
+  max-width: none;
+  padding: 0 $space-16;             // 60px -> rem
+}
+
+.info-icon-link {
+  color: inherit;
+  text-decoration: none;
+  @include transition(opacity);
+  
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.info-icon {
+  font-size: $text-xl;              // 1.5rem
+  vertical-align: middle;
+  margin-left: $space-2_5;          // 10px -> rem
+  opacity: 0.7;
+  cursor: pointer;
+  @include transition(opacity);
+  
+  &:hover {
+    opacity: 1;
+  }
+}
+
+// Left section styles
+.left-section {
+  flex: 1;
+  min-width: $space-72;             // 300px -> rem
+  display: flex;
+  flex-direction: column;
+  gap: $space-10;                   // 40px -> rem
+}
+
+.name-container {
+  margin-bottom: $space-8;          // 30px -> rem
+}
+
+.title {
+  font-size: $text-6xl;             // 4rem
+  font-weight: 300;
+  margin: 0;
+  line-height: 1.1;
+  letter-spacing: $space-0_5;       // 2px -> rem
+  color: oklch(0.55 0.1 45);        // #8a7a70 equivalent
+}
+
+.section-title {
+  font-size: $text-xl;              // 1.4rem -> closest
+  font-weight: 400;
+  margin-bottom: $space-5;          // 20px -> rem
+  position: relative;
+  text-transform: uppercase;
+  letter-spacing: $space-px;        // 1px -> rem
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -#{$space-2_5};          // -10px -> rem
+    left: 0;
+    width: $space-16;                // 60px -> rem
+    height: $space-0_5;              // 2px -> rem
+    background-color: oklch(0.55 0.1 45); // #8a7a70 equivalent
+  }
+}
+
+.project-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  padding-bottom: $space-24;        // 100px -> rem
+}
+
+.project-item {
+  font-size: $text-lg;              // 1.2rem -> closest
+  padding: $space-4 0;              // 15px -> rem
+  border-bottom: $space-px solid oklch(0.55 0.1 45 / 0.2); // rgba conversion
+  @include transition(transform);
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateX($space-2_5); // 10px -> rem
+    color: oklch(0.45 0.08 45);       // #6e625a equivalent
+  }
+}
+
+.social-links {
+  display: flex;
+  gap: $space-5;                    // 20px -> rem
+  margin-top: auto;
+}
+
+.social-icon {
+  font-size: $text-2xl;             // 1.8rem -> closest
+  color: oklch(0.55 0.1 45);        // #8a7a70 equivalent
+  @include transition(color);
+  
+  &:hover {
+    color: oklch(0.45 0.08 45);      // #6e625a equivalent
+  }
+}
+
+// Right section styles
+.right-section {
+  flex: 1;
+  min-width: $space-72;             // 300px -> rem
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-photo-container {
+  width: 33.75rem;                  // Keep original rem value
+  height: 33.75rem;
+  border-radius: $radius-full;
+  overflow: visible;
+  background: linear-gradient(to bottom, oklch(0.45 0.12 30) 55%, oklch(0.10 0.01 45) 100%);
+  @include flex-center;
+  position: relative;
+  margin-bottom: 6.25rem;           // Keep original rem value
+  margin-top: 2.5rem;               // Keep original rem value
+}
+
+.profile-photo {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  max-height: 100%;
+  max-width: 95%;
+  margin-bottom: $space-20;         // 80px -> rem
+}
+
+.circular-icons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: $space-12;                   // 50px -> rem
+  margin-top: $space-5;             // 20px -> rem
+}
+
+.icon-circle1, 
+.icon-circle2, 
+.icon-circle3, 
+.icon-circle4 {
+  position: absolute;
+  width: 3.125rem;                  // Keep original rem value
+  height: 3.125rem;
+  border-radius: $radius-full;
+  @include flex-center;
+  @include transition(transform);
+  cursor: pointer;
+}
+
+.icon-circle1 {
+  bottom: 18.125rem;                // Keep original rem positioning
+  right: 1.25rem;
+  z-index: 1;
+}
+
+.icon-circle2 {
+  bottom: 11.875rem;
+  right: 7.5rem;
+  z-index: 1;
+}
+
+.icon-circle3 {
+  bottom: 8.75rem;
+  right: 15.625rem;
+  z-index: 1;
+}
+
+.icon-circle4 {
+  bottom: 9.0625rem;
+  right: 24.375rem;
+  z-index: 1;
+}
+
+.icon {
+  width: $space-10;                 // 40px -> rem
+  height: $space-10;
+  fill: $text-light;
+}
+
+.icon-description {
+  position: absolute;
+  width: 9.375rem;                  // Keep original rem value
+  height: 9.375rem;
+  background-color: oklch(from $text-light l c h / 0.95);
+  border-radius: $radius-full;
+  @include flex-center;
+  text-align: center;
+  padding: 0.9375rem;               // Keep original rem value
+  color: oklch(0.55 0.1 45);        // #8a7a70 equivalent
+  font-size: $text-sm;              // 0.9rem -> closest
+  box-shadow: $shadow-lg;
+  opacity: 0;
+  transform: scale(0);
+  @include transition(all, 0.3s, cubic-bezier(0.34, 1.56, 0.64, 1));
+  pointer-events: none;
+  z-index: 10;
+}
+
+// Icon description positioning
+.icon-circle1 .icon-description { transform-origin: bottom right; }
+.icon-circle2 .icon-description { transform-origin: bottom center; }
+.icon-circle3 .icon-description { transform-origin: bottom left; }
+.icon-circle4 .icon-description { transform-origin: center left; }
+
+.icon-circle1,
+.icon-circle2,
+.icon-circle3,
+.icon-circle4 {
+  .icon-description {
+    @include transition(all, 0.4s, cubic-bezier(0.34, 1.56, 0.64, 1));
+    transform: scale(0) rotate(-15deg);
+  }
+  
+  &:hover .icon-description {
+    opacity: 1;
+    transform: scale(2) rotate(5deg);
+  }
+}
+
+// Technology icons
+.tech-icons {
+  position: absolute;
+  right: 1.25rem;                   // Keep original rem value
+  top: 6.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9375rem;                   // Keep original rem value
+}
+
+.tech-icon {
+  width: 2.5rem;                    // Keep original rem value
+  height: 2.5rem;
+  cursor: pointer;
+  @include transition(transform);
+  
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+// Tech icon colors using OKLCH
+.react svg { fill: oklch(0.75 0.2 210); }       // #61dafb equivalent
+.python svg { fill: oklch(0.55 0.15 245); }     // #3776ab equivalent
+.js svg { fill: oklch(0.85 0.15 85); }          // #f7df1e equivalent
+.cpp svg { fill: oklch(0.45 0.15 230); }        // #00599c equivalent
+.html svg { fill: oklch(0.65 0.2 25); }         // #e34f26 equivalent
+.css svg { fill: oklch(0.55 0.2 240); }         // #1572b6 equivalent
+
+// Responsive design using design system mixins
+@media (max-width: 1480px) {
+  .profile-photo-container {
+    width: 28.125rem;               // Keep original rem values
+    height: 28.125rem;
+    margin-bottom: 12.5rem;
+  }
+  
+  .icon-circle1 {
+    bottom: 15rem;
+    right: 1rem;
+  }
+  
+  .icon-circle2 {
+    bottom: 9.5rem;
+    right: 6rem;
+  }
+  
+  .icon-circle3 {
+    bottom: 7rem;
+    right: 12.5rem;
+  }
+  
+  .icon-circle4 {
+    bottom: 7.5rem;
+    right: 19.5rem;
+  }
+}
+
+@include media(md) {
+  .home-container {
+    padding-top: $space-16;         // 60px -> rem
+    min-height: 90vh;
+  }
+  
+  .content-wrapper {
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: $space-10;                 // 40px -> rem
+  }
+  
+  .profile-photo-container {
+    width: 18.75rem;                // Keep original rem values
+    height: 18.75rem;
+    margin-bottom: 7.5rem;
+    margin-top: 1.25rem;
+  }
+
+  .left-section.animate-in,
+  .right-section.animate-in {
+    animation-duration: 0.6s;
+  }
+
+  .icon-circle1.animate-in,
+  .icon-circle2.animate-in,
+  .icon-circle3.animate-in,
+  .icon-circle4.animate-in {
+    animation-duration: 0.4s;
+  }
+
+  .icon-description {
+    width: 7.5rem;                  // Keep original rem values
+    height: 7.5rem;
+    font-size: $text-xs;            // 0.8rem -> closest
+  }
+  
+  .tech-icons {
+    position: absolute;
+    flex-direction: column;
+    justify-content: center;
+    margin-top: 2.5rem;             // Keep original rem values
+    top: 25rem;
+  }
+
+  .icon-circle1, 
+  .icon-circle2, 
+  .icon-circle3, 
+  .icon-circle4 {
+    width: 2.5rem;                  // Keep original rem values
+    height: 2.5rem;
+  }
+
+  // Reposition icon circles
+  .icon-circle1 {
+    top: 9.375rem;                  // Keep original rem values
+    right: -5rem;
+    transform: scale(0.2);
+  }
+  
+  .icon-circle2 {
+    top: 15.625rem;
+    right: -2.5rem;
+    transform: scale(0.2);
+  }
+  
+  .icon-circle3 {
+    top: 15.625rem;
+    left: -2.5rem;
+    transform: scale(0.2);
+  }
+  
+  .icon-circle4 {
+    top: 9.375rem;
+    left: -5rem;
+    transform: scale(0.2);
+  }
+  
+  .left-section {
+    text-align: center;
+    align-items: center;
+  }
+  
+  .section-title::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .project-item:hover {
+    transform: none;
+  }
+  
+  .project-list {
+    width: 100%;
+    max-width: $space-72;           // 300px -> rem
+  }
+  
+  .profile-photo-container {
+    width: $space-72;               // 300px -> rem
+    height: $space-72;
+  }
+}
+
+@include media(xs) {
+  .home-container {
+    padding-top: $space-10;         // 40px -> rem
+  }
+  
+  .profile-photo-container {
+    width: 15.625rem;               // Keep original rem values
+    height: 15.625rem;
+    margin-bottom: 6.25rem;
+    margin-top: 0.625rem;
+  }
+
+  @keyframes fadeInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-#{$space-8}); // -30px -> rem
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes fadeInRight {
+    from {
+      opacity: 0;
+      transform: translateX($space-8);      // 30px -> rem
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .title-first, 
+  .title-second, 
+  .title-third {
+    animation-duration: 0.4s;
+  }
+
+  .icon-description {
+    width: $space-24;               // 100px -> rem
+    height: $space-24;
+    font-size: 0.7rem;
+    padding: $space-2_5;            // 10px -> rem
+  }
+
+  .title {
+    font-size: $text-4xl;           // 2.5rem -> closest
+  }
+  
+  .profile-photo-container {
+    width: $space-60;               // 250px -> rem
+    height: $space-60;
+  }
+  
+  .icon-circle1, 
+  .icon-circle2, 
+  .icon-circle3, 
+  .icon-circle4 {
+    width: 3.75rem;                 // Keep original rem values
+    height: 3.75rem;
+  }
+  
+  // Reposition icon circles for small mobile
+  .icon-circle1 {
+    top: 9.375rem;                  // Keep original rem values
+    right: -2.8125rem;
+    transform: scale(0.2);
+  }
+  
+  .icon-circle2 {
+    top: 15rem;
+    right: 1.5625rem;
+    transform: scale(0.2);
+  }
+  
+  .icon-circle3 {
+    top: 15rem;
+    left: 1.5625rem;
+    transform: scale(0.2);
+  }
+  
+  .icon-circle4 {
+    top: 9.375rem;
+    left: -2.8125rem;
+    transform: scale(0.2);
+  }
+  
+  .icon {
+    width: 1.875rem;                // Keep original rem values
+    height: 1.875rem;
+  }
+  
+  .tech-icon {
+    width: 1.25rem;                 // Keep original rem values
+    height: 1.25rem;
+  }
+  
+  .icon-description {
+    width: 6.25rem;                 // Keep original rem values
+    height: 6.25rem;
+    font-size: 0.7rem;
+    padding: 0.625rem;
+  }
+}
+
+// Ultra-wide screen optimization
+@media (min-width: 1400px) {
+  .icon-circle1 {
+    bottom: $space-48;              // 12rem -> space variable
+    right: $space-24;               // 6rem -> space variable
+  }
+
+  .icon-circle2 {
+    bottom: $space-28;              // 7rem -> space variable
+    right: $space-40;               // 10rem -> space variable
+  }
+
+  .icon-circle3 {
+    bottom: $space-14;              // 3.5rem -> space variable
+    right: $space-60;               // 15rem -> space variable
+  }
+
+  .icon-circle4 {
+    bottom: $space-8;               // 2rem -> space variable
+    right: $space-80 + $space-4;   // 21rem -> space variable
+  }
+}
+
+// Character Select Section
+.character-select-section {
+  width: 100vw;
+  margin: -#{$space-20} auto 0;     // -5rem -> space variable
+  padding: $space-6 $space-12;     // 1.5rem 3rem -> space variables
+  background: linear-gradient(135deg, oklch(0.15 0.08 300) 0%, oklch(0.45 0.12 30) 100%);
+  border-radius: 0;
+  box-shadow: $shadow-2xl;
+  position: relative;
+  overflow: hidden;
+  min-height: $space-96 - $space-16; // 35rem -> space variables
+}
+
+.character-select-header {
+  text-align: center;
+  margin-bottom: $space-8;          // 2rem -> space variable
+  position: relative;
+  z-index: 2;
+}
+
+.character-select-title {
+  font-size: $text-3xl;             // 2.2rem -> closest
+  color: oklch(0.98 0.005 45);      // #fffbfe equivalent
+  text-transform: uppercase;
+  letter-spacing: $space-1;         // 3px -> space variable
+  text-shadow: 0 0 $space-5 oklch(0.70 0.24 85 / 0.5);
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from { 
+    text-shadow: 0 0 $space-5 oklch(0.70 0.24 85 / 0.5);
+  }
+  to { 
+    text-shadow: 0 0 $space-8 oklch(0.70 0.24 85 / 0.8);
+  }
+}
+
+.character-display-area {
+  @include flex-center;
+  position: relative;
+  height: $space-96;                // 25rem -> space variable
+  margin-bottom: $space-6;          // 1.5rem -> space variable
+}
+
+.character-main-image {
+  width: $space-72;                 // 18rem -> space variable
+  height: $space-80 + $space-8;    // 22rem -> space variables
+  object-fit: cover;
+  object-position: top;
+  border-radius: $radius-2xl;      // 1.25rem -> radius variable
+  border: $space-1 solid oklch(0.70 0.24 85); // #FFA30F equivalent
+  box-shadow: 0 0 $space-8 oklch(0.70 0.24 85 / 0.4);
+  position: relative;
+  z-index: 3;
+  transform: translateY(100%);
+  opacity: 0;
+  @include transition(all, 0.8s, cubic-bezier(0.34, 1.56, 0.64, 1));
+  
+  &.revealed {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.character-info-left,
+.character-info-right {
+  position: absolute;
+  width: $space-60;                 // 15rem -> space variable
+  z-index: 4;
+}
+
+.character-info-left {
+  left: $space-4;                   // 1rem -> space variable
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.character-info-right {
+  right: $space-4;                  // 1rem -> space variable
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.character-name-display {
+  font-size: $text-2xl;             // 1.8rem -> closest
+  color: oklch(0.98 0.005 45);      // #fffbfe equivalent
+  margin-bottom: $space-2;          // 0.5rem -> space variable
+  text-transform: uppercase;
+  letter-spacing: $space-0_5;       // 2px -> space variable
+  text-shadow: $space-0_5 $space-0_5 $space-1 oklch(0 0 0 / 0.8);
+  text-align: center;
+}
+
+.character-class-display {
+  font-size: $text-lg;              // 1.1rem -> closest
+  color: oklch(0.70 0.24 85);       // #FFA30F equivalent
+  margin-bottom: $space-4;          // 1rem -> space variable
+  font-weight: 600;
+  text-shadow: $space-px $space-px $space-0_5 oklch(0 0 0 / 0.8);
+  text-align: center;
+}
+
+.character-stats-side {
+  background: oklch(0 0 0 / 0.7);
+  padding: $space-4;                // 1rem -> space variable
+  border-radius: $radius-xl;        // 1rem -> radius variable
+  backdrop-filter: blur($space-2_5);
+  border: $space-0_5 solid oklch(0.70 0.24 85 / 0.3);
+}
+
+.stats-title {
+  font-size: $text-base;            // 1rem
+  color: oklch(0.70 0.24 85);       // #FFA30F equivalent
+  margin-bottom: $space-3;          // 0.75rem -> space variable
+  text-transform: uppercase;
+  letter-spacing: $space-px;        // 1px -> space variable
+  text-align: center;
+}
+
+.stat-item-side {
+  background: oklch(0.45 0.12 30 / 0.4);
+  padding: $space-2;                // 0.5rem -> space variable
+  border-radius: $radius-lg;        // 0.5rem -> radius variable
+  margin-bottom: $space-2;          // 0.5rem -> space variable
+  border-left: $space-1 solid oklch(0.70 0.24 85); // 3px -> space variable
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-label-side {
+  font-size: $text-sm;              // 0.9rem -> closest
+  color: oklch(0.98 0.005 45);      // #fffbfe equivalent
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: $space-px;        // 1px -> space variable
+  flex-grow: 1;
+}
+
+.stat-value-side {
+  font-size: $text-xl;              // 1.5rem -> closest
+  color: oklch(0.98 0.005 45);      // #fffbfe equivalent
+  font-weight: 700;
+  text-shadow: $space-px $space-px $space-0_5 oklch(0 0 0 / 0.8);
+  min-width: $space-8;              // 2rem -> space variable
+  text-align: right;
+}
+
+.character-skills-side {
+  background: oklch(0 0 0 / 0.7);
+  padding: $space-4;                // 1rem -> space variable
+  border-radius: $radius-xl;        // 1rem -> radius variable
+  backdrop-filter: blur($space-2_5);
+  border: $space-0_5 solid oklch(0.70 0.24 85 / 0.3);
+}
+
+.skills-title-side {
+  font-size: $text-base;            // 1rem
+  color: oklch(0.70 0.24 85);       // #FFA30F equivalent
+  margin-bottom: $space-3;          // 0.75rem -> space variable
+  text-transform: uppercase;
+  letter-spacing: $space-px;        // 1px -> space variable
+  text-align: center;
+}
+
+.skills-list-side {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;                    // 0.5rem -> space variable
+}
+
+.skill-badge-side {
+  background: linear-gradient(45deg, oklch(0.65 0.22 80), oklch(0.70 0.24 85));
+  color: oklch(0.98 0.005 45);      // #fffbfe equivalent
+  padding: $space-2 $space-3;      // 0.5rem 0.75rem -> space variables
+  border-radius: $radius-xl;        // 0.75rem -> radius variable
+  font-size: $text-base;            // 1rem
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: $space-0_5;       // 0.5px -> space variable
+  box-shadow: 0 $space-0_5 $space-2_5 oklch(0.65 0.22 80 / 0.4);
+  text-align: center;
+  @include transition;
+}
+
+.character-variations {
+  display: flex;
+  justify-content: center;
+  gap: $space-20;                   // 5rem -> space variable
+  position: relative;
+  z-index: 4;
+}
+
+.variation-option {
+  width: $space-24;                 // 6rem -> space variable
+  height: $space-40;                // 10rem -> space variable
+  object-fit: cover;
+  border-radius: $radius-xl;        // 0.75rem -> radius variable
+  border: $space-1 solid transparent; // 3px -> space variable
+  cursor: pointer;
+  @include transition;
+  opacity: 0.7;
+  
+  &:hover {
+    opacity: 0.9;
+    transform: translateY(-#{$space-1}); // -0.25rem -> space variable
+  }
+  
+  &.selected {
+    opacity: 1;
+    border-color: oklch(0.70 0.24 85); // #FFA30F equivalent
+    box-shadow: 0 0 $space-6 oklch(0.70 0.24 85 / 0.6);
+    animation: selectedGlow 2s ease-in-out infinite alternate;
+  }
+}
+
+.recruit-button {
+  background: linear-gradient(45deg, oklch(0.70 0.24 85), oklch(0.65 0.22 80));
+  color: oklch(0.98 0.005 45);      // #fffbfe equivalent
+  border: none;
+  padding: $space-3 $space-6;      // 0.75rem 1.5rem -> space variables
+  border-radius: $radius-3xl;      // 1.5rem -> radius variable
+  font-size: $text-base;            // 1rem
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: $space-px;        // 1px -> space variable
+  cursor: pointer;
+  @include transition;
+  box-shadow: 0 $space-1_5 $space-4 oklch(0.70 0.24 85 / 0.4);
+  position: absolute;
+  bottom: $space-4;                 // 1rem -> space variable
+  left: $space-12;                  // 3rem -> space variable
+  z-index: 4;
+  
+  &:hover {
+    background: linear-gradient(45deg, oklch(0.65 0.22 80), oklch(0.70 0.24 85));
+    transform: translateY(-#{$space-0_5}); // -2px -> space variable
+    box-shadow: 0 $space-2 $space-6 oklch(0.70 0.24 85 / 0.6);
+  }
+}
+
+.resume-button {
+  background: oklch(0.95 0.02 45);  // #f8f5f2 equivalent
+  color: oklch(0.70 0.24 85);       // #FFA30F equivalent
+  border: $space-0_5 solid oklch(0.70 0.24 85); // 2px -> space variable
+  padding: $space-3 $space-6;      // 0.75rem 1.5rem -> space variables
+  border-radius: $radius-3xl;      // 1.5rem -> radius variable
+  font-size: $text-base;            // 1rem
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: $space-px;        // 1px -> space variable
+  cursor: pointer;
+  @include transition;
+  box-shadow: 0 $space-1_5 $space-4 oklch(0.70 0.24 85 / 0.2);
+  position: absolute;
+  bottom: $space-4;                 // 1rem -> space variable
+  right: $space-12;                 // 3rem -> space variable
+  z-index: 4;
+  
+  &:hover {
+    background: linear-gradient(45deg, oklch(0.70 0.24 85), oklch(0.65 0.22 80));
+    color: oklch(0.98 0.005 45);     // #fffbfe equivalent
+    border: $space-0_5 solid transparent;
+    transform: translateY(-#{$space-0_5}); // -2px -> space variable
+    box-shadow: 0 $space-2 $space-6 oklch(0.70 0.24 85 / 0.4);
+  }
+}

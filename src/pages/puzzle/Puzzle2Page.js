@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import './puzzle-shared.css';
+import './puzzle-shared.scss';
 
 const Puzzle2Page = () => {
   const [grid, setGrid] = useState([
