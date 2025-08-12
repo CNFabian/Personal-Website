@@ -176,18 +176,18 @@ body {
   }
 }
 
-// Original CSS converted to SCSS with OKLCH and rem
 .home-container {
-  bottom: $space-24;                 // 100px -> rem
   width: 100vw;
   margin: 0 auto;
   padding: $space-5 $space-10;      // 20px 40px -> rem
   min-height: 83vh;
-  position: flex;
+  position: relative;               // Changed from flex to relative
   padding-top: $space-20;           // 80px -> rem
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: visible;                // Ensure icons aren't clipped
+  padding-bottom: $space-24;        // Add bottom padding to prevent cutoff
 }
 
 .content-wrapper {
@@ -355,25 +355,25 @@ body {
 .icon-circle1 {
   bottom: 18.125rem;                // Keep original rem positioning
   right: 1.25rem;
-  z-index: 1;
+  z-index: 100;                     // Increased from 1
 }
 
 .icon-circle2 {
   bottom: 11.875rem;
   right: 7.5rem;
-  z-index: 1;
+  z-index: 100;                     // Increased from 1
 }
 
 .icon-circle3 {
   bottom: 8.75rem;
   right: 15.625rem;
-  z-index: 1;
+  z-index: 100;                     // Increased from 1
 }
 
 .icon-circle4 {
   bottom: 9.0625rem;
   right: 24.375rem;
-  z-index: 1;
+  z-index: 100;                     // Increased from 1
 }
 
 .icon {
@@ -398,7 +398,7 @@ body {
   transform: scale(0);
   @include transition(all, 0.3s, cubic-bezier(0.34, 1.56, 0.64, 1));
   pointer-events: none;
-  z-index: 10;
+  z-index: 110;                     // Increased from 10 to stay above circles
 }
 
 // Icon description positioning
@@ -713,17 +713,37 @@ body {
   }
 }
 
-// Character Select Section
 .character-select-section {
   width: 100vw;
-  margin: -#{$space-20} auto 0;     // -5rem -> space variable
-  padding: $space-6 $space-12;     // 1.5rem 3rem -> space variables
-  background: linear-gradient(135deg, oklch(0.15 0.08 300) 0%, oklch(0.45 0.12 30) 100%);
+  margin: 0 auto;                    // Remove negative margin
+  padding: $space-16 $space-12 $space-6; // Add more top padding
+  background: linear-gradient(180deg, 
+    oklch(0.20 0 0) 0%,              // Start from dark (matches #121212)
+    oklch(0.25 0.06 300) 5%,        // Transition to subtle purple
+    oklch(0.35 0.10 30) 50%,         // Mid-point with warm tone
+    oklch(0.25 0.06 300) 95%,        // Transition back to purple
+    oklch(0.20 0 0) 100%             // End with dark (matches footer)
+  );
   border-radius: 0;
-  box-shadow: $shadow-2xl;
+  box-shadow: none;                   // Remove shadow for seamless blend
   position: relative;
   overflow: hidden;
   min-height: $space-96 - $space-16; // 35rem -> space variables
+}
+
+.character-select-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: $space-24;                 // 6rem fade zone
+  background: linear-gradient(180deg,
+    oklch(0.20 0 0) 0%,              // Dark top
+    transparent 100%
+  );
+  z-index: 1;
+  pointer-events: none;
 }
 
 .character-select-header {
@@ -732,6 +752,22 @@ body {
   position: relative;
   z-index: 2;
 }
+
+.character-select-section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: $space-24;                 // 6rem fade zone
+  background: linear-gradient(180deg,
+    transparent 0%,
+    oklch(0.20 0 0) 100%             // Dark bottom to match footer
+  );
+  z-index: 1;
+  pointer-events: none;
+}
+
 
 .character-select-title {
   font-size: $text-3xl;             // 2.2rem -> closest

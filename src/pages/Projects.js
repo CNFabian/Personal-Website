@@ -152,9 +152,46 @@ const Projects = () => {
 
   return (
     <div className="projects-container">
-      <h2 className="section-heading">Professional Experience</h2>
+      <h2 className="section-heading">Projects & Professional Experience</h2>
       
         <div className="timeline">
+        <div className="timeline-item timeline-item-right">
+          <div className="timeline-content">
+            <div className="timeline-date">December 2024</div>
+            <h3 className="timeline-role">🏠 Nest Navigate - Interactive Learning Module</h3>
+            <h4 className="timeline-company">Educational Platform for Homebuyers</h4>
+            
+            <a href="https://nest-navigate-assignment.vercel.app/" className="link" target="_blank" rel="noopener noreferrer">View Live Application</a>
+            
+            <div className="timeline-location">
+              <MapPin size={16} />
+              Personal Project
+            </div>
+            
+            <div className="skill-tags">
+              <span className="skill-tag">React 18</span>
+              <span className="skill-tag">Vite</span>
+              <span className="skill-tag">Tailwind CSS</span>
+              <span className="skill-tag">Lucide React</span>
+              <span className="skill-tag">Gamification</span>
+              <span className="skill-tag">LocalStorage API</span>
+              <span className="skill-tag">Responsive Design</span>
+            </div>
+            
+            <p className="project-description">
+              Developed a <span className="skill-highlight">gamified learning platform</span> for first-time homebuyers focused on understanding home inspections. This interactive educational application transforms complex homebuying concepts into engaging, digestible lessons with real-time progress tracking.
+            </p>
+            
+            <ul className="timeline-achievements">
+              <li>Created <span className="skill-highlight">3 comprehensive interactive lessons</span> covering home inspection fundamentals, types of inspections, and red flags to watch for.</li>
+              <li>Implemented <span className="skill-highlight">gamification elements</span> including coin rewards (15 coins per correct answer), progress tracking, and an achievement ranking system from "House Hunter" to "Property Mogul".</li>
+              <li>Built with <span className="skill-highlight">React 18 and Vite</span> for optimal performance, utilizing React Hooks for state management and LocalStorage for progress persistence.</li>
+              <li>Designed a <span className="skill-highlight">mobile-first responsive interface</span> with smooth animations and transitions using Tailwind CSS.</li>
+              <li>Integrated <span className="skill-highlight">interactive quizzes</span> with instant feedback, progress visualization, and celebration animations for course completion.</li>
+              <li>Achieved <span className="skill-highlight">100% accessibility compliance</span> with proper ARIA labels and SEO optimization with structured data.</li>
+            </ul>
+          </div>
+        </div>
           <div className="timeline-item timeline-item-left">
             <div className="timeline-content">
               <div className="timeline-date">March 2025</div>

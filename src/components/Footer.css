@@ -1,11 +1,16 @@
 .footer {
-  background-color: #121212;
+  background: linear-gradient(180deg,
+    oklch(0.20 0 0) 0%,              /* Matches character section end */
+    oklch(0.18 0 0) 50%,             /* Slightly darker middle */
+    oklch(0.15 0 0) 100%             /* Very dark bottom */
+  );
   color: #f5f5f5;
   text-align: center;
   padding: 0.5rem 0;
   width: 100%;
   position: relative;
   margin-bottom: 0;
+  margin-top: -1px;                  /* Eliminate any gap */
 }
 
 .footer p {
