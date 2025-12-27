@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MapPin, Upload, Image } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import './Projects.css';
 
 const Projects = () => {
@@ -153,7 +154,37 @@ const Projects = () => {
   return (
     <div className="projects-container">
       <h2 className="section-heading">Projects & Professional Experience</h2>
-      
+      <div className="timeline-item timeline-item-left">
+          <div className="timeline-content">
+            <div className="timeline-date">December 2024</div>
+            <h3 className="timeline-role">Egyptian Ratscrew Card Game</h3>
+            <h4 className="timeline-company">Personal Project</h4>
+            <div className="timeline-location">
+              <MapPin size={16} />
+              Interactive Browser Game
+            </div>
+            
+            <div className="skill-tags">
+              <span className="skill-tag">Phaser 3</span>
+              <span className="skill-tag">TypeScript</span>
+              <span className="skill-tag">Game Development</span>
+              <span className="skill-tag">React Integration</span>
+            </div>
+            
+            <ul className="timeline-achievements">
+              <li>Built an interactive card game using <span className="skill-highlight">Phaser 3 game engine</span> and TypeScript for enhanced type safety.</li>
+              <li>Implemented custom game logic including slap mechanics, challenge systems, and configurable rule sets.</li>
+              <li>Integrated the Phaser game seamlessly into a React application, managing game lifecycle and cleanup.</li>
+              <li>Designed responsive UI with mobile touch support and keyboard controls for desktop gameplay.</li>
+            </ul>
+            
+            <div className="project-link-container">
+              <Link to="/egyptian-ratscrew" className="play-game-button">
+                Play Game →
+              </Link>
+            </div>
+          </div>
+        </div>
         <div className="timeline">
         <div className="timeline-item timeline-item-right">
           <div className="timeline-content">

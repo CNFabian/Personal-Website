@@ -7,6 +7,7 @@ import Secret from './pages/Secret';
 import Contact from './pages/Contact';
 import NewHome from './pages/new_home';
 import Projects from './pages/Projects';
+import EgyptianRatscrew from './pages/EgyptianRatscrew';
 
 import './App.css';
 
@@ -42,6 +43,7 @@ const App = () => {
         <Route path="/puzzle2" element={<Puzzle2Page />} />
         <Route path="/puzzle3" element={<Puzzle3Page />} />
         <Route path="/image_captioner" element={<ImageCaptioner />} />
+        <Route path="/egyptian-ratscrew" element={<EgyptianRatscrew />} />
       </Routes>
       <Footer /> 
     </>
