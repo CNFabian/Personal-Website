@@ -1,8 +1,33 @@
 import * as Phaser from 'phaser';
-import { SCENE_KEYS, COLORS, DEFAULT_RULES, GameRules } from '../common';
+import { SCENE_KEYS, COLORS, DEFAULT_RULES, GameRules, RULE_NAMES, RULE_DESCRIPTIONS } from '../common';
 import { io, Socket } from 'socket.io-client';
 
 const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || 'http://localhost:3001';
+const RULES_STORAGE_KEY = 'ratscrew_rules';
+
+/** Load saved rules from localStorage, falling back to defaults */
+function loadSavedRules(): GameRules {
+  try {
+    const stored = localStorage.getItem(RULES_STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // Merge with defaults to handle any newly-added rule keys
+      return { ...DEFAULT_RULES, ...parsed };
+    }
+  } catch {
+    // Ignore parse errors
+  }
+  return { ...DEFAULT_RULES };
+}
+
+/** Persist rules to localStorage */
+function saveRules(rules: GameRules): void {
+  try {
+    localStorage.setItem(RULES_STORAGE_KEY, JSON.stringify(rules));
+  } catch {
+    // Ignore storage errors
+  }
+}
 
 export class LobbyScene extends Phaser.Scene {
   private socket!: Socket;
@@ -18,6 +43,9 @@ export class LobbyScene extends Phaser.Scene {
   private myPlayerNumber: 1 | 2 = 1;
   private rules: GameRules = { ...DEFAULT_RULES };
 
+  // Rule toggle tracking
+  private ruleToggles: Map<keyof GameRules, { box: Phaser.GameObjects.Rectangle; checkmark: Phaser.GameObjects.Text }> = new Map();
+
   // UI containers for show/hide
   private mainMenuContainer!: Phaser.GameObjects.Container;
   private waitingContainer!: Phaser.GameObjects.Container;
@@ -28,6 +56,8 @@ export class LobbyScene extends Phaser.Scene {
   }
 
   init(data: { rules?: GameRules }): void {
+    // Load from localStorage first, then override with passed-in rules if any
+    this.rules = loadSavedRules();
     if (data?.rules) {
       this.rules = { ...data.rules };
     }
@@ -86,26 +116,166 @@ export class LobbyScene extends Phaser.Scene {
     }).setOrigin(0.5);
   }
 
-  // ---- Main menu (Create / Join buttons) ----
+  // ---- Main menu (Rules panel + Create / Join buttons) ----
 
   private createMainMenu(): void {
     const centerX = this.cameras.main.centerX;
-    const centerY = this.cameras.main.centerY;
     this.mainMenuContainer = this.add.container(0, 0);
 
-    const createBtn = this.createButton(centerX, centerY - 30, 'CREATE ROOM', () => {
+    // Rules panel
+    this.createRulesPanel();
+
+    // Buttons below the rules panel
+    const buttonsStartY = 590;
+
+    const createBtn = this.createButton(centerX, buttonsStartY, 'CREATE ROOM', () => {
+      // Validate at least one rule
+      const hasActiveRule = Object.values(this.rules).some(v => v === true);
+      if (!hasActiveRule) {
+        this.statusText.setText('Please enable at least one rule!');
+        this.time.delayedCall(2000, () => {
+          if (this.statusText) this.statusText.setText('');
+        });
+        return;
+      }
+      saveRules(this.rules);
       this.socket.emit('createRoom', { rules: this.rules });
     });
 
-    const joinBtn = this.createButton(centerX, centerY + 50, 'JOIN ROOM', () => {
+    const joinBtn = this.createButton(centerX, buttonsStartY + 70, 'JOIN ROOM', () => {
       this.showJoinUI();
     });
 
-    const backBtn = this.createButton(centerX, centerY + 130, 'BACK TO MENU', () => {
+    const backBtn = this.createButton(centerX, buttonsStartY + 140, 'BACK TO MENU', () => {
       this.cleanupAndReturn();
     });
 
     this.mainMenuContainer.add([createBtn, joinBtn, backBtn]);
+  }
+
+  private createRulesPanel(): void {
+    const centerX = this.cameras.main.centerX;
+    const panelWidth = 820;
+    const panelHeight = 370;
+    const panelY = 190;
+
+    // Panel background
+    const panelBg = this.add.rectangle(
+      centerX,
+      panelY + panelHeight / 2,
+      panelWidth,
+      panelHeight,
+      0x1a1a1a,
+      0.85
+    );
+    panelBg.setStrokeStyle(2, 0xffd700);
+
+    // Panel title
+    const panelTitle = this.add.text(centerX, panelY + 20, 'GAME RULES', {
+      fontSize: '22px',
+      color: COLORS.GOLD,
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+
+    this.mainMenuContainer.add([panelBg, panelTitle]);
+
+    // Create rule toggles in a 2-column grid
+    const ruleKeys = Object.keys(this.rules) as Array<keyof GameRules>;
+    const itemsPerColumn = 4;
+    const columnWidth = panelWidth / 2;
+    const startX = centerX - panelWidth / 2 + 50;
+    const startY = panelY + 55;
+    const spacing = 42;
+
+    ruleKeys.forEach((ruleKey, index) => {
+      const column = Math.floor(index / itemsPerColumn);
+      const row = index % itemsPerColumn;
+      const x = startX + column * columnWidth;
+      const y = startY + row * spacing;
+
+      this.createRuleToggle(ruleKey, x, y);
+    });
+
+    // Reset defaults button (small, bottom-right of panel)
+    const resetBtn = this.add.container(centerX + panelWidth / 2 - 90, panelY + panelHeight - 25);
+    const resetBg = this.add.rectangle(0, 0, 140, 30, 0x333333);
+    resetBg.setStrokeStyle(1, 0x666666);
+    const resetText = this.add.text(0, 0, 'RESET DEFAULTS', {
+      fontSize: '12px',
+      color: COLORS.LIGHT_GRAY,
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+    resetBtn.add([resetBg, resetText]);
+    resetBtn.setSize(140, 30);
+    resetBtn.setInteractive();
+
+    resetBtn.on('pointerover', () => {
+      resetBg.setFillStyle(0x444444);
+    });
+    resetBtn.on('pointerout', () => {
+      resetBg.setFillStyle(0x333333);
+    });
+    resetBtn.on('pointerup', () => {
+      this.rules = { ...DEFAULT_RULES };
+      saveRules(this.rules);
+      this.ruleToggles.forEach((toggle, key) => {
+        toggle.checkmark.setVisible(this.rules[key]);
+        toggle.box.setFillStyle(this.rules[key] ? 0x2a5a2a : 0x333333);
+      });
+    });
+
+    this.mainMenuContainer.add(resetBtn);
+  }
+
+  private createRuleToggle(ruleKey: keyof GameRules, x: number, y: number): void {
+    const container = this.add.container(x, y);
+
+    // Checkbox
+    const boxSize = 24;
+    const box = this.add.rectangle(0, 0, boxSize, boxSize, this.rules[ruleKey] ? 0x2a5a2a : 0x333333);
+    box.setStrokeStyle(2, 0xffd700);
+
+    const checkmark = this.add.text(0, 0, '✓', {
+      fontSize: '18px',
+      color: COLORS.GREEN,
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+    checkmark.setVisible(this.rules[ruleKey]);
+
+    // Rule name
+    const nameText = this.add.text(boxSize / 2 + 12, -6, RULE_NAMES[ruleKey], {
+      fontSize: '16px',
+      color: COLORS.WHITE,
+      fontStyle: 'bold'
+    }).setOrigin(0, 0.5);
+
+    // Description
+    const descText = this.add.text(boxSize / 2 + 12, 10, RULE_DESCRIPTIONS[ruleKey], {
+      fontSize: '11px',
+      color: COLORS.LIGHT_GRAY
+    }).setOrigin(0, 0.5);
+
+    container.add([box, checkmark, nameText, descText]);
+    container.setSize(380, 36);
+    container.setInteractive();
+
+    container.on('pointerover', () => {
+      box.setFillStyle(0x444444);
+    });
+
+    container.on('pointerout', () => {
+      box.setFillStyle(this.rules[ruleKey] ? 0x2a5a2a : 0x333333);
+    });
+
+    container.on('pointerdown', () => {
+      this.rules[ruleKey] = !this.rules[ruleKey];
+      checkmark.setVisible(this.rules[ruleKey]);
+      box.setFillStyle(this.rules[ruleKey] ? 0x2a5a2a : 0x333333);
+      saveRules(this.rules);
+    });
+
+    this.ruleToggles.set(ruleKey, { box, checkmark });
+    this.mainMenuContainer.add(container);
   }
 
   // ---- Waiting UI (after creating a room) ----
@@ -344,8 +514,6 @@ export class LobbyScene extends Phaser.Scene {
       });
     });
   }
-
-  // Player number is now tracked via myPlayerNumber, set by roomCreated/roomJoined events
 
   // ---- UI visibility helpers ----
 

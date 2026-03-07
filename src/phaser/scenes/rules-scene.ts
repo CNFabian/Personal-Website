@@ -1,6 +1,24 @@
 import * as Phaser from 'phaser';
 import { SCENE_KEYS, COLORS, GameRules, DEFAULT_RULES, RULE_DESCRIPTIONS, RULE_NAMES } from '../common';
 
+const RULES_STORAGE_KEY = 'ratscrew_rules';
+
+function loadSavedRules(): GameRules {
+  try {
+    const stored = localStorage.getItem(RULES_STORAGE_KEY);
+    if (stored) {
+      return { ...DEFAULT_RULES, ...JSON.parse(stored) };
+    }
+  } catch { /* ignore */ }
+  return { ...DEFAULT_RULES };
+}
+
+function saveRules(rules: GameRules): void {
+  try {
+    localStorage.setItem(RULES_STORAGE_KEY, JSON.stringify(rules));
+  } catch { /* ignore */ }
+}
+
 export class RulesScene extends Phaser.Scene {
   private rules: GameRules;
   private toggles: Map<keyof GameRules, Phaser.GameObjects.Container>;
@@ -8,11 +26,15 @@ export class RulesScene extends Phaser.Scene {
 
   constructor() {
     super({ key: SCENE_KEYS.RULES });
-    this.rules = { ...DEFAULT_RULES };
+    this.rules = loadSavedRules();
     this.toggles = new Map();
   }
 
   create(): void {
+    // Reload from localStorage each time scene starts
+    this.rules = loadSavedRules();
+    this.toggles.clear();
+
     this.createBackground();
     this.createTitle();
     this.createRulesPanel();
@@ -169,12 +191,13 @@ export class RulesScene extends Phaser.Scene {
 
   private toggleRule(ruleKey: keyof GameRules): void {
     this.rules[ruleKey] = !this.rules[ruleKey];
-    
+    saveRules(this.rules);
+
     const toggle = this.toggles.get(ruleKey);
     if (toggle) {
       const checkmark = (toggle as any).checkmark as Phaser.GameObjects.Text;
       checkmark.setVisible(this.rules[ruleKey]);
-      
+
       const box = (toggle as any).box as Phaser.GameObjects.Rectangle;
       box.setFillStyle(this.rules[ruleKey] ? 0x00ff00 : 0x333333);
       this.time.delayedCall(100, () => {
@@ -253,12 +276,13 @@ export class RulesScene extends Phaser.Scene {
 
   private resetToDefault(): void {
     this.rules = { ...DEFAULT_RULES };
-    
+    saveRules(this.rules);
+
     this.toggles.forEach((toggle, ruleKey) => {
       const checkmark = (toggle as any).checkmark as Phaser.GameObjects.Text;
       checkmark.setVisible(this.rules[ruleKey]);
     });
-    
+
     this.cameras.main.flash(200, 255, 255, 255, false);
   }
 
