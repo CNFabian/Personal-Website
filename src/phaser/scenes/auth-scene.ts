@@ -237,8 +237,7 @@ export class AuthScene extends Phaser.Scene {
       </div>
     `;
 
-    this.domFormElement = this.add.dom(centerX, formY + (portrait ? 60 : 65)).createFromHTML(formHTML);
-    this.domFormElement.setOrigin(0.5, 0);
+    this.domFormElement = this.add.dom(centerX, formY + (portrait ? 155 : 165)).createFromHTML(formHTML);
     this.domFormElement.setDepth(200);
 
     // Sync DOM inputs with internal state
