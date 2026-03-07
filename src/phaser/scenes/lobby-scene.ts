@@ -14,6 +14,8 @@ export class LobbyScene extends Phaser.Scene {
   private cursorTimer!: Phaser.Time.TimerEvent;
   private isJoining: boolean = false;
   private isWaiting: boolean = false;
+  private myRoomCode: string = '';
+  private myPlayerNumber: 1 | 2 = 1;
   private rules: GameRules = { ...DEFAULT_RULES };
 
   // UI containers for show/hide
@@ -301,12 +303,16 @@ export class LobbyScene extends Phaser.Scene {
 
     this.socket.on('roomCreated', (data: { roomCode: string; playerNumber: number }) => {
       console.log('[Lobby] Room created:', data.roomCode);
+      this.myRoomCode = data.roomCode;
+      this.myPlayerNumber = 1;
       this.roomCodeDisplay.setText(data.roomCode);
       this.showWaitingUI();
     });
 
     this.socket.on('roomJoined', (data: { roomCode: string; playerNumber: number }) => {
       console.log('[Lobby] Joined room:', data.roomCode, 'as player', data.playerNumber);
+      this.myRoomCode = data.roomCode;
+      this.myPlayerNumber = data.playerNumber as 1 | 2;
       this.statusText.setText('Joined! Starting game...');
     });
 
@@ -323,10 +329,7 @@ export class LobbyScene extends Phaser.Scene {
     });
 
     this.socket.on('gameStart', (data: { gameState: any; rules: any }) => {
-      console.log('[Lobby] Game starting!');
-
-      // Determine our player number from the room
-      const myPlayerNumber = this.getMyPlayerNumber();
+      console.log('[Lobby] Game starting! Room:', this.myRoomCode, 'Player:', this.myPlayerNumber);
 
       // Transition to game scene with multiplayer config
       this.cameras.main.fadeOut(500, 0, 0, 0);
@@ -334,19 +337,15 @@ export class LobbyScene extends Phaser.Scene {
         this.scene.start(SCENE_KEYS.GAME, {
           rules: data.rules,
           multiplayer: true,
-          playerNumber: myPlayerNumber,
-          roomCode: this.roomCodeDisplay?.text || '',
+          playerNumber: this.myPlayerNumber,
+          roomCode: this.myRoomCode,
           socket: this.socket, // Pass the socket directly
         });
       });
     });
   }
 
-  private getMyPlayerNumber(): number {
-    // If we created the room, we're player 1; if we joined, we're player 2
-    // We track this via the isWaiting flag (creator waits)
-    return this.isWaiting ? 1 : 2;
-  }
+  // Player number is now tracked via myPlayerNumber, set by roomCreated/roomJoined events
 
   // ---- UI visibility helpers ----
 
