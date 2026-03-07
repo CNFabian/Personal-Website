@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser';
-import { SCENE_KEYS, COLORS, DEFAULT_RULES, GameRules, RULE_NAMES, RULE_DESCRIPTIONS, AuthUser } from '../common';
+import { SCENE_KEYS, COLORS, DEFAULT_RULES, GameRules, RULE_NAMES, RULE_DESCRIPTIONS, AuthUser, isMobileDevice } from '../common';
 import { io, Socket } from 'socket.io-client';
 
 const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || 'http://localhost:3001';
@@ -45,6 +45,10 @@ export class LobbyScene extends Phaser.Scene {
   private authUser: AuthUser | null = null;
   private opponentJoined: boolean = false;
 
+  // Mobile
+  private isMobile: boolean = false;
+  private joinDomElement: Phaser.GameObjects.DOMElement | null = null;
+
   // Rule toggle tracking
   private ruleToggles: Map<keyof GameRules, { box: Phaser.GameObjects.Rectangle; checkmark: Phaser.GameObjects.Text }> = new Map();
 
@@ -72,6 +76,7 @@ export class LobbyScene extends Phaser.Scene {
     this.authUser = data?.authUser || null;
     this.opponentJoined = false;
     this.isHosting = false;
+    this.isMobile = isMobileDevice();
   }
 
   create(): void {
@@ -471,32 +476,67 @@ export class LobbyScene extends Phaser.Scene {
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    // Input background
-    const inputBg = this.add.rectangle(centerX, centerY - 20, 280, 60, 0x1a1a1a);
-    inputBg.setStrokeStyle(3, 0xffd700);
+    if (this.isMobile) {
+      // DOM input for mobile (triggers native keyboard)
+      const inputHTML = `
+        <input id="join-code-input" type="text" maxlength="4" autocomplete="off"
+          style="width:240px; padding:12px; font-size:36px; font-weight:bold;
+                 text-align:center; letter-spacing:12px; text-transform:uppercase;
+                 background:#1a1a1a; color:#ffd700; border:3px solid #ffd700;
+                 border-radius:4px; outline:none;" />
+      `;
+      this.joinDomElement = this.add.dom(centerX, centerY - 15).createFromHTML(inputHTML);
+      this.joinDomElement.setDepth(200);
 
-    // Input text
-    this.joinInputText = this.add.text(centerX, centerY - 20, '', {
-      fontSize: '42px',
-      color: COLORS.GOLD,
-      fontStyle: 'bold',
-      letterSpacing: 8
-    }).setOrigin(0.5);
+      const inputEl = this.joinDomElement.getChildByID('join-code-input') as HTMLInputElement;
+      if (inputEl) {
+        inputEl.addEventListener('input', () => {
+          inputEl.value = inputEl.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
+          this.joinInput = inputEl.value;
+        });
+        inputEl.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && this.joinInput.length === 4) {
+            inputEl.blur();
+            this.socket.emit('joinRoom', {
+              roomCode: this.joinInput,
+              userId: this.authUser?.userId,
+              username: this.authUser?.username,
+              token: this.authUser?.token,
+            });
+          }
+        });
+      }
 
-    // Blinking cursor
-    this.inputCursor = this.add.text(centerX + 5, centerY - 20, '|', {
-      fontSize: '42px',
-      color: COLORS.GOLD,
-      fontStyle: 'bold'
-    }).setOrigin(0, 0.5);
+      this.joinContainer.add([label]);
+      // DOM element is added to the scene separately, not the container
+    } else {
+      // Phaser text input for desktop (original)
+      const inputBg = this.add.rectangle(centerX, centerY - 20, 280, 60, 0x1a1a1a);
+      inputBg.setStrokeStyle(3, 0xffd700);
 
-    this.cursorTimer = this.time.addEvent({
-      delay: 500,
-      callback: () => {
-        this.inputCursor.setVisible(!this.inputCursor.visible);
-      },
-      loop: true
-    });
+      this.joinInputText = this.add.text(centerX, centerY - 20, '', {
+        fontSize: '42px',
+        color: COLORS.GOLD,
+        fontStyle: 'bold',
+        letterSpacing: 8
+      }).setOrigin(0.5);
+
+      this.inputCursor = this.add.text(centerX + 5, centerY - 20, '|', {
+        fontSize: '42px',
+        color: COLORS.GOLD,
+        fontStyle: 'bold'
+      }).setOrigin(0, 0.5);
+
+      this.cursorTimer = this.time.addEvent({
+        delay: 500,
+        callback: () => {
+          this.inputCursor.setVisible(!this.inputCursor.visible);
+        },
+        loop: true
+      });
+
+      this.joinContainer.add([label, inputBg, this.joinInputText, this.inputCursor]);
+    }
 
     const joinBtn = this.createButton(centerX, centerY + 50, 'JOIN', () => {
       if (this.joinInput.length === 4) {
@@ -515,7 +555,7 @@ export class LobbyScene extends Phaser.Scene {
       this.showMainMenu();
     });
 
-    this.joinContainer.add([label, inputBg, this.joinInputText, this.inputCursor, joinBtn, backBtn]);
+    this.joinContainer.add([joinBtn, backBtn]);
     this.joinContainer.setVisible(false);
   }
 
@@ -695,6 +735,7 @@ export class LobbyScene extends Phaser.Scene {
     this.hostContainer.setVisible(false);
     this.waitingContainer.setVisible(false);
     this.joinContainer.setVisible(false);
+    if (this.joinDomElement) this.joinDomElement.setVisible(false);
     this.statusText.setText('');
   }
 
@@ -706,6 +747,7 @@ export class LobbyScene extends Phaser.Scene {
     this.hostContainer.setVisible(true);
     this.waitingContainer.setVisible(false);
     this.joinContainer.setVisible(false);
+    if (this.joinDomElement) this.joinDomElement.setVisible(false);
   }
 
   private showWaitingUI(): void {
@@ -716,6 +758,7 @@ export class LobbyScene extends Phaser.Scene {
     this.hostContainer.setVisible(false);
     this.waitingContainer.setVisible(true);
     this.joinContainer.setVisible(false);
+    if (this.joinDomElement) this.joinDomElement.setVisible(false);
   }
 
   private showJoinUI(): void {
@@ -723,7 +766,13 @@ export class LobbyScene extends Phaser.Scene {
     this.isWaiting = false;
     this.isHosting = false;
     this.joinInput = '';
-    this.updateJoinInputDisplay();
+    if (!this.isMobile) {
+      this.updateJoinInputDisplay();
+    } else if (this.joinDomElement) {
+      this.joinDomElement.setVisible(true);
+      const inputEl = this.joinDomElement.getChildByID('join-code-input') as HTMLInputElement;
+      if (inputEl) inputEl.value = '';
+    }
     this.mainMenuContainer.setVisible(false);
     this.hostContainer.setVisible(false);
     this.waitingContainer.setVisible(false);
@@ -746,6 +795,10 @@ export class LobbyScene extends Phaser.Scene {
     // Don't disconnect here — the socket is handed off to GameScene
     if (this.cursorTimer) {
       this.cursorTimer.destroy();
+    }
+    if (this.joinDomElement) {
+      this.joinDomElement.destroy();
+      this.joinDomElement = null;
     }
   }
 

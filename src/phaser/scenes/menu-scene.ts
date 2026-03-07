@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser';
-import { SCENE_KEYS, COLORS, DEFAULT_RULES, LeaderboardEntry, AUTH_STORAGE_KEYS } from '../common';
+import { SCENE_KEYS, COLORS, DEFAULT_RULES, LeaderboardEntry, AUTH_STORAGE_KEYS, isMobileDevice } from '../common';
 
 const API_URL = process.env.REACT_APP_SOCKET_URL || 'http://localhost:3001';
 
@@ -77,42 +77,62 @@ export class MenuScene extends Phaser.Scene {
   private createMainMenu(): void {
     const centerX = this.cameras.main.centerX;
     const centerY = this.cameras.main.centerY;
+    const mobile = isMobileDevice();
 
-    // Quick Start Button (with default rules)
-    this.createButton(centerX, centerY - 15, 'QUICK START', () => {
-      this.quickStart();
-    });
-
-    // Configure Rules Button
-    this.createButton(centerX, centerY + 55, 'CONFIGURE RULES', () => {
-      this.scene.start(SCENE_KEYS.RULES);
-    });
-
-    // Play Online Button (now routes through auth)
-    this.createButton(centerX, centerY + 125, 'PLAY ONLINE', () => {
-      this.cameras.main.fadeOut(500, 0, 0, 0);
-      this.cameras.main.once('camerafadeoutcomplete', () => {
-        this.scene.start(SCENE_KEYS.AUTH);
+    if (mobile) {
+      // Mobile: only online play, leaderboard, how to play
+      this.createButton(centerX, centerY - 15, 'PLAY ONLINE', () => {
+        this.cameras.main.fadeOut(500, 0, 0, 0);
+        this.cameras.main.once('camerafadeoutcomplete', () => {
+          this.scene.start(SCENE_KEYS.AUTH);
+        });
       });
-    });
 
-    // Leaderboard Button
-    this.createButton(centerX, centerY + 195, 'LEADERBOARD', () => {
-      this.toggleLeaderboard();
-    });
+      this.createButton(centerX, centerY + 55, 'LEADERBOARD', () => {
+        this.toggleLeaderboard();
+      });
 
-    // Instructions Button
-    this.createButton(centerX, centerY + 265, 'HOW TO PLAY', () => {
-      this.toggleInstructions();
-    });
+      this.createButton(centerX, centerY + 125, 'HOW TO PLAY', () => {
+        this.toggleInstructions();
+      });
+    } else {
+      // Desktop: full menu
+      // Quick Start Button (with default rules)
+      this.createButton(centerX, centerY - 15, 'QUICK START', () => {
+        this.quickStart();
+      });
 
-    // Controls hint
-    const controlsHint = this.add.text(centerX, this.cameras.main.height - 50,
-      'Press SPACE for Quick Start | ESC for instructions', {
-      fontSize: '16px',
-      color: COLORS.WHITE
-    }).setOrigin(0.5);
-    controlsHint.setAlpha(0.7);
+      // Configure Rules Button
+      this.createButton(centerX, centerY + 55, 'CONFIGURE RULES', () => {
+        this.scene.start(SCENE_KEYS.RULES);
+      });
+
+      // Play Online Button (now routes through auth)
+      this.createButton(centerX, centerY + 125, 'PLAY ONLINE', () => {
+        this.cameras.main.fadeOut(500, 0, 0, 0);
+        this.cameras.main.once('camerafadeoutcomplete', () => {
+          this.scene.start(SCENE_KEYS.AUTH);
+        });
+      });
+
+      // Leaderboard Button
+      this.createButton(centerX, centerY + 195, 'LEADERBOARD', () => {
+        this.toggleLeaderboard();
+      });
+
+      // Instructions Button
+      this.createButton(centerX, centerY + 265, 'HOW TO PLAY', () => {
+        this.toggleInstructions();
+      });
+
+      // Controls hint
+      const controlsHint = this.add.text(centerX, this.cameras.main.height - 50,
+        'Press SPACE for Quick Start | ESC for instructions', {
+        fontSize: '16px',
+        color: COLORS.WHITE
+      }).setOrigin(0.5);
+      controlsHint.setAlpha(0.7);
+    }
   }
 
   private createButton(x: number, y: number, text: string, callback: () => void): Phaser.GameObjects.Container {

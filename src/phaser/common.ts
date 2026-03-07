@@ -245,3 +245,24 @@ export interface GameEvent {
   condition?: SlapCondition;
   message?: string;
 }
+
+// Mobile detection utility
+// Returns true if the device is likely a touchscreen mobile/tablet
+let _isMobileCached: boolean | null = null;
+export function isMobileDevice(): boolean {
+  if (_isMobileCached !== null) return _isMobileCached;
+
+  const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  const isNarrow = window.innerWidth <= 900;
+  const hasMobileUA = /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  );
+
+  _isMobileCached = hasTouch && (isNarrow || hasMobileUA);
+  return _isMobileCached;
+}
+
+// Reset cache (useful if orientation changes)
+export function resetMobileCache(): void {
+  _isMobileCached = null;
+}

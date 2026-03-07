@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser';
-import { SCENE_KEYS, ASSET_KEYS, COLORS, CARD_SCALE, CARD_WIDTH, CARD_HEIGHT, GameState, Player, Suit, GameRules, RULE_NAMES, AuthUser } from '../common';
+import { SCENE_KEYS, ASSET_KEYS, COLORS, CARD_SCALE, CARD_WIDTH, CARD_HEIGHT, GameState, Player, Suit, GameRules, RULE_NAMES, AuthUser, isMobileDevice } from '../common';
 import { RatScrew } from '../lib/ratscrew';
 import { Card } from '../lib/card';
 import type { Socket } from 'socket.io-client';
@@ -78,6 +78,11 @@ export class GameScene extends Phaser.Scene {
   private player1NameText!: Phaser.GameObjects.Text;
   private player2NameText!: Phaser.GameObjects.Text;
 
+  // ---- Mobile touch ----
+  private isMobile: boolean = false;
+  private playButton!: Phaser.GameObjects.Container;
+  private slapButton!: Phaser.GameObjects.Container;
+
   constructor() {
     super({ key: SCENE_KEYS.GAME });
   }
@@ -100,6 +105,9 @@ export class GameScene extends Phaser.Scene {
     // Auth / player info
     this.authUser = data?.authUser || null;
     this.playerInfo = data?.playerInfo || {};
+
+    // Mobile detection
+    this.isMobile = isMobileDevice();
   }
 
   create(): void {
@@ -109,6 +117,10 @@ export class GameScene extends Phaser.Scene {
     this.createUI();
     this.createActiveRulesDisplay();
     this.setupInput();
+
+    if (this.isMobile) {
+      this.createTouchButtons();
+    }
 
     if (this.isMultiplayer) {
       this.setupMultiplayer();
@@ -372,15 +384,24 @@ export class GameScene extends Phaser.Scene {
     }).setOrigin(0.5);
     this.pileCollectionText.setVisible(false);
 
-    // Control instructions — change text based on multiplayer
-    const controlHint = this.isMultiplayer
-      ? `You are Player ${this.myPlayerNumber} | Q=Play, A=Slap | Room: ${this.roomCode} | ESC=Leave`
-      : 'Player 1: Q=Play, A=Slap | Player 2: P=Play, L=Slap | ESC=Menu';
+    // Control instructions — change text based on multiplayer and mobile
+    let controlHint: string;
+    if (this.isMobile) {
+      controlHint = this.isMultiplayer
+        ? `You are Player ${this.myPlayerNumber} | Room: ${this.roomCode}`
+        : '';
+    } else {
+      controlHint = this.isMultiplayer
+        ? `You are Player ${this.myPlayerNumber} | Q=Play, A=Slap | Room: ${this.roomCode} | ESC=Leave`
+        : 'Player 1: Q=Play, A=Slap | Player 2: P=Play, L=Slap | ESC=Menu';
+    }
 
-    this.add.text(centerX, this.cameras.main.height - 30, controlHint, {
-      fontSize: '14px',
-      color: COLORS.LIGHT_GRAY
-    }).setOrigin(0.5);
+    if (controlHint) {
+      this.add.text(centerX, this.cameras.main.height - 30, controlHint, {
+        fontSize: '14px',
+        color: COLORS.LIGHT_GRAY
+      }).setOrigin(0.5);
+    }
 
     // Mode toggle (top-right corner)
     this.modeToggleText = this.add.text(
@@ -421,6 +442,103 @@ export class GameScene extends Phaser.Scene {
 
     // Menu / Leave
     this.input.keyboard.on('keydown-ESC', () => this.returnToMenu());
+  }
+
+  // ================================================================
+  // Mobile touch buttons
+  // ================================================================
+
+  private createTouchButtons(): void {
+    const w = this.cameras.main.width;
+    const h = this.cameras.main.height;
+    const btnW = 260;
+    const btnH = 90;
+    const gap = 30;
+    const btnY = h - 70;
+
+    // ---- PLAY CARD button (left) ----
+    this.playButton = this.add.container(w / 2 - btnW / 2 - gap / 2, btnY);
+    const playBg = this.add.rectangle(0, 0, btnW, btnH, 0x2a5a2a);
+    playBg.setStrokeStyle(4, 0xffd700);
+    const playLabel = this.add.text(0, 0, 'PLAY\nCARD', {
+      fontSize: '28px',
+      color: COLORS.GOLD,
+      fontStyle: 'bold',
+      align: 'center',
+      lineSpacing: 2
+    }).setOrigin(0.5);
+    this.playButton.add([playBg, playLabel]);
+    this.playButton.setSize(btnW, btnH);
+    this.playButton.setInteractive();
+    this.playButton.setDepth(500);
+
+    this.playButton.on('pointerdown', () => {
+      playBg.setFillStyle(0x1a3a1a);
+      this.playButton.setScale(0.95);
+    });
+    this.playButton.on('pointerup', () => {
+      playBg.setFillStyle(0x2a5a2a);
+      this.playButton.setScale(1);
+      if (this.isMultiplayer) {
+        this.handleMultiplayerPlay();
+      } else {
+        this.playCard(1);
+      }
+    });
+    this.playButton.on('pointerout', () => {
+      playBg.setFillStyle(0x2a5a2a);
+      this.playButton.setScale(1);
+    });
+
+    // ---- SLAP button (right) ----
+    this.slapButton = this.add.container(w / 2 + btnW / 2 + gap / 2, btnY);
+    const slapBg = this.add.rectangle(0, 0, btnW, btnH, 0x8B0000);
+    slapBg.setStrokeStyle(4, 0xff4444);
+    const slapLabel = this.add.text(0, 0, 'SLAP!', {
+      fontSize: '32px',
+      color: '#ff4444',
+      fontStyle: 'bold',
+      align: 'center'
+    }).setOrigin(0.5);
+    this.slapButton.add([slapBg, slapLabel]);
+    this.slapButton.setSize(btnW, btnH);
+    this.slapButton.setInteractive();
+    this.slapButton.setDepth(500);
+
+    this.slapButton.on('pointerdown', () => {
+      slapBg.setFillStyle(0x5a0000);
+      this.slapButton.setScale(0.95);
+    });
+    this.slapButton.on('pointerup', () => {
+      slapBg.setFillStyle(0x8B0000);
+      this.slapButton.setScale(1);
+      if (this.isMultiplayer) {
+        this.handleMultiplayerSlap();
+      } else {
+        this.attemptSlap(1);
+      }
+    });
+    this.slapButton.on('pointerout', () => {
+      slapBg.setFillStyle(0x8B0000);
+      this.slapButton.setScale(1);
+    });
+
+    // ---- Back/Leave button (small, top-right) ----
+    const backBtn = this.add.container(w - 90, 60);
+    const backBg = this.add.rectangle(0, 0, 120, 40, 0x333333);
+    backBg.setStrokeStyle(2, 0x666666);
+    const backLabel = this.add.text(0, 0, 'LEAVE', {
+      fontSize: '16px',
+      color: COLORS.LIGHT_GRAY,
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+    backBtn.add([backBg, backLabel]);
+    backBtn.setSize(120, 40);
+    backBtn.setInteractive();
+    backBtn.setDepth(500);
+    backBtn.on('pointerup', () => {
+      this.returnToMenu();
+    });
   }
 
   // ================================================================
@@ -973,17 +1091,62 @@ export class GameScene extends Phaser.Scene {
       }
     ).setOrigin(0.5);
 
-    const controlsText = this.add.text(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY + 80,
-      'Press SPACE to play again or ESC for menu',
-      {
-        fontSize: '20px',
-        color: COLORS.WHITE
-      }
-    ).setOrigin(0.5);
+    winContainer.add([overlay, panelBg, crown, winText, reasonText, scoresText]);
 
-    winContainer.add([overlay, panelBg, crown, winText, reasonText, scoresText, controlsText]);
+    if (this.isMobile) {
+      // Touch buttons for mobile
+      const playAgainBtn = this.createWinScreenButton(
+        this.cameras.main.centerX - 120,
+        this.cameras.main.centerY + 90,
+        'PLAY AGAIN',
+        0x2a5a2a, COLORS.GREEN
+      );
+      playAgainBtn.on('pointerup', () => {
+        winContainer.destroy();
+        this.scene.restart();
+      });
+
+      const menuBtn = this.createWinScreenButton(
+        this.cameras.main.centerX + 120,
+        this.cameras.main.centerY + 90,
+        'MENU',
+        0x8B4513, COLORS.GOLD
+      );
+      menuBtn.on('pointerup', () => {
+        winContainer.destroy();
+        this.returnToMenu();
+      });
+
+      winContainer.add([playAgainBtn, menuBtn]);
+    } else {
+      const controlsText = this.add.text(
+        this.cameras.main.centerX,
+        this.cameras.main.centerY + 80,
+        'Press SPACE to play again or ESC for menu',
+        {
+          fontSize: '20px',
+          color: COLORS.WHITE
+        }
+      ).setOrigin(0.5);
+      winContainer.add(controlsText);
+
+      this.tweens.add({ targets: controlsText, alpha: 0.5, duration: 1000, yoyo: true, repeat: -1, delay: 1000 });
+
+      const spaceHandler = () => {
+        this.input.keyboard?.off('keydown-SPACE', spaceHandler);
+        this.input.keyboard?.off('keydown-ESC', escHandler);
+        this.scene.restart();
+      };
+
+      const escHandler = () => {
+        this.input.keyboard?.off('keydown-SPACE', spaceHandler);
+        this.input.keyboard?.off('keydown-ESC', escHandler);
+        this.returnToMenu();
+      };
+
+      this.input.keyboard?.once('keydown-SPACE', spaceHandler);
+      this.input.keyboard?.once('keydown-ESC', escHandler);
+    }
 
     winContainer.setAlpha(0);
     crown.setScale(0);
@@ -992,22 +1155,6 @@ export class GameScene extends Phaser.Scene {
     this.tweens.add({ targets: winContainer, alpha: 1, duration: 500, ease: 'Power2' });
     this.tweens.add({ targets: crown, scale: 1, duration: 400, delay: 300, ease: 'Bounce.easeOut' });
     this.tweens.add({ targets: winText, scale: 1, duration: 400, delay: 500, ease: 'Back.easeOut' });
-    this.tweens.add({ targets: controlsText, alpha: 0.5, duration: 1000, yoyo: true, repeat: -1, delay: 1000 });
-
-    const spaceHandler = () => {
-      this.input.keyboard?.off('keydown-SPACE', spaceHandler);
-      this.input.keyboard?.off('keydown-ESC', escHandler);
-      this.scene.restart();
-    };
-
-    const escHandler = () => {
-      this.input.keyboard?.off('keydown-SPACE', spaceHandler);
-      this.input.keyboard?.off('keydown-ESC', escHandler);
-      this.returnToMenu();
-    };
-
-    this.input.keyboard?.once('keydown-SPACE', spaceHandler);
-    this.input.keyboard?.once('keydown-ESC', escHandler);
   }
 
   // ---- Win screen (multiplayer mode) ----
@@ -1096,17 +1243,66 @@ export class GameScene extends Phaser.Scene {
       }
     ).setOrigin(0.5);
 
-    const controlsText = this.add.text(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY + 90,
-      'Press SPACE for rematch or ESC for menu',
-      {
-        fontSize: '20px',
-        color: COLORS.WHITE
-      }
-    ).setOrigin(0.5);
+    winContainer.add([overlay, panelBg, crown, winText, reasonText, scoresText]);
 
-    winContainer.add([overlay, panelBg, crown, winText, reasonText, scoresText, controlsText]);
+    if (this.isMobile) {
+      const rematchBtn = this.createWinScreenButton(
+        this.cameras.main.centerX - 120,
+        this.cameras.main.centerY + 100,
+        'REMATCH',
+        0x2a5a2a, COLORS.GREEN
+      );
+      rematchBtn.on('pointerup', () => {
+        if (this.socket) {
+          this.socket.emit('restartGame', { roomCode: this.roomCode });
+        }
+        winContainer.destroy();
+      });
+
+      const menuBtn = this.createWinScreenButton(
+        this.cameras.main.centerX + 120,
+        this.cameras.main.centerY + 100,
+        'MENU',
+        0x8B4513, COLORS.GOLD
+      );
+      menuBtn.on('pointerup', () => {
+        winContainer.destroy();
+        this.returnToMenu();
+      });
+
+      winContainer.add([rematchBtn, menuBtn]);
+    } else {
+      const controlsText = this.add.text(
+        this.cameras.main.centerX,
+        this.cameras.main.centerY + 90,
+        'Press SPACE for rematch or ESC for menu',
+        {
+          fontSize: '20px',
+          color: COLORS.WHITE
+        }
+      ).setOrigin(0.5);
+      winContainer.add(controlsText);
+
+      this.tweens.add({ targets: controlsText, alpha: 0.5, duration: 1000, yoyo: true, repeat: -1, delay: 1000 });
+
+      const spaceHandler = () => {
+        this.input.keyboard?.off('keydown-SPACE', spaceHandler);
+        this.input.keyboard?.off('keydown-ESC', escHandler);
+        if (this.socket) {
+          this.socket.emit('restartGame', { roomCode: this.roomCode });
+        }
+        winContainer.destroy();
+      };
+
+      const escHandler = () => {
+        this.input.keyboard?.off('keydown-SPACE', spaceHandler);
+        this.input.keyboard?.off('keydown-ESC', escHandler);
+        this.returnToMenu();
+      };
+
+      this.input.keyboard?.once('keydown-SPACE', spaceHandler);
+      this.input.keyboard?.once('keydown-ESC', escHandler);
+    }
 
     winContainer.setAlpha(0);
     crown.setScale(0);
@@ -1115,26 +1311,30 @@ export class GameScene extends Phaser.Scene {
     this.tweens.add({ targets: winContainer, alpha: 1, duration: 500, ease: 'Power2' });
     this.tweens.add({ targets: crown, scale: 1, duration: 400, delay: 300, ease: 'Bounce.easeOut' });
     this.tweens.add({ targets: winText, scale: 1, duration: 400, delay: 500, ease: 'Back.easeOut' });
-    this.tweens.add({ targets: controlsText, alpha: 0.5, duration: 1000, yoyo: true, repeat: -1, delay: 1000 });
+  }
 
-    const spaceHandler = () => {
-      this.input.keyboard?.off('keydown-SPACE', spaceHandler);
-      this.input.keyboard?.off('keydown-ESC', escHandler);
-      // Request restart from server
-      if (this.socket) {
-        this.socket.emit('restartGame', { roomCode: this.roomCode });
-      }
-      winContainer.destroy();
-    };
+  // ---- Win screen button helper ----
 
-    const escHandler = () => {
-      this.input.keyboard?.off('keydown-SPACE', spaceHandler);
-      this.input.keyboard?.off('keydown-ESC', escHandler);
-      this.returnToMenu();
-    };
+  private createWinScreenButton(
+    x: number, y: number, label: string,
+    bgColor: number, textColor: string
+  ): Phaser.GameObjects.Container {
+    const btn = this.add.container(x, y);
+    const bg = this.add.rectangle(0, 0, 200, 55, bgColor);
+    bg.setStrokeStyle(3, 0xffd700);
+    const text = this.add.text(0, 0, label, {
+      fontSize: '22px',
+      color: textColor,
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+    btn.add([bg, text]);
+    btn.setSize(200, 55);
+    btn.setInteractive();
+    btn.setDepth(1001);
 
-    this.input.keyboard?.once('keydown-SPACE', spaceHandler);
-    this.input.keyboard?.once('keydown-ESC', escHandler);
+    btn.on('pointerdown', () => btn.setScale(0.95));
+    btn.on('pointerout', () => btn.setScale(1));
+    return btn;
   }
 
   // ---- Navigation ----

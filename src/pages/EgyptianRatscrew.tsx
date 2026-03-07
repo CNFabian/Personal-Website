@@ -37,6 +37,9 @@ const EgyptianRatscrew = () => {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
       },
+      dom: {
+        createContainer: true,
+      },
       input: {
         keyboard: true,
         mouse: true,

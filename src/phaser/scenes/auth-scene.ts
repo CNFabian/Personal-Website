@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser';
-import { SCENE_KEYS, COLORS, AuthUser, AUTH_STORAGE_KEYS } from '../common';
+import { SCENE_KEYS, COLORS, AuthUser, AUTH_STORAGE_KEYS, isMobileDevice } from '../common';
 
 const API_URL = process.env.REACT_APP_SOCKET_URL || 'http://localhost:3001';
 
@@ -19,6 +19,8 @@ export class AuthScene extends Phaser.Scene {
   private submitButtonText!: Phaser.GameObjects.Text;
   private passwordHintText!: Phaser.GameObjects.Text;
   private isLoading: boolean = false;
+  private isMobile: boolean = false;
+  private domFormElement: Phaser.GameObjects.DOMElement | null = null;
 
   constructor() {
     super({ key: SCENE_KEYS.AUTH });
@@ -30,12 +32,19 @@ export class AuthScene extends Phaser.Scene {
     this.activeField = 'username';
     this.isRegistering = false;
     this.isLoading = false;
+    this.isMobile = isMobileDevice();
 
     this.createBackground();
     this.createTitle();
-    this.createForm();
+
+    if (this.isMobile) {
+      this.createMobileForm();
+    } else {
+      this.createForm();
+      this.setupKeyboard();
+    }
+
     this.createButtons();
-    this.setupKeyboard();
 
     // Try auto-login
     this.tryAutoLogin();
@@ -182,6 +191,80 @@ export class AuthScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     this.updateFieldHighlights();
+  }
+
+  private createMobileForm(): void {
+    const centerX = this.cameras.main.centerX;
+    const formY = 220;
+
+    // Form panel background (Phaser)
+    const panelWidth = 500;
+    const panelHeight = 340;
+    const panel = this.add.rectangle(centerX, formY + panelHeight / 2, panelWidth, panelHeight, 0x1a1a1a, 0.9);
+    panel.setStrokeStyle(2, 0xffd700);
+
+    // Toggle text (Login / Register)
+    this.toggleText = this.add.text(centerX, formY + 25, 'LOGIN', {
+      fontSize: '28px',
+      color: COLORS.GOLD,
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+
+    // Status text
+    this.statusText = this.add.text(centerX, formY + 215, '', {
+      fontSize: '16px',
+      color: COLORS.RED,
+      fontStyle: 'bold',
+      align: 'center',
+      wordWrap: { width: 380 }
+    }).setOrigin(0.5);
+
+    // Create an HTML form element for mobile input (triggers native keyboard)
+    const formHTML = `
+      <div style="display:flex; flex-direction:column; align-items:center; gap:10px; width:380px;">
+        <label style="color:#d3d3d3; font-size:14px; font-weight:bold; align-self:flex-start;">USERNAME</label>
+        <input id="auth-username" type="text" maxlength="20" autocomplete="username"
+          style="width:100%; padding:10px; font-size:18px; background:#333; color:#fff;
+                 border:2px solid #ffd700; border-radius:4px; outline:none; box-sizing:border-box;" />
+        <div style="display:flex; justify-content:space-between; width:100%;">
+          <label style="color:#d3d3d3; font-size:14px; font-weight:bold;">PASSWORD</label>
+          <span style="color:#d3d3d3; font-size:12px; font-style:italic;">(optional)</span>
+        </div>
+        <input id="auth-password" type="password" maxlength="50" autocomplete="current-password"
+          style="width:100%; padding:10px; font-size:18px; background:#333; color:#fff;
+                 border:2px solid #666; border-radius:4px; outline:none; box-sizing:border-box;" />
+      </div>
+    `;
+
+    this.domFormElement = this.add.dom(centerX, formY + 130).createFromHTML(formHTML);
+    this.domFormElement.setDepth(200);
+
+    // Sync DOM inputs with internal state
+    const usernameEl = this.domFormElement.getChildByID('auth-username') as HTMLInputElement;
+    const passwordEl = this.domFormElement.getChildByID('auth-password') as HTMLInputElement;
+
+    if (usernameEl) {
+      usernameEl.addEventListener('input', () => {
+        this.usernameInput = usernameEl.value;
+      });
+      usernameEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          usernameEl.blur();
+          this.handleSubmit();
+        }
+      });
+    }
+    if (passwordEl) {
+      passwordEl.addEventListener('input', () => {
+        this.passwordInput = passwordEl.value;
+      });
+      passwordEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          passwordEl.blur();
+          this.handleSubmit();
+        }
+      });
+    }
   }
 
   private createButtons(): void {
@@ -404,10 +487,22 @@ export class AuthScene extends Phaser.Scene {
   }
 
   private goToLobby(authUser: AuthUser | null): void {
+    // Clean up DOM elements before transitioning
+    if (this.domFormElement) {
+      this.domFormElement.destroy();
+      this.domFormElement = null;
+    }
     this.cameras.main.fadeOut(500, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
       this.scene.start(SCENE_KEYS.LOBBY, { authUser });
     });
+  }
+
+  shutdown(): void {
+    if (this.domFormElement) {
+      this.domFormElement.destroy();
+      this.domFormElement = null;
+    }
   }
 
   // ---- Button helpers ----
