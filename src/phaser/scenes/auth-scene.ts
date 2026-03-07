@@ -237,7 +237,8 @@ export class AuthScene extends Phaser.Scene {
       </div>
     `;
 
-    this.domFormElement = this.add.dom(centerX, formY + (portrait ? 120 : 130)).createFromHTML(formHTML);
+    this.domFormElement = this.add.dom(centerX, formY + (portrait ? 60 : 65)).createFromHTML(formHTML);
+    this.domFormElement.setOrigin(0.5, 0);
     this.domFormElement.setDepth(200);
 
     // Sync DOM inputs with internal state
@@ -298,11 +299,11 @@ export class AuthScene extends Phaser.Scene {
     if (this.isRegistering) {
       this.toggleText.setText('REGISTER');
       this.submitButtonText.setText('REGISTER');
-      this.passwordHintText.setVisible(true);
+      if (this.passwordHintText) this.passwordHintText.setVisible(true);
     } else {
       this.toggleText.setText('LOGIN');
       this.submitButtonText.setText('LOGIN');
-      this.passwordHintText.setVisible(true);
+      if (this.passwordHintText) this.passwordHintText.setVisible(true);
     }
     this.statusText.setText('');
   }
