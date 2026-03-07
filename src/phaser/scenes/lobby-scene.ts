@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser';
-import { SCENE_KEYS, COLORS, DEFAULT_RULES, GameRules, RULE_NAMES, RULE_DESCRIPTIONS, AuthUser, isMobileDevice } from '../common';
+import { SCENE_KEYS, COLORS, DEFAULT_RULES, GameRules, RULE_NAMES, RULE_DESCRIPTIONS, AuthUser, isMobileDevice, isPortrait } from '../common';
 import { io, Socket } from 'socket.io-client';
 
 const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || 'http://localhost:3001';
@@ -105,48 +105,52 @@ export class LobbyScene extends Phaser.Scene {
       0x0a5f38
     );
 
+    const portrait = isPortrait();
+    const inset = portrait ? 25 : 50;
     const graphics = this.add.graphics();
-    graphics.lineStyle(8, 0x8B4513);
+    graphics.lineStyle(portrait ? 4 : 8, 0x8B4513);
     graphics.strokeRoundedRect(
-      50, 50,
-      this.cameras.main.width - 100,
-      this.cameras.main.height - 100,
+      inset, inset,
+      this.cameras.main.width - inset * 2,
+      this.cameras.main.height - inset * 2,
       20
     );
   }
 
   private createTitle(): void {
     const centerX = this.cameras.main.centerX;
+    const portrait = isPortrait();
 
-    this.add.text(centerX, 100, 'ONLINE MULTIPLAYER', {
-      fontSize: '48px',
+    this.add.text(centerX, portrait ? 70 : 100, portrait ? 'MULTIPLAYER' : 'ONLINE MULTIPLAYER', {
+      fontSize: portrait ? '32px' : '48px',
       color: COLORS.GOLD,
       fontStyle: 'bold',
       stroke: COLORS.BLACK,
       strokeThickness: 3
     }).setOrigin(0.5);
 
-    this.add.text(centerX, 155, 'Play against a friend over the internet', {
-      fontSize: '20px',
+    this.add.text(centerX, portrait ? 110 : 155, 'Play against a friend online', {
+      fontSize: portrait ? '15px' : '20px',
       color: COLORS.WHITE,
       fontStyle: 'italic'
     }).setOrigin(0.5);
 
     // Show logged-in username
+    const userX = this.cameras.main.width - (portrait ? 60 : 80);
     if (this.authUser) {
-      this.add.text(this.cameras.main.width - 80, 75, `${this.authUser.username}`, {
-        fontSize: '16px',
+      this.add.text(userX, portrait ? 45 : 75, `${this.authUser.username}`, {
+        fontSize: portrait ? '13px' : '16px',
         color: COLORS.GOLD,
         fontStyle: 'bold'
       }).setOrigin(0.5);
 
-      this.add.text(this.cameras.main.width - 80, 95, `${this.authUser.wins} wins`, {
-        fontSize: '13px',
+      this.add.text(userX, portrait ? 62 : 95, `${this.authUser.wins} wins`, {
+        fontSize: portrait ? '11px' : '13px',
         color: COLORS.LIGHT_GRAY
       }).setOrigin(0.5);
     } else {
-      this.add.text(this.cameras.main.width - 80, 80, 'Guest', {
-        fontSize: '16px',
+      this.add.text(userX, portrait ? 50 : 80, 'Guest', {
+        fontSize: portrait ? '13px' : '16px',
         color: COLORS.LIGHT_GRAY,
         fontStyle: 'italic'
       }).setOrigin(0.5);
@@ -184,26 +188,25 @@ export class LobbyScene extends Phaser.Scene {
 
   private createHostUI(): void {
     const centerX = this.cameras.main.centerX;
+    const portrait = isPortrait();
     this.hostContainer = this.add.container(0, 0);
 
-    // Room code at top
-    const codeLabel = this.add.text(centerX, 195, 'ROOM CODE:', {
-      fontSize: '20px',
+    const codeLabel = this.add.text(centerX, portrait ? 150 : 195, 'ROOM CODE:', {
+      fontSize: portrait ? '16px' : '20px',
       color: COLORS.WHITE,
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    this.roomCodeDisplay = this.add.text(centerX, 230, '----', {
-      fontSize: '48px',
+    this.roomCodeDisplay = this.add.text(centerX, portrait ? 180 : 230, '----', {
+      fontSize: portrait ? '36px' : '48px',
       color: COLORS.GOLD,
       fontStyle: 'bold',
       stroke: COLORS.BLACK,
       strokeThickness: 3
     }).setOrigin(0.5);
 
-    // Opponent status
-    this.opponentStatusText = this.add.text(centerX, 265, 'Waiting for opponent...', {
-      fontSize: '16px',
+    this.opponentStatusText = this.add.text(centerX, portrait ? 210 : 265, 'Waiting for opponent...', {
+      fontSize: portrait ? '13px' : '16px',
       color: COLORS.LIGHT_GRAY,
       fontStyle: 'italic'
     }).setOrigin(0.5);
@@ -218,20 +221,22 @@ export class LobbyScene extends Phaser.Scene {
 
     this.hostContainer.add([codeLabel, this.roomCodeDisplay, this.opponentStatusText]);
 
-    // Rules panel
     this.createHostRulesPanel();
 
-    // Start Game button (disabled by default)
-    this.startGameBtn = this.add.container(centerX, 690);
-    this.startGameBg = this.add.rectangle(0, 0, 320, 60, 0x444444);
+    const btnW = portrait ? 260 : 320;
+    const btnH = portrait ? 50 : 60;
+    const startY = portrait ? 830 : 690;
+
+    this.startGameBtn = this.add.container(centerX, startY);
+    this.startGameBg = this.add.rectangle(0, 0, btnW, btnH, 0x444444);
     this.startGameBg.setStrokeStyle(3, 0x666666);
     this.startGameText = this.add.text(0, 0, 'START GAME', {
-      fontSize: '24px',
+      fontSize: portrait ? '20px' : '24px',
       color: '#666666',
       fontStyle: 'bold'
     }).setOrigin(0.5);
     this.startGameBtn.add([this.startGameBg, this.startGameText]);
-    this.startGameBtn.setSize(320, 60);
+    this.startGameBtn.setSize(btnW, btnH);
     this.startGameBtn.setInteractive();
 
     this.startGameBtn.on('pointerup', () => {
@@ -272,7 +277,7 @@ export class LobbyScene extends Phaser.Scene {
     });
 
     // Cancel button
-    const cancelBtn = this.createButton(centerX, 760, 'CANCEL', () => {
+    const cancelBtn = this.createButton(centerX, portrait ? 895 : 760, 'CANCEL', () => {
       this.socket.disconnect();
       this.connectSocket();
       this.showMainMenu();
@@ -284,66 +289,63 @@ export class LobbyScene extends Phaser.Scene {
 
   private createHostRulesPanel(): void {
     const centerX = this.cameras.main.centerX;
-    const panelWidth = 820;
-    const panelHeight = 370;
-    const panelY = 290;
+    const portrait = isPortrait();
+    const panelWidth = portrait ? 480 : 820;
+    const panelHeight = portrait ? 540 : 370;
+    const panelY = portrait ? 240 : 290;
 
-    // Panel background
-    const panelBg = this.add.rectangle(
-      centerX,
-      panelY + panelHeight / 2,
-      panelWidth,
-      panelHeight,
-      0x1a1a1a,
-      0.85
-    );
+    const panelBg = this.add.rectangle(centerX, panelY + panelHeight / 2, panelWidth, panelHeight, 0x1a1a1a, 0.85);
     panelBg.setStrokeStyle(2, 0xffd700);
 
-    // Panel title
     const panelTitle = this.add.text(centerX, panelY + 20, 'GAME RULES', {
-      fontSize: '22px',
+      fontSize: portrait ? '18px' : '22px',
       color: COLORS.GOLD,
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
     this.hostContainer.add([panelBg, panelTitle]);
 
-    // Create rule toggles in a 2-column grid
     const ruleKeys = Object.keys(this.rules) as Array<keyof GameRules>;
-    const itemsPerColumn = 4;
-    const columnWidth = panelWidth / 2;
-    const startX = centerX - panelWidth / 2 + 50;
-    const startY = panelY + 55;
-    const spacing = 42;
 
-    ruleKeys.forEach((ruleKey, index) => {
-      const column = Math.floor(index / itemsPerColumn);
-      const row = index % itemsPerColumn;
-      const x = startX + column * columnWidth;
-      const y = startY + row * spacing;
+    if (portrait) {
+      // Single column on portrait
+      const startX = centerX - panelWidth / 2 + 40;
+      const startY = panelY + 50;
+      const spacing = 60;
 
-      this.createRuleToggle(ruleKey, x, y);
-    });
+      ruleKeys.forEach((ruleKey, index) => {
+        this.createRuleToggle(ruleKey, startX, startY + index * spacing);
+      });
+    } else {
+      // 2-column grid on landscape
+      const itemsPerColumn = 4;
+      const columnWidth = panelWidth / 2;
+      const startX = centerX - panelWidth / 2 + 50;
+      const startY = panelY + 55;
+      const spacing = 42;
+
+      ruleKeys.forEach((ruleKey, index) => {
+        const column = Math.floor(index / itemsPerColumn);
+        const row = index % itemsPerColumn;
+        const x = startX + column * columnWidth;
+        const y = startY + row * spacing;
+        this.createRuleToggle(ruleKey, x, y);
+      });
+    }
 
     // Reset defaults button
     const resetBtn = this.add.container(centerX + panelWidth / 2 - 90, panelY + panelHeight - 25);
     const resetBg = this.add.rectangle(0, 0, 140, 30, 0x333333);
     resetBg.setStrokeStyle(1, 0x666666);
     const resetText = this.add.text(0, 0, 'RESET DEFAULTS', {
-      fontSize: '12px',
-      color: COLORS.LIGHT_GRAY,
-      fontStyle: 'bold'
+      fontSize: '12px', color: COLORS.LIGHT_GRAY, fontStyle: 'bold'
     }).setOrigin(0.5);
     resetBtn.add([resetBg, resetText]);
     resetBtn.setSize(140, 30);
     resetBtn.setInteractive();
 
-    resetBtn.on('pointerover', () => {
-      resetBg.setFillStyle(0x444444);
-    });
-    resetBtn.on('pointerout', () => {
-      resetBg.setFillStyle(0x333333);
-    });
+    resetBtn.on('pointerover', () => resetBg.setFillStyle(0x444444));
+    resetBtn.on('pointerout', () => resetBg.setFillStyle(0x333333));
     resetBtn.on('pointerup', () => {
       this.rules = { ...DEFAULT_RULES };
       saveRules(this.rules);
@@ -359,34 +361,33 @@ export class LobbyScene extends Phaser.Scene {
 
   private createRuleToggle(ruleKey: keyof GameRules, x: number, y: number): void {
     const container = this.add.container(x, y);
+    const portrait = isPortrait();
 
-    // Checkbox
-    const boxSize = 24;
+    const boxSize = portrait ? 28 : 24;
     const box = this.add.rectangle(0, 0, boxSize, boxSize, this.rules[ruleKey] ? 0x2a5a2a : 0x333333);
     box.setStrokeStyle(2, 0xffd700);
 
     const checkmark = this.add.text(0, 0, '✓', {
-      fontSize: '18px',
+      fontSize: portrait ? '20px' : '18px',
       color: COLORS.GREEN,
       fontStyle: 'bold'
     }).setOrigin(0.5);
     checkmark.setVisible(this.rules[ruleKey]);
 
-    // Rule name
-    const nameText = this.add.text(boxSize / 2 + 12, -6, RULE_NAMES[ruleKey], {
-      fontSize: '16px',
+    const nameText = this.add.text(boxSize / 2 + 12, portrait ? -8 : -6, RULE_NAMES[ruleKey], {
+      fontSize: portrait ? '15px' : '16px',
       color: COLORS.WHITE,
       fontStyle: 'bold'
     }).setOrigin(0, 0.5);
 
-    // Description
-    const descText = this.add.text(boxSize / 2 + 12, 10, RULE_DESCRIPTIONS[ruleKey], {
-      fontSize: '11px',
-      color: COLORS.LIGHT_GRAY
+    const descText = this.add.text(boxSize / 2 + 12, portrait ? 12 : 10, RULE_DESCRIPTIONS[ruleKey], {
+      fontSize: portrait ? '10px' : '11px',
+      color: COLORS.LIGHT_GRAY,
+      wordWrap: { width: portrait ? 350 : 380 }
     }).setOrigin(0, 0.5);
 
     container.add([box, checkmark, nameText, descText]);
-    container.setSize(380, 36);
+    container.setSize(portrait ? 400 : 380, portrait ? 50 : 36);
     container.setInteractive();
 
     container.on('pointerover', () => {
@@ -806,18 +807,21 @@ export class LobbyScene extends Phaser.Scene {
 
   private createButton(x: number, y: number, text: string, callback: () => void): Phaser.GameObjects.Container {
     const button = this.add.container(x, y);
+    const portrait = isPortrait();
+    const btnW = portrait ? 260 : 320;
+    const btnH = portrait ? 50 : 60;
 
-    const bg = this.add.rectangle(0, 0, 320, 60, 0x8B4513);
+    const bg = this.add.rectangle(0, 0, btnW, btnH, 0x8B4513);
     bg.setStrokeStyle(3, 0xffd700);
 
     const buttonText = this.add.text(0, 0, text, {
-      fontSize: '24px',
+      fontSize: portrait ? '20px' : '24px',
       color: COLORS.GOLD,
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
     button.add([bg, buttonText]);
-    button.setSize(320, 60);
+    button.setSize(btnW, btnH);
     button.setInteractive();
 
     button.on('pointerover', () => {

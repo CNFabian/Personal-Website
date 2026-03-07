@@ -83,15 +83,28 @@
   }
 
   @media (max-width: 768px) {
-    padding: 1rem 0.5rem;
+    padding: 0.5rem 0.25rem;
 
-    .game-header h1 {
-      font-size: 2rem;
+    .game-header {
+      margin-bottom: 0.5rem;
+
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+      }
+
+      p {
+        font-size: 0.9rem;
+      }
+    }
+
+    .game-container-wrapper {
+      padding: 0.25rem;
+      margin-bottom: 0.5rem;
     }
 
     .game-instructions {
-      padding: 1rem;
-      font-size: 0.9rem;
+      display: none;
     }
   }
 }

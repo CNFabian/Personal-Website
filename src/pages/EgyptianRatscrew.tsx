@@ -10,7 +10,7 @@ import { AuthScene } from '../phaser/scenes/auth-scene';
 import { RulesScene } from '../phaser/scenes/rules-scene';
 import { LobbyScene } from '../phaser/scenes/lobby-scene';
 import { GameScene } from '../phaser/scenes/game-scene';
-import { GAME_WIDTH, GAME_HEIGHT, COLORS } from '../phaser/common';
+import { COLORS, getGameDimensions } from '../phaser/common';
 
 const EgyptianRatscrew = () => {
   const gameContainerRef = useRef(null);
@@ -19,10 +19,12 @@ const EgyptianRatscrew = () => {
   useEffect(() => {
     if (!gameContainerRef.current || gameInstanceRef.current) return;
 
+    const dims = getGameDimensions();
+
     const config = {
       type: Phaser.AUTO,
-      width: GAME_WIDTH,
-      height: GAME_HEIGHT,
+      width: dims.width,
+      height: dims.height,
       parent: gameContainerRef.current,
       backgroundColor: COLORS.BACKGROUND,
       scene: [PreloadScene, MenuScene, AuthScene, RulesScene, LobbyScene, GameScene],

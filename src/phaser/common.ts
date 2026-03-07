@@ -21,6 +21,21 @@ export const CARD_HEIGHT = 190;
 export const CARD_SCALE = 0.4;
 export const GAME_WIDTH = 1200;
 export const GAME_HEIGHT = 800;
+export const GAME_WIDTH_PORTRAIT = 600;
+export const GAME_HEIGHT_PORTRAIT = 1000;
+
+/** Returns the appropriate canvas dimensions based on device type */
+export function getGameDimensions(): { width: number; height: number } {
+  if (isMobileDevice()) {
+    return { width: GAME_WIDTH_PORTRAIT, height: GAME_HEIGHT_PORTRAIT };
+  }
+  return { width: GAME_WIDTH, height: GAME_HEIGHT };
+}
+
+/** Whether we're using portrait layout (mobile) */
+export function isPortrait(): boolean {
+  return isMobileDevice();
+}
 
 // Card enums
 export enum Suit {

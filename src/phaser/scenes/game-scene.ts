@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser';
-import { SCENE_KEYS, ASSET_KEYS, COLORS, CARD_SCALE, CARD_WIDTH, CARD_HEIGHT, GameState, Player, Suit, GameRules, RULE_NAMES, AuthUser, isMobileDevice } from '../common';
+import { SCENE_KEYS, ASSET_KEYS, COLORS, CARD_SCALE, CARD_WIDTH, CARD_HEIGHT, GameState, Player, Suit, GameRules, RULE_NAMES, AuthUser, isMobileDevice, isPortrait } from '../common';
 import { RatScrew } from '../lib/ratscrew';
 import { Card } from '../lib/card';
 import type { Socket } from 'socket.io-client';
@@ -159,48 +159,76 @@ export class GameScene extends Phaser.Scene {
     this.createPlayingAreas();
   }
 
+  /** Get layout positions based on portrait/landscape */
+  private getLayout() {
+    const w = this.cameras.main.width;
+    const h = this.cameras.main.height;
+    const cx = this.cameras.main.centerX;
+    const cy = this.cameras.main.centerY;
+
+    if (this.isMobile) {
+      // Portrait: 600x1000
+      return {
+        centerCard: { x: cx, y: 420 },
+        player1Deck: { x: cx, y: 660 },
+        player2Deck: { x: cx, y: 190 },
+        bonusPile: { x: 120, y: 420 },
+        player1Count: { x: cx, y: 730 },
+        player2Count: { x: cx, y: 260 },
+        player1Name: { x: cx, y: 750 },
+        player2Name: { x: cx, y: 130 },
+        centerCount: { x: cx, y: 490 },
+        bonusCount: { x: 120, y: 490 },
+        turnIndicator: { x: cx, y: 80 },
+        challengeText: { x: cx, y: 105 },
+        statusText: { x: cx, y: 560 },
+        pileCollection: { x: cx, y: 340 },
+        controlHint: { x: cx, y: h - 15 },
+        modeToggle: { x: w - 15, y: 15 },
+        leaveBtn: { x: w - 60, y: 55 },
+        activeRules: { x: 55, y: 55 },
+      };
+    } else {
+      // Landscape: 1200x800
+      return {
+        centerCard: { x: cx, y: cy },
+        player1Deck: { x: 178, y: h - 200 },
+        player2Deck: { x: w - 200, y: 188 },
+        bonusPile: { x: w - 372, y: cy },
+        player1Count: { x: 180, y: h - 125 },
+        player2Count: { x: w - 200, y: 115 },
+        player1Name: { x: 180, y: h - 155 },
+        player2Name: { x: w - 200, y: 85 },
+        centerCount: { x: cx, y: cy + 80 },
+        bonusCount: { x: w - 375, y: cy + 80 },
+        turnIndicator: { x: cx, y: 100 },
+        challengeText: { x: cx, y: 130 },
+        statusText: { x: cx, y: h - 100 },
+        pileCollection: { x: cx, y: cy - 100 },
+        controlHint: { x: cx, y: h - 30 },
+        modeToggle: { x: w - 20, y: 20 },
+        leaveBtn: { x: w - 90, y: 60 },
+        activeRules: { x: 75, y: 75 },
+      };
+    }
+  }
+
   private createPlayingAreas(): void {
-    const centerX = this.cameras.main.centerX;
-    const centerY = this.cameras.main.centerY;
+    const L = this.getLayout();
+    const cw = CARD_WIDTH * CARD_SCALE;
+    const ch = CARD_HEIGHT * CARD_SCALE;
 
     const graphics = this.add.graphics();
     graphics.lineStyle(2, 0xffd700, 0.5);
 
     // Center pile area
-    graphics.strokeRoundedRect(
-      centerX - (CARD_WIDTH * CARD_SCALE) / 2 - 10,
-      centerY - (CARD_HEIGHT * CARD_SCALE) / 2 - 10,
-      CARD_WIDTH * CARD_SCALE + 20,
-      CARD_HEIGHT * CARD_SCALE + 20,
-      5
-    );
-
-    // Player 1 deck area (bottom)
-    graphics.strokeRoundedRect(
-      140,
-      this.cameras.main.height - 200 - (CARD_HEIGHT * CARD_SCALE) / 2 - 10,
-      CARD_WIDTH * CARD_SCALE + 20,
-      CARD_HEIGHT * CARD_SCALE + 20,
-      5
-    );
-
-    // Player 2 deck area (top)
-    graphics.strokeRoundedRect(
-      this.cameras.main.width - 200 - (CARD_WIDTH * CARD_SCALE) / 2 - 10,
-      140,
-      CARD_WIDTH * CARD_SCALE + 20,
-      CARD_HEIGHT * CARD_SCALE + 20,
-      5
-    );
-
-    // Bonus pile area (right side)
-    graphics.strokeRoundedRect(
-      this.cameras.main.width - 400 - 10,
-      centerY - (CARD_HEIGHT * CARD_SCALE) / 2 - 10,
-      CARD_WIDTH * CARD_SCALE + 20,
-      CARD_HEIGHT * CARD_SCALE + 20,
-      5
-    );
+    graphics.strokeRoundedRect(L.centerCard.x - cw / 2 - 10, L.centerCard.y - ch / 2 - 10, cw + 20, ch + 20, 5);
+    // Player 1 deck area
+    graphics.strokeRoundedRect(L.player1Deck.x - cw / 2 - 10, L.player1Deck.y - ch / 2 - 10, cw + 20, ch + 20, 5);
+    // Player 2 deck area
+    graphics.strokeRoundedRect(L.player2Deck.x - cw / 2 - 10, L.player2Deck.y - ch / 2 - 10, cw + 20, ch + 20, 5);
+    // Bonus pile area
+    graphics.strokeRoundedRect(L.bonusPile.x - cw / 2 - 10, L.bonusPile.y - ch / 2 - 10, cw + 20, ch + 20, 5);
   }
 
   private initializeGame(): void {
@@ -214,8 +242,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createActiveRulesDisplay(): void {
-    // Container for active rules display in top-left
-    this.activeRulesContainer = this.add.container(75,75);
+    const L = this.getLayout();
+    // Container for active rules display
+    this.activeRulesContainer = this.add.container(L.activeRules.x, L.activeRules.y);
 
     // Get active rules from game logic
     const activeRuleNames = this.game_logic.getActiveRuleNames();
@@ -223,11 +252,14 @@ export class GameScene extends Phaser.Scene {
       ? activeRuleNames.join('\n')
       : 'No rules active';
 
-    // Dynamic sizing based on number of rules
-    const titleHeight = 25;
-    const lineHeight = 18;
-    const padding = 20;
-    const minWidth = 200;
+    // Portrait uses smaller fonts
+    const titleFontSize = this.isMobile ? '12px' : '16px';
+    const rulesFontSize = this.isMobile ? '10px' : '14px';
+    const titleHeight = this.isMobile ? 18 : 25;
+    const lineHeight = this.isMobile ? 14 : 18;
+    const padding = this.isMobile ? 14 : 20;
+    const minWidth = this.isMobile ? 130 : 200;
+    const maxWidth = this.isMobile ? 180 : 300;
 
     // Calculate dimensions
     const numLines = activeRuleNames.length || 1;
@@ -239,8 +271,9 @@ export class GameScene extends Phaser.Scene {
       current.length > longest.length ? current : longest,
       'ACTIVE RULES'
     );
-    const estimatedWidth = Math.max(minWidth, longestRule.length * 8 + 40);
-    const panelWidth = Math.min(estimatedWidth, 300);
+    const charWidth = this.isMobile ? 6 : 8;
+    const estimatedWidth = Math.max(minWidth, longestRule.length * charWidth + 30);
+    const panelWidth = Math.min(estimatedWidth, maxWidth);
 
     // Background panel for rules
     const panel = this.add.rectangle(
@@ -256,10 +289,10 @@ export class GameScene extends Phaser.Scene {
     // Title
     const title = this.add.text(
       panelWidth / 2,
-      15,
+      this.isMobile ? 8 : 15,
       'ACTIVE RULES',
       {
-        fontSize: '16px',
+        fontSize: titleFontSize,
         color: COLORS.GOLD,
         fontStyle: 'bold',
         align: 'center'
@@ -269,10 +302,10 @@ export class GameScene extends Phaser.Scene {
     // Rules display
     const rulesDisplay = this.add.text(
       panelWidth / 2,
-      titleHeight + 10,
+      titleHeight + (this.isMobile ? 5 : 10),
       rulesText,
       {
-        fontSize: '14px',
+        fontSize: rulesFontSize,
         color: COLORS.WHITE,
         align: 'center',
         lineSpacing: 2
@@ -287,18 +320,17 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createUI(): void {
-    const centerX = this.cameras.main.centerX;
-    const centerY = this.cameras.main.centerY;
+    const L = this.getLayout();
 
     // Create card sprites
-    this.centerCardSprite = this.createCardDisplay(centerX, centerY, null);
-    this.player1DeckSprite = this.createCardDisplay(178, this.cameras.main.height - 200, null) as any;
-    this.player2DeckSprite = this.createCardDisplay(this.cameras.main.width - 200, 188, null) as any;
+    this.centerCardSprite = this.createCardDisplay(L.centerCard.x, L.centerCard.y, null);
+    this.player1DeckSprite = this.createCardDisplay(L.player1Deck.x, L.player1Deck.y, null) as any;
+    this.player2DeckSprite = this.createCardDisplay(L.player2Deck.x, L.player2Deck.y, null) as any;
 
     // Bonus pile (initially hidden)
     this.bonusPileSprite = this.add.rectangle(
-      this.cameras.main.width - 372,
-      centerY,
+      L.bonusPile.x,
+      L.bonusPile.y,
       CARD_WIDTH * CARD_SCALE,
       CARD_HEIGHT * CARD_SCALE,
       0x4169E1
@@ -306,15 +338,18 @@ export class GameScene extends Phaser.Scene {
     this.bonusPileSprite.setStrokeStyle(2, 0x000080);
     this.bonusPileSprite.setVisible(false);
 
+    const countFontSize = this.isMobile ? '15px' : '18px';
+    const nameFontSize = this.isMobile ? '12px' : '14px';
+
     // Card count displays
-    this.player1CountText = this.add.text(180, this.cameras.main.height - 125, 'Cards: 26', {
-      fontSize: '18px',
+    this.player1CountText = this.add.text(L.player1Count.x, L.player1Count.y, 'Cards: 26', {
+      fontSize: countFontSize,
       color: COLORS.WHITE,
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    this.player2CountText = this.add.text(this.cameras.main.width - 200, 115, 'Cards: 26', {
-      fontSize: '18px',
+    this.player2CountText = this.add.text(L.player2Count.x, L.player2Count.y, 'Cards: 26', {
+      fontSize: countFontSize,
       color: COLORS.WHITE,
       fontStyle: 'bold'
     }).setOrigin(0.5);
@@ -330,53 +365,53 @@ export class GameScene extends Phaser.Scene {
         ? `${p2Info.username}${p2Info.wins != null ? ` (${p2Info.wins} wins)` : ''}`
         : 'Player 2';
 
-      this.player1NameText = this.add.text(180, this.cameras.main.height - 155, p1Label, {
-        fontSize: '14px',
+      this.player1NameText = this.add.text(L.player1Name.x, L.player1Name.y, p1Label, {
+        fontSize: nameFontSize,
         color: COLORS.GOLD,
         fontStyle: 'bold'
       }).setOrigin(0.5);
 
-      this.player2NameText = this.add.text(this.cameras.main.width - 200, 85, p2Label, {
-        fontSize: '14px',
+      this.player2NameText = this.add.text(L.player2Name.x, L.player2Name.y, p2Label, {
+        fontSize: nameFontSize,
         color: COLORS.GOLD,
         fontStyle: 'bold'
       }).setOrigin(0.5);
     }
 
-    this.centerCountText = this.add.text(centerX, centerY + 80, 'Center: 0', {
-      fontSize: '16px',
+    this.centerCountText = this.add.text(L.centerCount.x, L.centerCount.y, 'Center: 0', {
+      fontSize: this.isMobile ? '14px' : '16px',
       color: COLORS.GOLD,
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    this.bonusCountText = this.add.text(this.cameras.main.width - 375, centerY + 80, 'Bonus: 0', {
-      fontSize: '16px',
+    this.bonusCountText = this.add.text(L.bonusCount.x, L.bonusCount.y, 'Bonus: 0', {
+      fontSize: this.isMobile ? '14px' : '16px',
       color: COLORS.GOLD,
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
     // Status and instructions
-    this.statusText = this.add.text(centerX, this.cameras.main.height - 100, 'Game ready', {
-      fontSize: '16px',
+    this.statusText = this.add.text(L.statusText.x, L.statusText.y, 'Game ready', {
+      fontSize: this.isMobile ? '14px' : '16px',
       color: COLORS.WHITE,
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    this.turnIndicator = this.add.text(centerX, 100, "Player 1's Turn", {
-      fontSize: '24px',
+    this.turnIndicator = this.add.text(L.turnIndicator.x, L.turnIndicator.y, "Player 1's Turn", {
+      fontSize: this.isMobile ? '20px' : '24px',
       color: COLORS.GOLD,
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    this.challengeText = this.add.text(centerX, 130, '', {
-      fontSize: '16px',
+    this.challengeText = this.add.text(L.challengeText.x, L.challengeText.y, '', {
+      fontSize: this.isMobile ? '14px' : '16px',
       color: COLORS.RED,
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
     // Pile collection indicator (initially hidden)
-    this.pileCollectionText = this.add.text(centerX, centerY - 100, '', {
-      fontSize: '20px',
+    this.pileCollectionText = this.add.text(L.pileCollection.x, L.pileCollection.y, '', {
+      fontSize: this.isMobile ? '16px' : '20px',
       color: COLORS.GREEN,
       fontStyle: 'bold',
       stroke: COLORS.BLACK,
@@ -388,7 +423,7 @@ export class GameScene extends Phaser.Scene {
     let controlHint: string;
     if (this.isMobile) {
       controlHint = this.isMultiplayer
-        ? `You are Player ${this.myPlayerNumber} | Room: ${this.roomCode}`
+        ? `Player ${this.myPlayerNumber} | Room: ${this.roomCode}`
         : '';
     } else {
       controlHint = this.isMultiplayer
@@ -397,25 +432,31 @@ export class GameScene extends Phaser.Scene {
     }
 
     if (controlHint) {
-      this.add.text(centerX, this.cameras.main.height - 30, controlHint, {
-        fontSize: '14px',
+      this.add.text(L.controlHint.x, L.controlHint.y, controlHint, {
+        fontSize: this.isMobile ? '11px' : '14px',
         color: COLORS.LIGHT_GRAY
       }).setOrigin(0.5);
     }
 
-    // Mode toggle (top-right corner)
-    this.modeToggleText = this.add.text(
-      this.cameras.main.width - 20,
-      20,
-      this.isEasyMode ? 'EASY MODE\n(Press M to toggle)' : 'HARD MODE\n(Press M to toggle)',
-      {
-        fontSize: '14px',
-        color: this.isEasyMode ? COLORS.GREEN : COLORS.RED,
-        fontStyle: 'bold',
-        align: 'right',
-        lineSpacing: 2
-      }
-    ).setOrigin(1.25, -24.2);
+    // Mode toggle — hide on mobile (not useful with touch)
+    if (!this.isMobile) {
+      this.modeToggleText = this.add.text(
+        L.modeToggle.x,
+        L.modeToggle.y,
+        this.isEasyMode ? 'EASY MODE\n(Press M to toggle)' : 'HARD MODE\n(Press M to toggle)',
+        {
+          fontSize: '14px',
+          color: this.isEasyMode ? COLORS.GREEN : COLORS.RED,
+          fontStyle: 'bold',
+          align: 'right',
+          lineSpacing: 2
+        }
+      ).setOrigin(1.25, -24.2);
+    } else {
+      // Create a minimal mode text for portrait
+      this.modeToggleText = this.add.text(0, 0, '', { fontSize: '1px', color: '#000' });
+      this.modeToggleText.setVisible(false);
+    }
   }
 
   private setupInput(): void {
@@ -451,17 +492,22 @@ export class GameScene extends Phaser.Scene {
   private createTouchButtons(): void {
     const w = this.cameras.main.width;
     const h = this.cameras.main.height;
-    const btnW = 260;
-    const btnH = 90;
-    const gap = 30;
-    const btnY = h - 70;
+    const cx = this.cameras.main.centerX;
 
-    // ---- PLAY CARD button (left) ----
-    this.playButton = this.add.container(w / 2 - btnW / 2 - gap / 2, btnY);
+    // Portrait: stacked vertically; Landscape: side by side
+    const btnW = this.isMobile ? 280 : 260;
+    const btnH = this.isMobile ? 65 : 90;
+    const playBtnX = this.isMobile ? cx : (w / 2 - btnW / 2 - 15);
+    const playBtnY = this.isMobile ? 830 : (h - 70);
+    const slapBtnX = this.isMobile ? cx : (w / 2 + btnW / 2 + 15);
+    const slapBtnY = this.isMobile ? 905 : (h - 70);
+
+    // ---- PLAY CARD button ----
+    this.playButton = this.add.container(playBtnX, playBtnY);
     const playBg = this.add.rectangle(0, 0, btnW, btnH, 0x2a5a2a);
     playBg.setStrokeStyle(4, 0xffd700);
-    const playLabel = this.add.text(0, 0, 'PLAY\nCARD', {
-      fontSize: '28px',
+    const playLabel = this.add.text(0, 0, this.isMobile ? 'PLAY CARD' : 'PLAY\nCARD', {
+      fontSize: this.isMobile ? '24px' : '28px',
       color: COLORS.GOLD,
       fontStyle: 'bold',
       align: 'center',
@@ -490,12 +536,12 @@ export class GameScene extends Phaser.Scene {
       this.playButton.setScale(1);
     });
 
-    // ---- SLAP button (right) ----
-    this.slapButton = this.add.container(w / 2 + btnW / 2 + gap / 2, btnY);
+    // ---- SLAP button ----
+    this.slapButton = this.add.container(slapBtnX, slapBtnY);
     const slapBg = this.add.rectangle(0, 0, btnW, btnH, 0x8B0000);
     slapBg.setStrokeStyle(4, 0xff4444);
     const slapLabel = this.add.text(0, 0, 'SLAP!', {
-      fontSize: '32px',
+      fontSize: this.isMobile ? '26px' : '32px',
       color: '#ff4444',
       fontStyle: 'bold',
       align: 'center'
@@ -524,16 +570,19 @@ export class GameScene extends Phaser.Scene {
     });
 
     // ---- Back/Leave button (small, top-right) ----
-    const backBtn = this.add.container(w - 90, 60);
-    const backBg = this.add.rectangle(0, 0, 120, 40, 0x333333);
+    const L = this.getLayout();
+    const backBtn = this.add.container(L.leaveBtn.x, L.leaveBtn.y);
+    const leaveBtnW = this.isMobile ? 80 : 120;
+    const leaveBtnH = this.isMobile ? 32 : 40;
+    const backBg = this.add.rectangle(0, 0, leaveBtnW, leaveBtnH, 0x333333);
     backBg.setStrokeStyle(2, 0x666666);
     const backLabel = this.add.text(0, 0, 'LEAVE', {
-      fontSize: '16px',
+      fontSize: this.isMobile ? '13px' : '16px',
       color: COLORS.LIGHT_GRAY,
       fontStyle: 'bold'
     }).setOrigin(0.5);
     backBtn.add([backBg, backLabel]);
-    backBtn.setSize(120, 40);
+    backBtn.setSize(leaveBtnW, leaveBtnH);
     backBtn.setInteractive();
     backBtn.setDepth(500);
     backBtn.on('pointerup', () => {
@@ -691,6 +740,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     // Update center card from server state
+    const L = this.getLayout();
     this.centerCardSprite.destroy();
     if (state.topCard) {
       // Build a lightweight card-like object for the display helper
@@ -701,14 +751,14 @@ export class GameScene extends Phaser.Scene {
         displaySuit: state.topCard.displaySuit,
       };
       this.centerCardSprite = this.createCardDisplayFromData(
-        this.cameras.main.centerX,
-        this.cameras.main.centerY,
+        L.centerCard.x,
+        L.centerCard.y,
         cardLike
       );
     } else {
       this.centerCardSprite = this.createCardDisplay(
-        this.cameras.main.centerX,
-        this.cameras.main.centerY,
+        L.centerCard.x,
+        L.centerCard.y,
         null
       );
     }
@@ -762,42 +812,49 @@ export class GameScene extends Phaser.Scene {
   private showDisconnectOverlay(message: string): void {
     if (this.disconnectOverlay) return; // already showing
 
+    const portrait = isPortrait();
+    const cx = this.cameras.main.centerX;
+    const cy = this.cameras.main.centerY;
+    const panelW = portrait ? 380 : 500;
+    const panelH = portrait ? 180 : 200;
+
     this.disconnectOverlay = this.add.container(0, 0);
     this.disconnectOverlay.setDepth(2000);
 
-    const overlay = this.add.rectangle(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY,
-      this.cameras.main.width,
-      this.cameras.main.height,
-      0x000000,
-      0.7
-    );
+    const overlay = this.add.rectangle(cx, cy, this.cameras.main.width, this.cameras.main.height, 0x000000, 0.7);
 
-    const panel = this.add.rectangle(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY,
-      500,
-      200,
-      0x1a1a1a
-    );
+    const panel = this.add.rectangle(cx, cy, panelW, panelH, 0x1a1a1a);
     panel.setStrokeStyle(3, 0xff4444);
 
-    const msgText = this.add.text(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY - 30,
-      message,
-      { fontSize: '24px', color: COLORS.WHITE, fontStyle: 'bold', align: 'center' }
-    ).setOrigin(0.5);
+    const msgText = this.add.text(cx, cy - 30, message, {
+      fontSize: portrait ? '20px' : '24px',
+      color: COLORS.WHITE,
+      fontStyle: 'bold',
+      align: 'center',
+      wordWrap: { width: panelW - 40 }
+    }).setOrigin(0.5);
 
-    const hint = this.add.text(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY + 30,
-      'Press ESC to return to menu',
-      { fontSize: '18px', color: COLORS.LIGHT_GRAY }
-    ).setOrigin(0.5);
+    const hintMsg = this.isMobile ? 'Tap LEAVE to return to menu' : 'Press ESC to return to menu';
+    const hint = this.add.text(cx, cy + 30, hintMsg, {
+      fontSize: portrait ? '15px' : '18px',
+      color: COLORS.LIGHT_GRAY
+    }).setOrigin(0.5);
 
     this.disconnectOverlay.add([overlay, panel, msgText, hint]);
+
+    // Add a touch-friendly button on mobile
+    if (this.isMobile) {
+      const btn = this.add.container(cx, cy + 70);
+      const btnBg = this.add.rectangle(0, 0, 160, 45, 0x8B4513);
+      btnBg.setStrokeStyle(2, 0xff4444);
+      const btnText = this.add.text(0, 0, 'LEAVE', { fontSize: '18px', color: COLORS.WHITE, fontStyle: 'bold' }).setOrigin(0.5);
+      btn.add([btnBg, btnText]);
+      btn.setSize(160, 45);
+      btn.setInteractive();
+      btn.setDepth(2001);
+      btn.on('pointerup', () => this.returnToMenu());
+      this.disconnectOverlay.add(btn);
+    }
   }
 
   // ================================================================
@@ -920,23 +977,23 @@ export class GameScene extends Phaser.Scene {
     // Update all the non-center card elements first
     this.updateDisplayWithoutCenterCard();
 
-    // Update center card
+    // Update center card using layout-aware position
+    const L = this.getLayout();
     this.centerCardSprite.destroy();
     this.centerCardSprite = this.createCardDisplay(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY,
+      L.centerCard.x,
+      L.centerCard.y,
       this.game_logic.topCard
     );
   }
 
   private showPlayCardAnimation(player: Player): void {
-    const player1X = 180;
-    const player2X = this.cameras.main.width - 180;
+    const L = this.getLayout();
 
-    const startX = player === 1 ? player1X : player2X;
-    const startY = player === 1 ? this.cameras.main.height - 150 : 150;
-    const endX = this.cameras.main.centerX;
-    const endY = this.cameras.main.centerY;
+    const startX = player === 1 ? L.player1Deck.x : L.player2Deck.x;
+    const startY = player === 1 ? L.player1Deck.y : L.player2Deck.y;
+    const endX = L.centerCard.x;
+    const endY = L.centerCard.y;
 
     const card = this.game_logic.topCard;
     if (!card) return;
@@ -1025,6 +1082,11 @@ export class GameScene extends Phaser.Scene {
 
   private showWinScreen(): void {
     const winContainer = this.add.container(0, 0);
+    const portrait = isPortrait();
+    const cx = this.cameras.main.centerX;
+    const cy = this.cameras.main.centerY;
+    const panelW = portrait ? 460 : 600;
+    const panelH = portrait ? 340 : 400;
 
     if (this.centerCardSprite) {
       this.centerCardSprite.setVisible(false);
@@ -1032,102 +1094,48 @@ export class GameScene extends Phaser.Scene {
 
     winContainer.setDepth(1000);
 
-    const overlay = this.add.rectangle(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY,
-      this.cameras.main.width,
-      this.cameras.main.height,
-      0x000000,
-      0.8
-    );
+    const overlay = this.add.rectangle(cx, cy, this.cameras.main.width, this.cameras.main.height, 0x000000, 0.8);
 
-    const panelBg = this.add.rectangle(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY,
-      600,
-      400,
-      0x1a1a1a
-    );
+    const panelBg = this.add.rectangle(cx, cy, panelW, panelH, 0x1a1a1a);
     panelBg.setStrokeStyle(4, 0xffd700);
 
-    const crown = this.add.text(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY - 120,
-      '👑',
-      { fontSize: '64px' }
-    ).setOrigin(0.5);
+    const crown = this.add.text(cx, cy - (portrait ? 100 : 120), '👑', { fontSize: portrait ? '48px' : '64px' }).setOrigin(0.5);
 
-    const winText = this.add.text(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY - 50,
-      `PLAYER ${this.game_logic.winner} WINS!`,
-      {
-        fontSize: '48px',
-        color: COLORS.GOLD,
-        fontStyle: 'bold',
-        stroke: COLORS.BLACK,
-        strokeThickness: 3
-      }
-    ).setOrigin(0.5);
+    const winText = this.add.text(cx, cy - (portrait ? 40 : 50), `PLAYER ${this.game_logic.winner} WINS!`, {
+      fontSize: portrait ? '36px' : '48px',
+      color: COLORS.GOLD,
+      fontStyle: 'bold',
+      stroke: COLORS.BLACK,
+      strokeThickness: 3
+    }).setOrigin(0.5);
 
-    const reasonText = this.add.text(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY - 10,
-      'Opponent ran out of cards!',
-      {
-        fontSize: '20px',
-        color: COLORS.WHITE,
-        fontStyle: 'italic'
-      }
-    ).setOrigin(0.5);
+    const reasonText = this.add.text(cx, cy - (portrait ? 5 : 10), 'Opponent ran out of cards!', {
+      fontSize: portrait ? '16px' : '20px',
+      color: COLORS.WHITE,
+      fontStyle: 'italic'
+    }).setOrigin(0.5);
 
-    const scoresText = this.add.text(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY + 30,
-      `Final Scores - P1: ${this.game_logic.player1Count} | P2: ${this.game_logic.player2Count}`,
-      {
-        fontSize: '18px',
-        color: COLORS.LIGHT_GRAY
-      }
-    ).setOrigin(0.5);
+    const scoresText = this.add.text(cx, cy + (portrait ? 25 : 30),
+      `Final Scores - P1: ${this.game_logic.player1Count} | P2: ${this.game_logic.player2Count}`, {
+      fontSize: portrait ? '15px' : '18px',
+      color: COLORS.LIGHT_GRAY
+    }).setOrigin(0.5);
 
     winContainer.add([overlay, panelBg, crown, winText, reasonText, scoresText]);
 
     if (this.isMobile) {
-      // Touch buttons for mobile
-      const playAgainBtn = this.createWinScreenButton(
-        this.cameras.main.centerX - 120,
-        this.cameras.main.centerY + 90,
-        'PLAY AGAIN',
-        0x2a5a2a, COLORS.GREEN
-      );
-      playAgainBtn.on('pointerup', () => {
-        winContainer.destroy();
-        this.scene.restart();
-      });
+      const btnY = cy + (portrait ? 80 : 90);
+      const playAgainBtn = this.createWinScreenButton(cx - 110, btnY, 'PLAY AGAIN', 0x2a5a2a, COLORS.GREEN);
+      playAgainBtn.on('pointerup', () => { winContainer.destroy(); this.scene.restart(); });
 
-      const menuBtn = this.createWinScreenButton(
-        this.cameras.main.centerX + 120,
-        this.cameras.main.centerY + 90,
-        'MENU',
-        0x8B4513, COLORS.GOLD
-      );
-      menuBtn.on('pointerup', () => {
-        winContainer.destroy();
-        this.returnToMenu();
-      });
+      const menuBtn = this.createWinScreenButton(cx + 110, btnY, 'MENU', 0x8B4513, COLORS.GOLD);
+      menuBtn.on('pointerup', () => { winContainer.destroy(); this.returnToMenu(); });
 
       winContainer.add([playAgainBtn, menuBtn]);
     } else {
-      const controlsText = this.add.text(
-        this.cameras.main.centerX,
-        this.cameras.main.centerY + 80,
-        'Press SPACE to play again or ESC for menu',
-        {
-          fontSize: '20px',
-          color: COLORS.WHITE
-        }
-      ).setOrigin(0.5);
+      const controlsText = this.add.text(cx, cy + 80, 'Press SPACE to play again or ESC for menu', {
+        fontSize: '20px', color: COLORS.WHITE
+      }).setOrigin(0.5);
       winContainer.add(controlsText);
 
       this.tweens.add({ targets: controlsText, alpha: 0.5, duration: 1000, yoyo: true, repeat: -1, delay: 1000 });
@@ -1137,13 +1145,11 @@ export class GameScene extends Phaser.Scene {
         this.input.keyboard?.off('keydown-ESC', escHandler);
         this.scene.restart();
       };
-
       const escHandler = () => {
         this.input.keyboard?.off('keydown-SPACE', spaceHandler);
         this.input.keyboard?.off('keydown-ESC', escHandler);
         this.returnToMenu();
       };
-
       this.input.keyboard?.once('keydown-SPACE', spaceHandler);
       this.input.keyboard?.once('keydown-ESC', escHandler);
     }
@@ -1161,6 +1167,11 @@ export class GameScene extends Phaser.Scene {
 
   private showWinScreenMultiplayer(state: ServerGameState): void {
     const winContainer = this.add.container(0, 0);
+    const portrait = isPortrait();
+    const cx = this.cameras.main.centerX;
+    const cy = this.cameras.main.centerY;
+    const panelW = portrait ? 460 : 600;
+    const panelH = portrait ? 360 : 400;
 
     if (this.centerCardSprite) {
       this.centerCardSprite.setVisible(false);
@@ -1168,119 +1179,65 @@ export class GameScene extends Phaser.Scene {
 
     winContainer.setDepth(1000);
 
-    const overlay = this.add.rectangle(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY,
-      this.cameras.main.width,
-      this.cameras.main.height,
-      0x000000,
-      0.8
-    );
+    const overlay = this.add.rectangle(cx, cy, this.cameras.main.width, this.cameras.main.height, 0x000000, 0.8);
 
-    const panelBg = this.add.rectangle(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY,
-      600,
-      400,
-      0x1a1a1a
-    );
+    const panelBg = this.add.rectangle(cx, cy, panelW, panelH, 0x1a1a1a);
     panelBg.setStrokeStyle(4, 0xffd700);
 
     const iWon = state.winner === this.myPlayerNumber;
 
-    const crown = this.add.text(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY - 120,
-      iWon ? '👑' : '💀',
-      { fontSize: '64px' }
-    ).setOrigin(0.5);
+    const crown = this.add.text(cx, cy - (portrait ? 105 : 120), iWon ? '👑' : '💀', {
+      fontSize: portrait ? '48px' : '64px'
+    }).setOrigin(0.5);
 
-    const winText = this.add.text(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY - 50,
-      iWon ? 'YOU WIN!' : 'YOU LOSE!',
-      {
-        fontSize: '48px',
-        color: iWon ? COLORS.GOLD : COLORS.RED,
-        fontStyle: 'bold',
-        stroke: COLORS.BLACK,
-        strokeThickness: 3
-      }
-    ).setOrigin(0.5);
+    const winText = this.add.text(cx, cy - (portrait ? 45 : 50), iWon ? 'YOU WIN!' : 'YOU LOSE!', {
+      fontSize: portrait ? '36px' : '48px',
+      color: iWon ? COLORS.GOLD : COLORS.RED,
+      fontStyle: 'bold',
+      stroke: COLORS.BLACK,
+      strokeThickness: 3
+    }).setOrigin(0.5);
 
-    // Show opponent name if available
     const opponentNum = this.myPlayerNumber === 1 ? 2 : 1;
     const opponentInfo = this.playerInfo[opponentNum];
     const myInfo = this.playerInfo[this.myPlayerNumber];
 
-    const reasonText = this.add.text(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY - 10,
-      iWon
-        ? `${opponentInfo?.username || 'Opponent'} ran out of cards!`
-        : 'You ran out of cards!',
-      {
-        fontSize: '20px',
-        color: COLORS.WHITE,
-        fontStyle: 'italic'
-      }
-    ).setOrigin(0.5);
+    const reasonText = this.add.text(cx, cy - (portrait ? 5 : 10),
+      iWon ? `${opponentInfo?.username || 'Opponent'} ran out of cards!` : 'You ran out of cards!', {
+      fontSize: portrait ? '16px' : '20px',
+      color: COLORS.WHITE,
+      fontStyle: 'italic'
+    }).setOrigin(0.5);
 
-    // Show win record if authenticated
     let recordLine = `Final Scores - P1: ${state.player1Count} | P2: ${state.player2Count}`;
     if (myInfo?.wins != null) {
       recordLine += `\nYour total wins: ${myInfo.wins}`;
     }
 
-    const scoresText = this.add.text(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY + 30,
-      recordLine,
-      {
-        fontSize: '18px',
-        color: COLORS.LIGHT_GRAY,
-        align: 'center'
-      }
-    ).setOrigin(0.5);
+    const scoresText = this.add.text(cx, cy + (portrait ? 25 : 30), recordLine, {
+      fontSize: portrait ? '15px' : '18px',
+      color: COLORS.LIGHT_GRAY,
+      align: 'center'
+    }).setOrigin(0.5);
 
     winContainer.add([overlay, panelBg, crown, winText, reasonText, scoresText]);
 
     if (this.isMobile) {
-      const rematchBtn = this.createWinScreenButton(
-        this.cameras.main.centerX - 120,
-        this.cameras.main.centerY + 100,
-        'REMATCH',
-        0x2a5a2a, COLORS.GREEN
-      );
+      const btnY = cy + (portrait ? 85 : 100);
+      const rematchBtn = this.createWinScreenButton(cx - 110, btnY, 'REMATCH', 0x2a5a2a, COLORS.GREEN);
       rematchBtn.on('pointerup', () => {
-        if (this.socket) {
-          this.socket.emit('restartGame', { roomCode: this.roomCode });
-        }
+        if (this.socket) this.socket.emit('restartGame', { roomCode: this.roomCode });
         winContainer.destroy();
       });
 
-      const menuBtn = this.createWinScreenButton(
-        this.cameras.main.centerX + 120,
-        this.cameras.main.centerY + 100,
-        'MENU',
-        0x8B4513, COLORS.GOLD
-      );
-      menuBtn.on('pointerup', () => {
-        winContainer.destroy();
-        this.returnToMenu();
-      });
+      const menuBtn = this.createWinScreenButton(cx + 110, btnY, 'MENU', 0x8B4513, COLORS.GOLD);
+      menuBtn.on('pointerup', () => { winContainer.destroy(); this.returnToMenu(); });
 
       winContainer.add([rematchBtn, menuBtn]);
     } else {
-      const controlsText = this.add.text(
-        this.cameras.main.centerX,
-        this.cameras.main.centerY + 90,
-        'Press SPACE for rematch or ESC for menu',
-        {
-          fontSize: '20px',
-          color: COLORS.WHITE
-        }
-      ).setOrigin(0.5);
+      const controlsText = this.add.text(cx, cy + 90, 'Press SPACE for rematch or ESC for menu', {
+        fontSize: '20px', color: COLORS.WHITE
+      }).setOrigin(0.5);
       winContainer.add(controlsText);
 
       this.tweens.add({ targets: controlsText, alpha: 0.5, duration: 1000, yoyo: true, repeat: -1, delay: 1000 });
@@ -1288,18 +1245,14 @@ export class GameScene extends Phaser.Scene {
       const spaceHandler = () => {
         this.input.keyboard?.off('keydown-SPACE', spaceHandler);
         this.input.keyboard?.off('keydown-ESC', escHandler);
-        if (this.socket) {
-          this.socket.emit('restartGame', { roomCode: this.roomCode });
-        }
+        if (this.socket) this.socket.emit('restartGame', { roomCode: this.roomCode });
         winContainer.destroy();
       };
-
       const escHandler = () => {
         this.input.keyboard?.off('keydown-SPACE', spaceHandler);
         this.input.keyboard?.off('keydown-ESC', escHandler);
         this.returnToMenu();
       };
-
       this.input.keyboard?.once('keydown-SPACE', spaceHandler);
       this.input.keyboard?.once('keydown-ESC', escHandler);
     }

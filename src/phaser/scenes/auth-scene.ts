@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser';
-import { SCENE_KEYS, COLORS, AuthUser, AUTH_STORAGE_KEYS, isMobileDevice } from '../common';
+import { SCENE_KEYS, COLORS, AuthUser, AUTH_STORAGE_KEYS, isMobileDevice, isPortrait } from '../common';
 
 const API_URL = process.env.REACT_APP_SOCKET_URL || 'http://localhost:3001';
 
@@ -59,29 +59,32 @@ export class AuthScene extends Phaser.Scene {
       0x0a5f38
     );
 
+    const portrait = isPortrait();
+    const inset = portrait ? 25 : 50;
     const graphics = this.add.graphics();
-    graphics.lineStyle(8, 0x8B4513);
+    graphics.lineStyle(portrait ? 4 : 8, 0x8B4513);
     graphics.strokeRoundedRect(
-      50, 50,
-      this.cameras.main.width - 100,
-      this.cameras.main.height - 100,
+      inset, inset,
+      this.cameras.main.width - inset * 2,
+      this.cameras.main.height - inset * 2,
       20
     );
   }
 
   private createTitle(): void {
     const centerX = this.cameras.main.centerX;
+    const portrait = isPortrait();
 
-    this.add.text(centerX, 100, 'ONLINE PLAY', {
-      fontSize: '48px',
+    this.add.text(centerX, portrait ? 80 : 100, 'ONLINE PLAY', {
+      fontSize: portrait ? '36px' : '48px',
       color: COLORS.GOLD,
       fontStyle: 'bold',
       stroke: COLORS.BLACK,
       strokeThickness: 3
     }).setOrigin(0.5);
 
-    this.add.text(centerX, 155, 'Sign in to track your wins on the leaderboard', {
-      fontSize: '18px',
+    this.add.text(centerX, portrait ? 125 : 155, 'Sign in to track your wins', {
+      fontSize: portrait ? '15px' : '18px',
       color: COLORS.WHITE,
       fontStyle: 'italic'
     }).setOrigin(0.5);
@@ -195,48 +198,46 @@ export class AuthScene extends Phaser.Scene {
 
   private createMobileForm(): void {
     const centerX = this.cameras.main.centerX;
-    const formY = 220;
+    const portrait = isPortrait();
+    const formY = portrait ? 180 : 220;
+    const panelWidth = portrait ? 420 : 500;
+    const panelHeight = portrait ? 310 : 340;
+    const inputWidth = portrait ? 300 : 380;
 
-    // Form panel background (Phaser)
-    const panelWidth = 500;
-    const panelHeight = 340;
     const panel = this.add.rectangle(centerX, formY + panelHeight / 2, panelWidth, panelHeight, 0x1a1a1a, 0.9);
     panel.setStrokeStyle(2, 0xffd700);
 
-    // Toggle text (Login / Register)
     this.toggleText = this.add.text(centerX, formY + 25, 'LOGIN', {
-      fontSize: '28px',
+      fontSize: portrait ? '24px' : '28px',
       color: COLORS.GOLD,
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    // Status text
-    this.statusText = this.add.text(centerX, formY + 215, '', {
-      fontSize: '16px',
+    this.statusText = this.add.text(centerX, formY + (portrait ? 200 : 215), '', {
+      fontSize: portrait ? '14px' : '16px',
       color: COLORS.RED,
       fontStyle: 'bold',
       align: 'center',
-      wordWrap: { width: 380 }
+      wordWrap: { width: inputWidth }
     }).setOrigin(0.5);
 
-    // Create an HTML form element for mobile input (triggers native keyboard)
     const formHTML = `
-      <div style="display:flex; flex-direction:column; align-items:center; gap:10px; width:380px;">
+      <div style="display:flex; flex-direction:column; align-items:center; gap:10px; width:${inputWidth}px;">
         <label style="color:#d3d3d3; font-size:14px; font-weight:bold; align-self:flex-start;">USERNAME</label>
         <input id="auth-username" type="text" maxlength="20" autocomplete="username"
-          style="width:100%; padding:10px; font-size:18px; background:#333; color:#fff;
+          style="width:100%; padding:10px; font-size:${portrait ? '16' : '18'}px; background:#333; color:#fff;
                  border:2px solid #ffd700; border-radius:4px; outline:none; box-sizing:border-box;" />
         <div style="display:flex; justify-content:space-between; width:100%;">
           <label style="color:#d3d3d3; font-size:14px; font-weight:bold;">PASSWORD</label>
           <span style="color:#d3d3d3; font-size:12px; font-style:italic;">(optional)</span>
         </div>
         <input id="auth-password" type="password" maxlength="50" autocomplete="current-password"
-          style="width:100%; padding:10px; font-size:18px; background:#333; color:#fff;
+          style="width:100%; padding:10px; font-size:${portrait ? '16' : '18'}px; background:#333; color:#fff;
                  border:2px solid #666; border-radius:4px; outline:none; box-sizing:border-box;" />
       </div>
     `;
 
-    this.domFormElement = this.add.dom(centerX, formY + 130).createFromHTML(formHTML);
+    this.domFormElement = this.add.dom(centerX, formY + (portrait ? 120 : 130)).createFromHTML(formHTML);
     this.domFormElement.setDepth(200);
 
     // Sync DOM inputs with internal state
@@ -269,25 +270,23 @@ export class AuthScene extends Phaser.Scene {
 
   private createButtons(): void {
     const centerX = this.cameras.main.centerX;
-    const buttonY = 510;
+    const portrait = isPortrait();
+    const buttonY = portrait ? 460 : 510;
+    const gap = portrait ? 48 : 55;
 
-    // Submit button
     const submitBtn = this.createButton(centerX, buttonY, 'LOGIN', () => this.handleSubmit());
     this.submitButtonText = submitBtn.getAt(1) as Phaser.GameObjects.Text;
 
-    // Toggle Login/Register
-    this.createSmallButton(centerX, buttonY + 55, "Don't have an account? Register", () => {
+    this.createSmallButton(centerX, buttonY + gap, "Don't have an account? Register", () => {
       this.isRegistering = !this.isRegistering;
       this.updateFormMode();
     });
 
-    // Continue as Guest
-    this.createButton(centerX, buttonY + 115, 'CONTINUE AS GUEST', () => {
+    this.createButton(centerX, buttonY + gap * 2, 'CONTINUE AS GUEST', () => {
       this.goToLobby(null);
     });
 
-    // Back to menu
-    this.createSmallButton(centerX, buttonY + 170, 'Back to Menu', () => {
+    this.createSmallButton(centerX, buttonY + gap * 3, 'Back to Menu', () => {
       this.cameras.main.fadeOut(500, 0, 0, 0);
       this.cameras.main.once('camerafadeoutcomplete', () => {
         this.scene.start(SCENE_KEYS.MENU);
@@ -509,18 +508,21 @@ export class AuthScene extends Phaser.Scene {
 
   private createButton(x: number, y: number, text: string, callback: () => void): Phaser.GameObjects.Container {
     const button = this.add.container(x, y);
+    const portrait = isPortrait();
+    const btnW = portrait ? 260 : 320;
+    const btnH = portrait ? 48 : 55;
 
-    const bg = this.add.rectangle(0, 0, 320, 55, 0x8B4513);
+    const bg = this.add.rectangle(0, 0, btnW, btnH, 0x8B4513);
     bg.setStrokeStyle(3, 0xffd700);
 
     const buttonText = this.add.text(0, 0, text, {
-      fontSize: '22px',
+      fontSize: portrait ? '18px' : '22px',
       color: COLORS.GOLD,
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
     button.add([bg, buttonText]);
-    button.setSize(320, 55);
+    button.setSize(btnW, btnH);
     button.setInteractive();
 
     button.on('pointerover', () => {

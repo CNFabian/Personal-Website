@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser';
-import { SCENE_KEYS, COLORS, DEFAULT_RULES, LeaderboardEntry, AUTH_STORAGE_KEYS, isMobileDevice } from '../common';
+import { SCENE_KEYS, COLORS, DEFAULT_RULES, LeaderboardEntry, AUTH_STORAGE_KEYS, isMobileDevice, isPortrait } from '../common';
 
 const API_URL = process.env.REACT_APP_SOCKET_URL || 'http://localhost:3001';
 
@@ -47,17 +47,22 @@ export class MenuScene extends Phaser.Scene {
 
   private createTitle(): void {
     const centerX = this.cameras.main.centerX;
-    
-    const title = this.add.text(centerX, 120, 'EGYPTIAN', {
-      fontSize: '64px',
+    const portrait = isPortrait();
+    const titleSize = portrait ? '48px' : '64px';
+    const titleY1 = portrait ? 90 : 120;
+    const titleY2 = portrait ? 145 : 190;
+    const subY = portrait ? 190 : 240;
+
+    const title = this.add.text(centerX, titleY1, 'EGYPTIAN', {
+      fontSize: titleSize,
       color: COLORS.GOLD,
       fontStyle: 'bold',
       stroke: COLORS.BLACK,
       strokeThickness: 3
     }).setOrigin(0.5);
 
-    const subtitle = this.add.text(centerX, 190, 'RATSCREW', {
-      fontSize: '64px',
+    const subtitle = this.add.text(centerX, titleY2, 'RATSCREW', {
+      fontSize: titleSize,
       color: COLORS.GOLD,
       fontStyle: 'bold',
       stroke: COLORS.BLACK,
@@ -67,8 +72,8 @@ export class MenuScene extends Phaser.Scene {
     title.setShadow(0, 0, COLORS.GOLD, 10, false, true);
     subtitle.setShadow(0, 0, COLORS.GOLD, 10, false, true);
 
-    this.add.text(centerX, 240, 'The Fast-Paced Card Slapping Game', {
-      fontSize: '24px',
+    this.add.text(centerX, subY, 'The Fast-Paced Card Slapping Game', {
+      fontSize: portrait ? '18px' : '24px',
       color: COLORS.WHITE,
       fontStyle: 'italic'
     }).setOrigin(0.5);
@@ -137,18 +142,21 @@ export class MenuScene extends Phaser.Scene {
 
   private createButton(x: number, y: number, text: string, callback: () => void): Phaser.GameObjects.Container {
     const button = this.add.container(x, y);
+    const portrait = isPortrait();
+    const btnW = portrait ? 260 : 320;
+    const btnH = portrait ? 55 : 60;
 
-    const bg = this.add.rectangle(0, 0, 320, 60, 0x8B4513);
+    const bg = this.add.rectangle(0, 0, btnW, btnH, 0x8B4513);
     bg.setStrokeStyle(3, 0xffd700);
-    
+
     const buttonText = this.add.text(0, 0, text, {
-      fontSize: '24px',
+      fontSize: portrait ? '20px' : '24px',
       color: COLORS.GOLD,
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
     button.add([bg, buttonText]);
-    button.setSize(320, 60);
+    button.setSize(btnW, btnH);
     button.setInteractive();
 
     button.on('pointerover', () => {
@@ -175,37 +183,41 @@ export class MenuScene extends Phaser.Scene {
 
   private createInstructions(): void {
     this.instructionsContainer = this.add.container(0, 0);
-    
-    const overlay = this.add.rectangle(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY,
-      this.cameras.main.width,
-      this.cameras.main.height,
-      0x000000,
-      0.8
-    );
+    const portrait = isPortrait();
+    const cx = this.cameras.main.centerX;
+    const cy = this.cameras.main.centerY;
+    const panelW = portrait ? 480 : 700;
+    const panelH = portrait ? 700 : 600;
 
-    const panel = this.add.rectangle(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY,
-      700,
-      600,
-      0x1a1a1a
-    );
+    const overlay = this.add.rectangle(cx, cy, this.cameras.main.width, this.cameras.main.height, 0x000000, 0.8);
+
+    const panel = this.add.rectangle(cx, cy, panelW, panelH, 0x1a1a1a);
     panel.setStrokeStyle(3, 0xffd700);
 
-    const title = this.add.text(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY - 270,
-      'HOW TO PLAY EGYPTIAN RATSCREW',
-      {
-        fontSize: '28px',
-        color: COLORS.GOLD,
-        fontStyle: 'bold'
-      }
-    ).setOrigin(0.5);
+    const title = this.add.text(cx, cy - panelH / 2 + 30, 'HOW TO PLAY', {
+      fontSize: portrait ? '22px' : '28px',
+      color: COLORS.GOLD,
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
 
-    const instructions = [
+    const instructions = portrait ? [
+      'OBJECTIVE:',
+      'Collect all 52 cards!',
+      '',
+      'GAMEPLAY:',
+      'Take turns playing cards.',
+      'Watch for slap patterns.',
+      'First to slap wins the pile!',
+      '',
+      'FACE CARDS:',
+      'Ace = 4, King = 3,',
+      'Queen = 2, Jack = 1 chance',
+      '',
+      'CONTROLS:',
+      'Tap PLAY CARD / SLAP buttons',
+      '',
+      'Tap outside to close'
+    ] : [
       'OBJECTIVE:',
       'Be the first player to collect all 52 cards!',
       '',
@@ -218,7 +230,7 @@ export class MenuScene extends Phaser.Scene {
       'When a face card is played, the other player must',
       'respond with face cards or lose the pile:',
       '• Ace = 4 chances',
-      '• King = 3 chances', 
+      '• King = 3 chances',
       '• Queen = 2 chances',
       '• Jack = 1 chance',
       '',
@@ -232,25 +244,23 @@ export class MenuScene extends Phaser.Scene {
       'Click outside this panel or press ESC to close'
     ];
 
-    let yOffset = -240;
+    const baseFontSize = portrait ? 14 : 16;
+    const headerFontSize = portrait ? 17 : 20;
+    const lineSpacing = portrait ? 20 : 24;
+
+    let yOffset = -panelH / 2 + 65;
     instructions.forEach((line) => {
       const color = line.endsWith(':') ? COLORS.GOLD : COLORS.WHITE;
-      const fontSize = line.endsWith(':') ? '20px' : '16px';
+      const fontSize = line.endsWith(':') ? `${headerFontSize}px` : `${baseFontSize}px`;
       const fontStyle = line.endsWith(':') ? 'bold' : 'normal';
 
-      const instructionText = this.add.text(
-        this.cameras.main.centerX,
-        this.cameras.main.centerY + yOffset,
-        line,
-        {
-          fontSize,
-          color,
-          fontStyle
-        }
-      ).setOrigin(0.5);
+      const instructionText = this.add.text(cx, cy + yOffset, line, {
+        fontSize, color, fontStyle,
+        wordWrap: { width: panelW - 60 }
+      }).setOrigin(0.5);
 
       this.instructionsContainer.add(instructionText);
-      yOffset += line === '' ? 10 : 24;
+      yOffset += line === '' ? 8 : lineSpacing;
     });
 
     this.instructionsContainer.add([overlay, panel, title]);
@@ -259,59 +269,34 @@ export class MenuScene extends Phaser.Scene {
 
   private createLeaderboard(): void {
     this.leaderboardContainer = this.add.container(0, 0);
+    const portrait = isPortrait();
+    const cx = this.cameras.main.centerX;
+    const cy = this.cameras.main.centerY;
 
-    const overlay = this.add.rectangle(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY,
-      this.cameras.main.width,
-      this.cameras.main.height,
-      0x000000,
-      0.8
-    );
+    const overlay = this.add.rectangle(cx, cy, this.cameras.main.width, this.cameras.main.height, 0x000000, 0.8);
 
-    const panelWidth = 500;
-    const panelHeight = 450;
-    const panel = this.add.rectangle(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY,
-      panelWidth,
-      panelHeight,
-      0x1a1a1a
-    );
+    const panelWidth = portrait ? 420 : 500;
+    const panelHeight = portrait ? 400 : 450;
+    const panel = this.add.rectangle(cx, cy, panelWidth, panelHeight, 0x1a1a1a);
     panel.setStrokeStyle(3, 0xffd700);
 
-    const title = this.add.text(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY - panelHeight / 2 + 35,
-      'LEADERBOARD - TOP 5',
-      {
-        fontSize: '28px',
-        color: COLORS.GOLD,
-        fontStyle: 'bold'
-      }
-    ).setOrigin(0.5);
+    const title = this.add.text(cx, cy - panelHeight / 2 + 35, 'LEADERBOARD - TOP 5', {
+      fontSize: portrait ? '22px' : '28px',
+      color: COLORS.GOLD,
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
 
-    // Loading text (will be replaced with actual data)
-    const loadingText = this.add.text(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY,
-      'Loading...',
-      {
-        fontSize: '20px',
-        color: COLORS.LIGHT_GRAY,
-        fontStyle: 'italic'
-      }
-    ).setOrigin(0.5);
+    const loadingText = this.add.text(cx, cy, 'Loading...', {
+      fontSize: portrait ? '17px' : '20px',
+      color: COLORS.LIGHT_GRAY,
+      fontStyle: 'italic'
+    }).setOrigin(0.5);
 
-    const closeHint = this.add.text(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY + panelHeight / 2 - 30,
-      'Click outside or press ESC to close',
-      {
-        fontSize: '14px',
-        color: COLORS.LIGHT_GRAY
-      }
-    ).setOrigin(0.5);
+    const closeHint = this.add.text(cx, cy + panelHeight / 2 - 30,
+      portrait ? 'Tap outside to close' : 'Click outside or press ESC to close', {
+      fontSize: portrait ? '12px' : '14px',
+      color: COLORS.LIGHT_GRAY
+    }).setOrigin(0.5);
 
     this.leaderboardContainer.add([overlay, panel, title, loadingText, closeHint]);
     this.leaderboardContainer.setVisible(false);
@@ -352,43 +337,30 @@ export class MenuScene extends Phaser.Scene {
         return;
       }
 
+      const portrait = isPortrait();
+      const cx = this.cameras.main.centerX;
+      const colOffset = portrait ? 140 : 180;
+      const nameOffset = portrait ? 70 : 100;
+      const entryFontSize = portrait ? '18px' : '22px';
+      const winsFontSize = portrait ? '16px' : '20px';
+      const rowSpacing = portrait ? 48 : 55;
+
       entries.forEach((entry, i) => {
-        const y = startY + i * 55;
+        const y = startY + i * rowSpacing;
         const rankColors = ['#FFD700', '#C0C0C0', '#CD7F32', '#FFFFFF', '#FFFFFF'];
         const rankEmojis = ['1st', '2nd', '3rd', '4th', '5th'];
 
-        const rankText = this.add.text(
-          this.cameras.main.centerX - 180,
-          y,
-          rankEmojis[i],
-          {
-            fontSize: '22px',
-            color: rankColors[i],
-            fontStyle: 'bold'
-          }
-        ).setOrigin(0, 0.5);
+        const rankText = this.add.text(cx - colOffset, y, rankEmojis[i], {
+          fontSize: entryFontSize, color: rankColors[i], fontStyle: 'bold'
+        }).setOrigin(0, 0.5);
 
-        const nameText = this.add.text(
-          this.cameras.main.centerX - 100,
-          y,
-          entry.username,
-          {
-            fontSize: '22px',
-            color: COLORS.WHITE,
-            fontStyle: 'bold'
-          }
-        ).setOrigin(0, 0.5);
+        const nameText = this.add.text(cx - nameOffset, y, entry.username, {
+          fontSize: entryFontSize, color: COLORS.WHITE, fontStyle: 'bold'
+        }).setOrigin(0, 0.5);
 
-        const winsText = this.add.text(
-          this.cameras.main.centerX + 180,
-          y,
-          `${entry.wins} wins`,
-          {
-            fontSize: '20px',
-            color: COLORS.GOLD,
-            fontStyle: 'bold'
-          }
-        ).setOrigin(1, 0.5);
+        const winsText = this.add.text(cx + colOffset, y, `${entry.wins} wins`, {
+          fontSize: winsFontSize, color: COLORS.GOLD, fontStyle: 'bold'
+        }).setOrigin(1, 0.5);
 
         this.leaderboardContainer.add([rankText, nameText, winsText]);
       });
@@ -442,23 +414,26 @@ export class MenuScene extends Phaser.Scene {
 
     // Click outside overlays to close
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      const portrait = isPortrait();
       if (this.instructionsVisible) {
+        const pw = portrait ? 480 : 700;
+        const ph = portrait ? 700 : 600;
         const panelBounds = new Phaser.Geom.Rectangle(
-          this.cameras.main.centerX - 350,
-          this.cameras.main.centerY - 300,
-          700,
-          600
+          this.cameras.main.centerX - pw / 2,
+          this.cameras.main.centerY - ph / 2,
+          pw, ph
         );
         if (!Phaser.Geom.Rectangle.Contains(panelBounds, pointer.x, pointer.y)) {
           this.toggleInstructions();
         }
       }
       if (this.leaderboardVisible) {
+        const pw = portrait ? 420 : 500;
+        const ph = portrait ? 400 : 450;
         const panelBounds = new Phaser.Geom.Rectangle(
-          this.cameras.main.centerX - 250,
-          this.cameras.main.centerY - 225,
-          500,
-          450
+          this.cameras.main.centerX - pw / 2,
+          this.cameras.main.centerY - ph / 2,
+          pw, ph
         );
         if (!Phaser.Geom.Rectangle.Contains(panelBounds, pointer.x, pointer.y)) {
           this.toggleLeaderboard();

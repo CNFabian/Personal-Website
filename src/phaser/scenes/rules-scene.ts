@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser';
-import { SCENE_KEYS, COLORS, GameRules, DEFAULT_RULES, RULE_DESCRIPTIONS, RULE_NAMES } from '../common';
+import { SCENE_KEYS, COLORS, GameRules, DEFAULT_RULES, RULE_DESCRIPTIONS, RULE_NAMES, isPortrait } from '../common';
 
 const RULES_STORAGE_KEY = 'ratscrew_rules';
 
@@ -51,36 +51,39 @@ export class RulesScene extends Phaser.Scene {
       0x0a5f38
     );
 
+    const portrait = isPortrait();
+    const inset = portrait ? 25 : 50;
     const graphics = this.add.graphics();
-    graphics.lineStyle(8, 0x8B4513);
+    graphics.lineStyle(portrait ? 4 : 8, 0x8B4513);
     graphics.strokeRoundedRect(
-      50, 50,
-      this.cameras.main.width - 100,
-      this.cameras.main.height - 100,
+      inset, inset,
+      this.cameras.main.width - inset * 2,
+      this.cameras.main.height - inset * 2,
       20
     );
   }
 
   private createTitle(): void {
+    const portrait = isPortrait();
     this.add.text(
       this.cameras.main.centerX,
-      80,
-      'GAME RULES CONFIGURATION',
+      portrait ? 55 : 80,
+      portrait ? 'GAME RULES' : 'GAME RULES CONFIGURATION',
       {
-        fontSize: '48px',
+        fontSize: portrait ? '32px' : '48px',
         color: COLORS.GOLD,
         fontStyle: 'bold',
         stroke: COLORS.BLACK,
-        strokeThickness: 4
+        strokeThickness: portrait ? 3 : 4
       }
     ).setOrigin(0.5);
 
     this.add.text(
       this.cameras.main.centerX,
-      130,
-      'Toggle which slap rules you want to play with',
+      portrait ? 95 : 130,
+      portrait ? 'Toggle slap rules' : 'Toggle which slap rules you want to play with',
       {
-        fontSize: '20px',
+        fontSize: portrait ? '16px' : '20px',
         color: COLORS.WHITE
       }
     ).setOrigin(0.5);
@@ -88,11 +91,12 @@ export class RulesScene extends Phaser.Scene {
 
   private createRulesPanel(): void {
     this.rulesContainer = this.add.container(0, 0);
+    const portrait = isPortrait();
 
-    const panelWidth = 900;
-    const panelHeight = 500;
+    const panelWidth = portrait ? 480 : 900;
+    const panelHeight = portrait ? 580 : 500;
     const panelX = this.cameras.main.centerX - panelWidth / 2;
-    const panelY = 180;
+    const panelY = portrait ? 130 : 180;
 
     const panel = this.add.rectangle(
       this.cameras.main.centerX,
@@ -106,23 +110,38 @@ export class RulesScene extends Phaser.Scene {
     this.rulesContainer.add(panel);
 
     const ruleKeys = Object.keys(this.rules) as Array<keyof GameRules>;
-    const itemsPerColumn = 4;
-    const columnWidth = panelWidth / 2;
-    const startX = panelX + 50;
-    const startY = panelY + 40;
-    const spacing = 60;
 
-    ruleKeys.forEach((ruleKey, index) => {
-      const column = Math.floor(index / itemsPerColumn);
-      const row = index % itemsPerColumn;
-      
-      const x = startX + column * columnWidth;
-      const y = startY + row * spacing;
+    if (portrait) {
+      // Single-column layout for portrait
+      const startX = panelX + 40;
+      const startY = panelY + 35;
+      const spacing = 68;
 
-      const toggle = this.createToggle(ruleKey, x, y);
-      this.toggles.set(ruleKey, toggle);
-      this.rulesContainer.add(toggle);
-    });
+      ruleKeys.forEach((ruleKey, index) => {
+        const x = startX;
+        const y = startY + index * spacing;
+        const toggle = this.createToggle(ruleKey, x, y);
+        this.toggles.set(ruleKey, toggle);
+        this.rulesContainer.add(toggle);
+      });
+    } else {
+      // Two-column layout for landscape
+      const itemsPerColumn = 4;
+      const columnWidth = panelWidth / 2;
+      const startX = panelX + 50;
+      const startY = panelY + 40;
+      const spacing = 60;
+
+      ruleKeys.forEach((ruleKey, index) => {
+        const column = Math.floor(index / itemsPerColumn);
+        const row = index % itemsPerColumn;
+        const x = startX + column * columnWidth;
+        const y = startY + row * spacing;
+        const toggle = this.createToggle(ruleKey, x, y);
+        this.toggles.set(ruleKey, toggle);
+        this.rulesContainer.add(toggle);
+      });
+    }
   }
 
   private createToggle(
@@ -131,41 +150,43 @@ export class RulesScene extends Phaser.Scene {
     y: number
   ): Phaser.GameObjects.Container {
     const container = this.add.container(x, y);
-    
-    const boxSize = 30;
+    const portrait = isPortrait();
+
+    const boxSize = portrait ? 28 : 30;
     const box = this.add.rectangle(0, 0, boxSize, boxSize, 0x333333);
     box.setStrokeStyle(2, 0xffd700);
-    
+
     const checkmark = this.add.text(0, 0, '✓', {
-      fontSize: '24px',
+      fontSize: portrait ? '22px' : '24px',
       color: COLORS.GREEN,
       fontStyle: 'bold'
     }).setOrigin(0.5);
     checkmark.setVisible(this.rules[ruleKey]);
-    
+
     const nameText = this.add.text(
       boxSize / 2 + 15,
-      0,
+      portrait ? -2 : 0,
       RULE_NAMES[ruleKey],
       {
-        fontSize: '20px',
+        fontSize: portrait ? '17px' : '20px',
         color: COLORS.WHITE,
         fontStyle: 'bold'
       }
     ).setOrigin(0, 0.5);
-    
+
     const descText = this.add.text(
       boxSize / 2 + 15,
-      20,
+      portrait ? 18 : 20,
       RULE_DESCRIPTIONS[ruleKey],
       {
-        fontSize: '14px',
-        color: COLORS.LIGHT_GRAY
+        fontSize: portrait ? '12px' : '14px',
+        color: COLORS.LIGHT_GRAY,
+        wordWrap: portrait ? { width: 360 } : undefined
       }
     ).setOrigin(0, 0.5);
-    
+
     container.add([box, checkmark, nameText, descText]);
-    container.setSize(400, 50);
+    container.setSize(portrait ? 420 : 400, portrait ? 55 : 50);
     container.setInteractive();
     
     (container as any).box = box;
@@ -207,28 +228,20 @@ export class RulesScene extends Phaser.Scene {
   }
 
   private createButtons(): void {
-    const buttonY = 700;
-    
-    this.createButton(
-      this.cameras.main.centerX - 160,
-      buttonY,
-      'START GAME',
-      () => this.startGame()
-    );
-    
-    this.createButton(
-      this.cameras.main.centerX + 160,
-      buttonY,
-      'RESET DEFAULT',
-      () => this.resetToDefault()
-    );
-    
-    this.createButton(
-      this.cameras.main.centerX,
-      buttonY + 60,
-      'BACK TO MENU',
-      () => this.scene.start(SCENE_KEYS.MENU)
-    );
+    const portrait = isPortrait();
+    const cx = this.cameras.main.centerX;
+
+    if (portrait) {
+      const buttonY = 800;
+      this.createButton(cx, buttonY, 'START GAME', () => this.startGame());
+      this.createButton(cx, buttonY + 60, 'RESET DEFAULT', () => this.resetToDefault());
+      this.createButton(cx, buttonY + 120, 'BACK TO MENU', () => this.scene.start(SCENE_KEYS.MENU));
+    } else {
+      const buttonY = 700;
+      this.createButton(cx - 160, buttonY, 'START GAME', () => this.startGame());
+      this.createButton(cx + 160, buttonY, 'RESET DEFAULT', () => this.resetToDefault());
+      this.createButton(cx, buttonY + 60, 'BACK TO MENU', () => this.scene.start(SCENE_KEYS.MENU));
+    }
   }
 
   private createButton(
@@ -239,17 +252,20 @@ export class RulesScene extends Phaser.Scene {
   ): Phaser.GameObjects.Container {
     const button = this.add.container(x, y);
     
-    const bg = this.add.rectangle(0, 0, 280, 55, 0x8B4513);
+    const portrait = isPortrait();
+    const btnW = portrait ? 260 : 280;
+    const btnH = portrait ? 48 : 55;
+    const bg = this.add.rectangle(0, 0, btnW, btnH, 0x8B4513);
     bg.setStrokeStyle(3, 0xffd700);
-    
+
     const buttonText = this.add.text(0, 0, text, {
-      fontSize: '20px',
+      fontSize: portrait ? '18px' : '20px',
       color: COLORS.GOLD,
       fontStyle: 'bold'
     }).setOrigin(0.5);
-    
+
     button.add([bg, buttonText]);
-    button.setSize(280, 55);
+    button.setSize(btnW, btnH);
     button.setInteractive();
     
     button.on('pointerover', () => {
@@ -290,12 +306,13 @@ export class RulesScene extends Phaser.Scene {
     const hasActiveRule = Object.values(this.rules).some(v => v === true);
     
     if (!hasActiveRule) {
+      const portrait = isPortrait();
       const warning = this.add.text(
         this.cameras.main.centerX,
-        650,
+        portrait ? 770 : 650,
         'Please enable at least one rule!',
         {
-          fontSize: '24px',
+          fontSize: portrait ? '20px' : '24px',
           color: COLORS.RED,
           fontStyle: 'bold',
           stroke: COLORS.BLACK,
