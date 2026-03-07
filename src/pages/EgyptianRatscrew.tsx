@@ -4,11 +4,11 @@ import './EgyptianRatscrew.scss';
 
 // Import your Phaser scenes (you'll need to make sure these are accessible)
 // You may need to adjust the import paths based on your project structure
-import { PreloadScene } from '../phaser/scenes/preload-scene.ts';
-import { MenuScene } from '../phaser/scenes/menu-scene.ts';
-import { RulesScene } from '../phaser/scenes/rules-scene.ts';
-import { GameScene } from '../phaser/scenes/game-scene.ts';
-import { GAME_WIDTH, GAME_HEIGHT, COLORS } from '../phaser/common.ts';
+import { PreloadScene } from '../phaser/scenes/preload-scene';
+import { MenuScene } from '../phaser/scenes/menu-scene';
+import { RulesScene } from '../phaser/scenes/rules-scene';
+import { GameScene } from '../phaser/scenes/game-scene';
+import { GAME_WIDTH, GAME_HEIGHT, COLORS } from '../phaser/common';
 
 const EgyptianRatscrew = () => {
   const gameContainerRef = useRef(null);
