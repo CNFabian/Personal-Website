@@ -72,17 +72,25 @@ export class MenuScene extends Phaser.Scene {
     const centerY = this.cameras.main.centerY;
 
     // Quick Start Button (with default rules)
-    this.createButton(centerX, centerY + 20, 'QUICK START', () => {
+    this.createButton(centerX, centerY - 15, 'QUICK START', () => {
       this.quickStart();
     });
 
     // Configure Rules Button
-    this.createButton(centerX, centerY + 90, 'CONFIGURE RULES', () => {
+    this.createButton(centerX, centerY + 55, 'CONFIGURE RULES', () => {
       this.scene.start(SCENE_KEYS.RULES);
     });
 
+    // Play Online Button
+    this.createButton(centerX, centerY + 125, 'PLAY ONLINE', () => {
+      this.cameras.main.fadeOut(500, 0, 0, 0);
+      this.cameras.main.once('camerafadeoutcomplete', () => {
+        this.scene.start(SCENE_KEYS.LOBBY, { rules: DEFAULT_RULES });
+      });
+    });
+
     // Instructions Button
-    this.createButton(centerX, centerY + 160, 'HOW TO PLAY', () => {
+    this.createButton(centerX, centerY + 195, 'HOW TO PLAY', () => {
       this.toggleInstructions();
     });
 

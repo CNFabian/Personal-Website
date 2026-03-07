@@ -3,6 +3,7 @@ export const SCENE_KEYS = {
   PRELOAD: 'PreloadScene',
   MENU: 'MenuScene',
   RULES: 'RulesScene',
+  LOBBY: 'LobbyScene',
   GAME: 'GameScene'
 } as const;
 

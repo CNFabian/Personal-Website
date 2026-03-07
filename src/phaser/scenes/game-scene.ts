@@ -2,6 +2,33 @@ import * as Phaser from 'phaser';
 import { SCENE_KEYS, ASSET_KEYS, COLORS, CARD_SCALE, CARD_WIDTH, CARD_HEIGHT, GameState, Player, Suit, GameRules, RULE_NAMES } from '../common';
 import { RatScrew } from '../lib/ratscrew';
 import { Card } from '../lib/card';
+import type { Socket } from 'socket.io-client';
+
+// Shape of the serialised state that the server sends
+interface ServerGameState {
+  player1Count: number;
+  player2Count: number;
+  centerCount: number;
+  bonusCount: number;
+  topCard: { suit: string; rank: string; displayValue: string; displaySuit: string } | null;
+  currentPlayer: 1 | 2;
+  gameState: string;
+  winner: 1 | 2 | null;
+  challengePlayer: 1 | 2 | null;
+  challengeRemaining: number;
+  pileAwaitingCollection: boolean;
+  pileWinner: 1 | 2 | null;
+  statusMessage: string;
+  lastAction: { type: string; player: number } | null;
+}
+
+interface GameSceneData {
+  rules?: GameRules;
+  multiplayer?: boolean;
+  playerNumber?: 1 | 2;
+  roomCode?: string;
+  socket?: Socket;
+}
 
 export class GameScene extends Phaser.Scene {
   private game_logic!: RatScrew;
@@ -9,7 +36,7 @@ export class GameScene extends Phaser.Scene {
   private player2DeckSprite!: Phaser.GameObjects.Image;
   private centerCardSprite!: Phaser.GameObjects.Image | Phaser.GameObjects.Container;
   private bonusPileSprite!: Phaser.GameObjects.Rectangle;
-  
+
   // UI Text elements
   private player1CountText!: Phaser.GameObjects.Text;
   private player2CountText!: Phaser.GameObjects.Text;
@@ -20,24 +47,42 @@ export class GameScene extends Phaser.Scene {
   private challengeText!: Phaser.GameObjects.Text;
   private pileCollectionText!: Phaser.GameObjects.Text;
 
-  // Active rules display (ONLY NEW ADDITION)
+  // Active rules display
   private activeRulesContainer!: Phaser.GameObjects.Container;
-  
+
   // Easy/Hard mode toggle
   private isEasyMode: boolean = true;
   private modeToggleText!: Phaser.GameObjects.Text;
 
   private usingSprites: boolean = false;
 
+  // ---- Multiplayer state ----
+  private isMultiplayer: boolean = false;
+  private myPlayerNumber: 1 | 2 = 1;
+  private roomCode: string = '';
+  private socket: Socket | null = null;
+  private lastServerState: ServerGameState | null = null;
+  private disconnectOverlay: Phaser.GameObjects.Container | null = null;
+  private winScreenShown: boolean = false;
+
   constructor() {
     super({ key: SCENE_KEYS.GAME });
   }
 
-  init(data: { rules?: GameRules }): void {
-    // Store the rules passed from the rules scene
+  init(data: GameSceneData): void {
+    // Store the rules passed from the rules/lobby scene
     if (data?.rules) {
       console.log('Game started with rules:', data.rules);
     }
+
+    // Multiplayer config
+    this.isMultiplayer = !!data?.multiplayer;
+    this.myPlayerNumber = data?.playerNumber || 1;
+    this.roomCode = data?.roomCode || '';
+    this.socket = data?.socket || null;
+    this.lastServerState = null;
+    this.disconnectOverlay = null;
+    this.winScreenShown = false;
   }
 
   create(): void {
@@ -47,7 +92,12 @@ export class GameScene extends Phaser.Scene {
     this.createUI();
     this.createActiveRulesDisplay();
     this.setupInput();
-    this.updateDisplay();
+
+    if (this.isMultiplayer) {
+      this.setupMultiplayer();
+    } else {
+      this.updateDisplay();
+    }
   }
 
   private checkAssets(): void {
@@ -126,9 +176,11 @@ export class GameScene extends Phaser.Scene {
 
   private initializeGame(): void {
     // Get rules from scene data or use defaults
-    const sceneData = this.scene.settings.data as { rules?: GameRules };
+    const sceneData = this.scene.settings.data as GameSceneData;
     const rules = sceneData?.rules;
-    
+
+    // In multiplayer the server is the source of truth, but we still create
+    // a local RatScrew instance for the active-rules display helper.
     this.game_logic = new RatScrew(rules);
   }
 
@@ -138,8 +190,8 @@ export class GameScene extends Phaser.Scene {
 
     // Get active rules from game logic
     const activeRuleNames = this.game_logic.getActiveRuleNames();
-    const rulesText = activeRuleNames.length > 0 
-      ? activeRuleNames.join('\n') 
+    const rulesText = activeRuleNames.length > 0
+      ? activeRuleNames.join('\n')
       : 'No rules active';
 
     // Dynamic sizing based on number of rules
@@ -147,27 +199,27 @@ export class GameScene extends Phaser.Scene {
     const lineHeight = 18;
     const padding = 20;
     const minWidth = 200;
-    
+
     // Calculate dimensions
-    const numLines = activeRuleNames.length || 1; // At least 1 line for "No rules active"
+    const numLines = activeRuleNames.length || 1;
     const textHeight = numLines * lineHeight;
     const panelHeight = titleHeight + textHeight + padding;
-    
+
     // Calculate width based on longest rule name
-    const longestRule = activeRuleNames.reduce((longest, current) => 
-      current.length > longest.length ? current : longest, 
-      'ACTIVE RULES' // Include title in width calculation
+    const longestRule = activeRuleNames.reduce((longest, current) =>
+      current.length > longest.length ? current : longest,
+      'ACTIVE RULES'
     );
-    const estimatedWidth = Math.max(minWidth, longestRule.length * 8 + 40); // 8px per char + padding
-    const panelWidth = Math.min(estimatedWidth, 300); // Max width of 300px
+    const estimatedWidth = Math.max(minWidth, longestRule.length * 8 + 40);
+    const panelWidth = Math.min(estimatedWidth, 300);
 
     // Background panel for rules
     const panel = this.add.rectangle(
-      panelWidth / 2, 
-      panelHeight / 2, 
-      panelWidth, 
-      panelHeight, 
-      0x000000, 
+      panelWidth / 2,
+      panelHeight / 2,
+      panelWidth,
+      panelHeight,
+      0x000000,
       0.7
     );
     panel.setStrokeStyle(2, 0xffd700);
@@ -213,7 +265,7 @@ export class GameScene extends Phaser.Scene {
     this.centerCardSprite = this.createCardDisplay(centerX, centerY, null);
     this.player1DeckSprite = this.createCardDisplay(178, this.cameras.main.height - 200, null) as any;
     this.player2DeckSprite = this.createCardDisplay(this.cameras.main.width - 200, 188, null) as any;
-    
+
     // Bonus pile (initially hidden)
     this.bonusPileSprite = this.add.rectangle(
       this.cameras.main.width - 372,
@@ -246,7 +298,7 @@ export class GameScene extends Phaser.Scene {
 
     this.bonusCountText = this.add.text(this.cameras.main.width - 375, centerY + 80, 'Bonus: 0', {
       fontSize: '16px',
-      color: COLORS.GOLD, // Royal blue color
+      color: COLORS.GOLD,
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
@@ -279,9 +331,12 @@ export class GameScene extends Phaser.Scene {
     }).setOrigin(0.5);
     this.pileCollectionText.setVisible(false);
 
-    // Control instructions
-    const controlsText = this.add.text(centerX, this.cameras.main.height - 30, 
-      'Player 1: Q=Play, A=Slap | Player 2: P=Play, L=Slap | ESC=Menu', {
+    // Control instructions — change text based on multiplayer
+    const controlHint = this.isMultiplayer
+      ? `You are Player ${this.myPlayerNumber} | Q=Play, A=Slap | Room: ${this.roomCode} | ESC=Leave`
+      : 'Player 1: Q=Play, A=Slap | Player 2: P=Play, L=Slap | ESC=Menu';
+
+    this.add.text(centerX, this.cameras.main.height - 30, controlHint, {
       fontSize: '14px',
       color: COLORS.LIGHT_GRAY
     }).setOrigin(0.5);
@@ -304,20 +359,258 @@ export class GameScene extends Phaser.Scene {
   private setupInput(): void {
     if (!this.input.keyboard) return;
 
-    // Player 1 controls
-    this.input.keyboard.on('keydown-Q', () => this.playCard(1));
-    this.input.keyboard.on('keydown-A', () => this.attemptSlap(1));
+    if (this.isMultiplayer) {
+      // In multiplayer: Q = play, A = slap — always for your own player
+      this.input.keyboard.on('keydown-Q', () => this.handleMultiplayerPlay());
+      this.input.keyboard.on('keydown-A', () => this.handleMultiplayerSlap());
 
-    // Player 2 controls
-    this.input.keyboard.on('keydown-P', () => this.playCard(2));
-    this.input.keyboard.on('keydown-L', () => this.attemptSlap(2));
+      // Also allow P/L as alternatives (since they're on separate machines)
+      this.input.keyboard.on('keydown-P', () => this.handleMultiplayerPlay());
+      this.input.keyboard.on('keydown-L', () => this.handleMultiplayerSlap());
+    } else {
+      // Local 2-player controls (unchanged)
+      this.input.keyboard.on('keydown-Q', () => this.playCard(1));
+      this.input.keyboard.on('keydown-A', () => this.attemptSlap(1));
+      this.input.keyboard.on('keydown-P', () => this.playCard(2));
+      this.input.keyboard.on('keydown-L', () => this.attemptSlap(2));
+    }
 
     // Mode toggle
     this.input.keyboard.on('keydown-M', () => this.toggleMode());
 
-    // Menu
+    // Menu / Leave
     this.input.keyboard.on('keydown-ESC', () => this.returnToMenu());
   }
+
+  // ================================================================
+  // Multiplayer — Socket.io setup & handlers
+  // ================================================================
+
+  private setupMultiplayer(): void {
+    if (!this.socket) {
+      console.error('[GameScene] No socket provided for multiplayer');
+      return;
+    }
+
+    console.log(`[GameScene] Multiplayer mode: Player ${this.myPlayerNumber}, Room ${this.roomCode}`);
+
+    // Listen for game state updates from the server
+    this.socket.on('gameStateUpdate', (state: ServerGameState) => {
+      this.lastServerState = state;
+      this.updateDisplayFromServerState(state);
+    });
+
+    // Listen for opponent disconnect
+    this.socket.on('opponentDisconnected', (data: { message: string }) => {
+      this.showDisconnectOverlay(data.message);
+    });
+
+    // Listen for room errors (e.g. room closed)
+    this.socket.on('roomError', (data: { message: string }) => {
+      this.showDisconnectOverlay(data.message);
+    });
+
+    // Listen for game restart
+    this.socket.on('gameStart', (data: { gameState: ServerGameState; rules: any }) => {
+      this.winScreenShown = false;
+      if (this.disconnectOverlay) {
+        this.disconnectOverlay.destroy();
+        this.disconnectOverlay = null;
+      }
+      this.lastServerState = data.gameState;
+      this.updateDisplayFromServerState(data.gameState);
+    });
+  }
+
+  private handleMultiplayerPlay(): void {
+    if (!this.socket || !this.roomCode) return;
+    this.socket.emit('playCard', { roomCode: this.roomCode, player: this.myPlayerNumber });
+    // Do NOT update local state — wait for server
+  }
+
+  private handleMultiplayerSlap(): void {
+    if (!this.socket || !this.roomCode) return;
+    this.socket.emit('attemptSlap', { roomCode: this.roomCode, player: this.myPlayerNumber });
+  }
+
+  // ================================================================
+  // Display update from server state (multiplayer)
+  // ================================================================
+
+  private updateDisplayFromServerState(state: ServerGameState): void {
+    // Update card counts
+    this.player1CountText.setText(`Cards: ${state.player1Count}`);
+    this.player2CountText.setText(`Cards: ${state.player2Count}`);
+    this.centerCountText.setText(`Center: ${state.centerCount}`);
+
+    // Bonus pile
+    this.bonusCountText.setText(`Bonus: ${state.bonusCount}`);
+    this.bonusPileSprite.setVisible(state.bonusCount > 0);
+
+    // Status message
+    if (this.isEasyMode) {
+      this.statusText.setText(state.statusMessage);
+    } else {
+      if (!this.isRuleHintMessage(state.statusMessage)) {
+        this.statusText.setText(state.statusMessage);
+      }
+    }
+
+    // Pile collection indicator
+    if (state.pileAwaitingCollection && state.pileWinner) {
+      const isMe = state.pileWinner === this.myPlayerNumber;
+      const label = isMe ? 'YOU: SLAP TO COLLECT!' : `Player ${state.pileWinner}: SLAP TO COLLECT!`;
+      this.pileCollectionText.setText(label);
+      this.pileCollectionText.setVisible(true);
+
+      this.tweens.killTweensOf(this.pileCollectionText);
+      this.tweens.add({
+        targets: this.pileCollectionText,
+        scale: 1.1,
+        duration: 500,
+        yoyo: true,
+        repeat: -1
+      });
+    } else {
+      this.pileCollectionText.setVisible(false);
+      this.tweens.killTweensOf(this.pileCollectionText);
+      this.pileCollectionText.setScale(1);
+    }
+
+    // Turn indicator
+    if (state.gameState === 'PLAYING') {
+      const isMeTurn = state.currentPlayer === this.myPlayerNumber;
+      this.turnIndicator.setText(isMeTurn ? 'YOUR TURN' : "Opponent's Turn");
+      this.challengeText.setText('');
+    } else if (state.gameState === 'CHALLENGE') {
+      this.turnIndicator.setText('Challenge Mode');
+      const isMeChallenge = state.challengePlayer === this.myPlayerNumber;
+      this.challengeText.setText(
+        isMeChallenge
+          ? `YOU have ${state.challengeRemaining} chances`
+          : `Opponent has ${state.challengeRemaining} chances`
+      );
+    } else if (state.gameState === 'GAME_OVER' && !this.winScreenShown) {
+      this.winScreenShown = true;
+      this.turnIndicator.setText('GAME OVER!');
+      const iWon = state.winner === this.myPlayerNumber;
+      this.challengeText.setText(iWon ? 'YOU WIN!' : 'YOU LOSE!');
+      this.showWinScreenMultiplayer(state);
+    }
+
+    // Update center card from server state
+    this.centerCardSprite.destroy();
+    if (state.topCard) {
+      // Build a lightweight card-like object for the display helper
+      const cardLike = {
+        suit: state.topCard.suit as Suit,
+        rank: state.topCard.rank,
+        displayValue: state.topCard.displayValue,
+        displaySuit: state.topCard.displaySuit,
+      };
+      this.centerCardSprite = this.createCardDisplayFromData(
+        this.cameras.main.centerX,
+        this.cameras.main.centerY,
+        cardLike
+      );
+    } else {
+      this.centerCardSprite = this.createCardDisplay(
+        this.cameras.main.centerX,
+        this.cameras.main.centerY,
+        null
+      );
+    }
+
+    // Deck visibility
+    this.player1DeckSprite.setVisible(state.player1Count > 0);
+    this.player2DeckSprite.setVisible(state.player2Count > 0);
+
+    // Show slap feedback based on lastAction
+    if (state.lastAction) {
+      const actionPlayer = state.lastAction.player as Player;
+      if (state.lastAction.type === 'slap_attempt') {
+        // We can infer success from the status message
+        const success = state.statusMessage.includes('successfully') ||
+                       state.statusMessage.includes('during challenge') ||
+                       state.statusMessage.includes('collect');
+        this.showSlapFeedback(actionPlayer, success);
+      }
+    }
+  }
+
+  /** Create a card display from raw server data (no Card instance needed) */
+  private createCardDisplayFromData(
+    x: number,
+    y: number,
+    data: { suit: string; rank: string; displayValue: string; displaySuit: string }
+  ): Phaser.GameObjects.Container {
+    const container = this.add.container(x, y);
+
+    const cardBg = this.add.rectangle(0, 0, CARD_WIDTH * CARD_SCALE, CARD_HEIGHT * CARD_SCALE, 0xffffff);
+    cardBg.setStrokeStyle(2, 0x000000);
+
+    const suitColor = (data.suit === 'HEARTS' || data.suit === 'DIAMONDS') ? 0xff0000 : 0x000000;
+
+    const rankText = this.add.text(0, -15, data.displayValue, {
+      fontSize: '16px',
+      color: `#${suitColor.toString(16).padStart(6, '0')}`,
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+
+    const suitText = this.add.text(0, 5, data.displaySuit, {
+      fontSize: '20px',
+      color: `#${suitColor.toString(16).padStart(6, '0')}`,
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+
+    container.add([cardBg, rankText, suitText]);
+    return container;
+  }
+
+  private showDisconnectOverlay(message: string): void {
+    if (this.disconnectOverlay) return; // already showing
+
+    this.disconnectOverlay = this.add.container(0, 0);
+    this.disconnectOverlay.setDepth(2000);
+
+    const overlay = this.add.rectangle(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY,
+      this.cameras.main.width,
+      this.cameras.main.height,
+      0x000000,
+      0.7
+    );
+
+    const panel = this.add.rectangle(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY,
+      500,
+      200,
+      0x1a1a1a
+    );
+    panel.setStrokeStyle(3, 0xff4444);
+
+    const msgText = this.add.text(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY - 30,
+      message,
+      { fontSize: '24px', color: COLORS.WHITE, fontStyle: 'bold', align: 'center' }
+    ).setOrigin(0.5);
+
+    const hint = this.add.text(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY + 30,
+      'Press ESC to return to menu',
+      { fontSize: '18px', color: COLORS.LIGHT_GRAY }
+    ).setOrigin(0.5);
+
+    this.disconnectOverlay.add([overlay, panel, msgText, hint]);
+  }
+
+  // ================================================================
+  // Local-mode methods (unchanged)
+  // ================================================================
 
   private createCardDisplay(x: number, y: number, card: Card | null): Phaser.GameObjects.Image | Phaser.GameObjects.Container {
     if (!card) {
@@ -329,7 +622,7 @@ export class GameScene extends Phaser.Scene {
 
     // Check if we have card textures loaded
     const textureName = `card-${card.suit.toLowerCase()}-${card.rank.toLowerCase()}`;
-    
+
     if (this.textures.exists(textureName)) {
       // Use actual card image
       const cardSprite = this.add.image(x, y, textureName);
@@ -338,41 +631,43 @@ export class GameScene extends Phaser.Scene {
     } else {
       // Fallback: Create simple card representation
       const container = this.add.container(x, y);
-      
+
       const cardBg = this.add.rectangle(0, 0, CARD_WIDTH * CARD_SCALE, CARD_HEIGHT * CARD_SCALE, 0xffffff);
       cardBg.setStrokeStyle(2, 0x000000);
-      
-      const suitColor = (card.suit === Suit.HEARTS || card.suit === Suit.DIAMONDS) ? 
+
+      const suitColor = (card.suit === Suit.HEARTS || card.suit === Suit.DIAMONDS) ?
         0xff0000 : 0x000000;
-      
+
       const rankText = this.add.text(0, -15, card.displayValue, {
         fontSize: '16px',
         color: `#${suitColor.toString(16).padStart(6, '0')}`,
         fontStyle: 'bold'
       }).setOrigin(0.5);
-      
+
       const suitText = this.add.text(0, 5, card.displaySuit, {
         fontSize: '20px',
         color: `#${suitColor.toString(16).padStart(6, '0')}`,
         fontStyle: 'bold'
       }).setOrigin(0.5);
-      
+
       container.add([cardBg, rankText, suitText]);
       return container;
     }
   }
 
   private playCard(player: Player): void {
+    if (this.isMultiplayer) return; // handled separately
     if (this.game_logic.playCard(player)) {
       // Show animation first
       this.showPlayCardAnimation(player);
-      
+
       // Update display (counts and other UI immediately, center card after animation)
       this.updateDisplayWithoutCenterCard();
     }
   }
 
   private attemptSlap(player: Player): void {
+    if (this.isMultiplayer) return; // handled separately
     const success = this.game_logic.attemptSlap(player);
     this.updateDisplay();
     this.showSlapFeedback(player, success);
@@ -383,7 +678,7 @@ export class GameScene extends Phaser.Scene {
     this.player1CountText.setText(`Cards: ${this.game_logic.player1Count}`);
     this.player2CountText.setText(`Cards: ${this.game_logic.player2Count}`);
     this.centerCountText.setText(`Center: ${this.game_logic.centerCount}`);
-    
+
     // Update bonus pile
     const bonusCount = this.game_logic.bonusCount;
     this.bonusCountText.setText(`Bonus: ${bonusCount}`);
@@ -396,7 +691,7 @@ export class GameScene extends Phaser.Scene {
     if (this.game_logic.pileAwaitingCollection && this.game_logic.pileWinner) {
       this.pileCollectionText.setText(`Player ${this.game_logic.pileWinner}: SLAP TO COLLECT!`);
       this.pileCollectionText.setVisible(true);
-      
+
       // Add pulsing animation
       this.tweens.add({
         targets: this.pileCollectionText,
@@ -432,7 +727,7 @@ export class GameScene extends Phaser.Scene {
   private updateDisplay(): void {
     // Update all the non-center card elements first
     this.updateDisplayWithoutCenterCard();
-    
+
     // Update center card
     this.centerCardSprite.destroy();
     this.centerCardSprite = this.createCardDisplay(
@@ -445,7 +740,7 @@ export class GameScene extends Phaser.Scene {
   private showPlayCardAnimation(player: Player): void {
     const player1X = 180;
     const player2X = this.cameras.main.width - 180;
-    
+
     const startX = player === 1 ? player1X : player2X;
     const startY = player === 1 ? this.cameras.main.height - 150 : 150;
     const endX = this.cameras.main.centerX;
@@ -490,16 +785,16 @@ export class GameScene extends Phaser.Scene {
     const originalY = feedbackText.y;
 
     // TEXT-ONLY SHAKE: Smooth oscillating shake just for the text
-    const shakeIntensity = success ? 2 : 4; // Gentle shake for good slap, stronger for bad
+    const shakeIntensity = success ? 2 : 4;
     const shakeDuration = success ? 300 : 500;
-    
+
     this.tweens.add({
       targets: feedbackText,
       x: originalX + shakeIntensity,
-      duration: shakeDuration / 12, // Quick oscillations
+      duration: shakeDuration / 12,
       ease: 'Sine.easeInOut',
       yoyo: true,
-      repeat: 11 // Creates 6 complete shake cycles
+      repeat: 11
     });
 
     // Pop-in effect (scale animation)
@@ -510,7 +805,6 @@ export class GameScene extends Phaser.Scene {
       duration: 150,
       ease: 'Back.easeOut',
       onComplete: () => {
-        // Then scale back to normal and move up
         this.tweens.add({
           targets: feedbackText,
           scale: 1,
@@ -518,15 +812,12 @@ export class GameScene extends Phaser.Scene {
           duration: 200,
           ease: 'Cubic.easeOut',
           onComplete: () => {
-            // Kill all tweens on the feedbackText object
             this.tweens.killTweensOf(feedbackText);
-            
-            // Start fade-out from current transformed position
             this.tweens.add({
               targets: feedbackText,
               alpha: 0,
               duration: 1200,
-              delay: 200, // Short delay before fading
+              delay: 200,
               ease: 'Cubic.easeIn',
               onComplete: () => {
                 feedbackText.destroy();
@@ -538,156 +829,242 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  private showWinScreen(): void {
-  // Create a container for all win screen elements
-  const winContainer = this.add.container(0, 0);
+  // ---- Win screen (local mode) ----
 
-  if (this.centerCardSprite) {
-    this.centerCardSprite.setVisible(false);
+  private showWinScreen(): void {
+    const winContainer = this.add.container(0, 0);
+
+    if (this.centerCardSprite) {
+      this.centerCardSprite.setVisible(false);
+    }
+
+    winContainer.setDepth(1000);
+
+    const overlay = this.add.rectangle(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY,
+      this.cameras.main.width,
+      this.cameras.main.height,
+      0x000000,
+      0.8
+    );
+
+    const panelBg = this.add.rectangle(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY,
+      600,
+      400,
+      0x1a1a1a
+    );
+    panelBg.setStrokeStyle(4, 0xffd700);
+
+    const crown = this.add.text(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY - 120,
+      '👑',
+      { fontSize: '64px' }
+    ).setOrigin(0.5);
+
+    const winText = this.add.text(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY - 50,
+      `PLAYER ${this.game_logic.winner} WINS!`,
+      {
+        fontSize: '48px',
+        color: COLORS.GOLD,
+        fontStyle: 'bold',
+        stroke: COLORS.BLACK,
+        strokeThickness: 3
+      }
+    ).setOrigin(0.5);
+
+    const reasonText = this.add.text(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY - 10,
+      'Opponent ran out of cards!',
+      {
+        fontSize: '20px',
+        color: COLORS.WHITE,
+        fontStyle: 'italic'
+      }
+    ).setOrigin(0.5);
+
+    const scoresText = this.add.text(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY + 30,
+      `Final Scores - P1: ${this.game_logic.player1Count} | P2: ${this.game_logic.player2Count}`,
+      {
+        fontSize: '18px',
+        color: COLORS.LIGHT_GRAY
+      }
+    ).setOrigin(0.5);
+
+    const controlsText = this.add.text(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY + 80,
+      'Press SPACE to play again or ESC for menu',
+      {
+        fontSize: '20px',
+        color: COLORS.WHITE
+      }
+    ).setOrigin(0.5);
+
+    winContainer.add([overlay, panelBg, crown, winText, reasonText, scoresText, controlsText]);
+
+    winContainer.setAlpha(0);
+    crown.setScale(0);
+    winText.setScale(0);
+
+    this.tweens.add({ targets: winContainer, alpha: 1, duration: 500, ease: 'Power2' });
+    this.tweens.add({ targets: crown, scale: 1, duration: 400, delay: 300, ease: 'Bounce.easeOut' });
+    this.tweens.add({ targets: winText, scale: 1, duration: 400, delay: 500, ease: 'Back.easeOut' });
+    this.tweens.add({ targets: controlsText, alpha: 0.5, duration: 1000, yoyo: true, repeat: -1, delay: 1000 });
+
+    const spaceHandler = () => {
+      this.input.keyboard?.off('keydown-SPACE', spaceHandler);
+      this.input.keyboard?.off('keydown-ESC', escHandler);
+      this.scene.restart();
+    };
+
+    const escHandler = () => {
+      this.input.keyboard?.off('keydown-SPACE', spaceHandler);
+      this.input.keyboard?.off('keydown-ESC', escHandler);
+      this.returnToMenu();
+    };
+
+    this.input.keyboard?.once('keydown-SPACE', spaceHandler);
+    this.input.keyboard?.once('keydown-ESC', escHandler);
   }
 
-  // Set high depth for win screen  
-  winContainer.setDepth(1000);
-  
-  // Semi-transparent overlay
-  const overlay = this.add.rectangle(
-    this.cameras.main.centerX,
-    this.cameras.main.centerY,
-    this.cameras.main.width,
-    this.cameras.main.height,
-    0x000000,
-    0.8
-  );
+  // ---- Win screen (multiplayer mode) ----
 
-  // Win panel background
-  const panelBg = this.add.rectangle(
-    this.cameras.main.centerX,
-    this.cameras.main.centerY,
-    600,
-    400,
-    0x1a1a1a
-  );
-  panelBg.setStrokeStyle(4, 0xffd700);
+  private showWinScreenMultiplayer(state: ServerGameState): void {
+    const winContainer = this.add.container(0, 0);
 
-  // Trophy/crown effect
-  const crown = this.add.text(
-    this.cameras.main.centerX,
-    this.cameras.main.centerY - 120,
-    '👑',
-    { fontSize: '64px' }
-  ).setOrigin(0.5);
-
-  // Win text
-  const winText = this.add.text(
-    this.cameras.main.centerX,
-    this.cameras.main.centerY - 50,
-    `PLAYER ${this.game_logic.winner} WINS!`,
-    {
-      fontSize: '48px',
-      color: COLORS.GOLD,
-      fontStyle: 'bold',
-      stroke: COLORS.BLACK,
-      strokeThickness: 3
+    if (this.centerCardSprite) {
+      this.centerCardSprite.setVisible(false);
     }
-  ).setOrigin(0.5);
 
-  // Victory reason
-  const reasonText = this.add.text(
-    this.cameras.main.centerX,
-    this.cameras.main.centerY - 10,
-    'Opponent ran out of cards!',
-    {
-      fontSize: '20px',
-      color: COLORS.WHITE,
-      fontStyle: 'italic'
+    winContainer.setDepth(1000);
+
+    const overlay = this.add.rectangle(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY,
+      this.cameras.main.width,
+      this.cameras.main.height,
+      0x000000,
+      0.8
+    );
+
+    const panelBg = this.add.rectangle(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY,
+      600,
+      400,
+      0x1a1a1a
+    );
+    panelBg.setStrokeStyle(4, 0xffd700);
+
+    const iWon = state.winner === this.myPlayerNumber;
+
+    const crown = this.add.text(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY - 120,
+      iWon ? '👑' : '💀',
+      { fontSize: '64px' }
+    ).setOrigin(0.5);
+
+    const winText = this.add.text(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY - 50,
+      iWon ? 'YOU WIN!' : 'YOU LOSE!',
+      {
+        fontSize: '48px',
+        color: iWon ? COLORS.GOLD : COLORS.RED,
+        fontStyle: 'bold',
+        stroke: COLORS.BLACK,
+        strokeThickness: 3
+      }
+    ).setOrigin(0.5);
+
+    const reasonText = this.add.text(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY - 10,
+      iWon ? 'Opponent ran out of cards!' : 'You ran out of cards!',
+      {
+        fontSize: '20px',
+        color: COLORS.WHITE,
+        fontStyle: 'italic'
+      }
+    ).setOrigin(0.5);
+
+    const scoresText = this.add.text(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY + 30,
+      `Final Scores - P1: ${state.player1Count} | P2: ${state.player2Count}`,
+      {
+        fontSize: '18px',
+        color: COLORS.LIGHT_GRAY
+      }
+    ).setOrigin(0.5);
+
+    const controlsText = this.add.text(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY + 80,
+      'Press SPACE for rematch or ESC for menu',
+      {
+        fontSize: '20px',
+        color: COLORS.WHITE
+      }
+    ).setOrigin(0.5);
+
+    winContainer.add([overlay, panelBg, crown, winText, reasonText, scoresText, controlsText]);
+
+    winContainer.setAlpha(0);
+    crown.setScale(0);
+    winText.setScale(0);
+
+    this.tweens.add({ targets: winContainer, alpha: 1, duration: 500, ease: 'Power2' });
+    this.tweens.add({ targets: crown, scale: 1, duration: 400, delay: 300, ease: 'Bounce.easeOut' });
+    this.tweens.add({ targets: winText, scale: 1, duration: 400, delay: 500, ease: 'Back.easeOut' });
+    this.tweens.add({ targets: controlsText, alpha: 0.5, duration: 1000, yoyo: true, repeat: -1, delay: 1000 });
+
+    const spaceHandler = () => {
+      this.input.keyboard?.off('keydown-SPACE', spaceHandler);
+      this.input.keyboard?.off('keydown-ESC', escHandler);
+      // Request restart from server
+      if (this.socket) {
+        this.socket.emit('restartGame', { roomCode: this.roomCode });
+      }
+      winContainer.destroy();
+    };
+
+    const escHandler = () => {
+      this.input.keyboard?.off('keydown-SPACE', spaceHandler);
+      this.input.keyboard?.off('keydown-ESC', escHandler);
+      this.returnToMenu();
+    };
+
+    this.input.keyboard?.once('keydown-SPACE', spaceHandler);
+    this.input.keyboard?.once('keydown-ESC', escHandler);
+  }
+
+  // ---- Navigation ----
+
+  private returnToMenu(): void {
+    // Disconnect socket when leaving
+    if (this.isMultiplayer && this.socket) {
+      this.socket.disconnect();
+      this.socket = null;
     }
-  ).setOrigin(0.5);
 
-  // Final scores
-  const scoresText = this.add.text(
-    this.cameras.main.centerX,
-    this.cameras.main.centerY + 30,
-    `Final Scores - P1: ${this.game_logic.player1Count} | P2: ${this.game_logic.player2Count}`,
-    {
-      fontSize: '18px',
-      color: COLORS.LIGHT_GRAY
-    }
-  ).setOrigin(0.5);
+    this.cameras.main.fadeOut(500, 0, 0, 0);
+    this.cameras.main.once('camerafadeoutcomplete', () => {
+      this.scene.start(SCENE_KEYS.MENU);
+    });
+  }
 
-  // Controls
-  const controlsText = this.add.text(
-    this.cameras.main.centerX,
-    this.cameras.main.centerY + 80,
-    'Press SPACE to play again or ESC for menu',
-    {
-      fontSize: '20px',
-      color: COLORS.WHITE
-    }
-  ).setOrigin(0.5);
-
-  // Add to container
-  winContainer.add([overlay, panelBg, crown, winText, reasonText, scoresText, controlsText]);
-
-  // Animations
-  winContainer.setAlpha(0);
-  crown.setScale(0);
-  winText.setScale(0);
-  
-  this.tweens.add({
-    targets: winContainer,
-    alpha: 1,
-    duration: 500,
-    ease: 'Power2'
-  });
-
-  this.tweens.add({
-    targets: crown,
-    scale: 1,
-    duration: 400,
-    delay: 300,
-    ease: 'Bounce.easeOut'
-  });
-
-  this.tweens.add({
-    targets: winText,
-    scale: 1,
-    duration: 400,
-    delay: 500,
-    ease: 'Back.easeOut'
-  });
-
-  this.tweens.add({
-    targets: controlsText,
-    alpha: 0.5,
-    duration: 1000,
-    yoyo: true,
-    repeat: -1,
-    delay: 1000
-  });
-
-  // Input handlers
-  const spaceHandler = () => {
-    this.input.keyboard?.off('keydown-SPACE', spaceHandler);
-    this.input.keyboard?.off('keydown-ESC', escHandler);
-    this.scene.restart();
-  };
-
-  const escHandler = () => {
-    this.input.keyboard?.off('keydown-SPACE', spaceHandler);
-    this.input.keyboard?.off('keydown-ESC', escHandler);
-    this.returnToMenu();
-  };
-
-  this.input.keyboard?.once('keydown-SPACE', spaceHandler);
-  this.input.keyboard?.once('keydown-ESC', escHandler);
-}
-
- private returnToMenu(): void {
-  this.cameras.main.fadeOut(500, 0, 0, 0);
-  this.cameras.main.once('camerafadeoutcomplete', () => {
-    this.scene.start(SCENE_KEYS.MENU);
-  });
-}
+  // ---- Shared helpers ----
 
   private toggleMode(): void {
     this.isEasyMode = !this.isEasyMode;
@@ -695,38 +1072,49 @@ export class GameScene extends Phaser.Scene {
       this.isEasyMode ? 'EASY MODE\n(Press M to toggle)' : 'HARD MODE\n(Press M to toggle)'
     );
     this.modeToggleText.setColor(this.isEasyMode ? COLORS.GREEN : COLORS.RED);
-    
+
     // Update status text immediately when mode changes
-    this.updateStatusText();
+    if (!this.isMultiplayer) {
+      this.updateStatusText();
+    } else if (this.lastServerState) {
+      // Re-apply server state with new mode
+      if (this.isEasyMode) {
+        this.statusText.setText(this.lastServerState.statusMessage);
+      }
+    }
   }
 
   private updateStatusText(): void {
     const gameMessage = this.game_logic.getGameStatusMessage();
-    
+
     if (this.isEasyMode) {
-      // Easy mode: Show all messages including rule hints
       this.statusText.setText(gameMessage);
     } else {
-      // Hard mode: Only update text if it's NOT a rule hint message
       if (!this.isRuleHintMessage(gameMessage)) {
-        // Show gameplay messages (pile collection, challenges, game over, etc.)
         this.statusText.setText(gameMessage);
       }
-      // If it IS a rule hint message, don't update the text at all
-      // This keeps the previous message displayed without giving hints
     }
   }
 
-  // NEW: Check if message is a rule hint
   private isRuleHintMessage(message: string): boolean {
     const ruleHintKeywords = [
-      'doubles', 'sandwich', 'tens', 'marriage', 
+      'doubles', 'sandwich', 'tens', 'marriage',
       'top-bottom', '4-in-row', 'sequence', 'jokers',
       'slappable', 'Double', 'Sandwich', 'Marriage'
     ];
-    
-    return ruleHintKeywords.some(keyword => 
+
+    return ruleHintKeywords.some(keyword =>
       message.toLowerCase().includes(keyword.toLowerCase())
     );
+  }
+
+  shutdown(): void {
+    // Clean up socket listeners when scene shuts down
+    if (this.socket) {
+      this.socket.off('gameStateUpdate');
+      this.socket.off('opponentDisconnected');
+      this.socket.off('roomError');
+      this.socket.off('gameStart');
+    }
   }
 }
