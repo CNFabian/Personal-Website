@@ -2,6 +2,7 @@
 export const SCENE_KEYS = {
   PRELOAD: 'PreloadScene',
   MENU: 'MenuScene',
+  AUTH: 'AuthScene',
   RULES: 'RulesScene',
   LOBBY: 'LobbyScene',
   GAME: 'GameScene'
@@ -215,6 +216,27 @@ export const DEFAULT_RULES: GameRules = {
   sequence: false,
   jokers: false
 };
+
+// Auth & leaderboard types
+export interface AuthUser {
+  userId: number;
+  username: string;
+  token: string;
+  wins: number;
+}
+
+export interface LeaderboardEntry {
+  rank: number;
+  username: string;
+  wins: number;
+}
+
+// Auth localStorage keys
+export const AUTH_STORAGE_KEYS = {
+  TOKEN: 'ratscrew_auth_token',
+  USERNAME: 'ratscrew_username',
+  USER_ID: 'ratscrew_user_id',
+} as const;
 
 // Game event types
 export interface GameEvent {

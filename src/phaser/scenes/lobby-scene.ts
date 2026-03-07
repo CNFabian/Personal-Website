@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser';
-import { SCENE_KEYS, COLORS, DEFAULT_RULES, GameRules, RULE_NAMES, RULE_DESCRIPTIONS } from '../common';
+import { SCENE_KEYS, COLORS, DEFAULT_RULES, GameRules, RULE_NAMES, RULE_DESCRIPTIONS, AuthUser } from '../common';
 import { io, Socket } from 'socket.io-client';
 
 const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || 'http://localhost:3001';
@@ -11,7 +11,6 @@ function loadSavedRules(): GameRules {
     const stored = localStorage.getItem(RULES_STORAGE_KEY);
     if (stored) {
       const parsed = JSON.parse(stored);
-      // Merge with defaults to handle any newly-added rule keys
       return { ...DEFAULT_RULES, ...parsed };
     }
   } catch {
@@ -39,34 +38,47 @@ export class LobbyScene extends Phaser.Scene {
   private cursorTimer!: Phaser.Time.TimerEvent;
   private isJoining: boolean = false;
   private isWaiting: boolean = false;
+  private isHosting: boolean = false;
   private myRoomCode: string = '';
   private myPlayerNumber: 1 | 2 = 1;
   private rules: GameRules = { ...DEFAULT_RULES };
+  private authUser: AuthUser | null = null;
+  private opponentJoined: boolean = false;
 
   // Rule toggle tracking
   private ruleToggles: Map<keyof GameRules, { box: Phaser.GameObjects.Rectangle; checkmark: Phaser.GameObjects.Text }> = new Map();
 
   // UI containers for show/hide
   private mainMenuContainer!: Phaser.GameObjects.Container;
+  private hostContainer!: Phaser.GameObjects.Container;
   private waitingContainer!: Phaser.GameObjects.Container;
   private joinContainer!: Phaser.GameObjects.Container;
+
+  // Start Game button (host screen)
+  private startGameBtn!: Phaser.GameObjects.Container;
+  private startGameBg!: Phaser.GameObjects.Rectangle;
+  private startGameText!: Phaser.GameObjects.Text;
+  private opponentStatusText!: Phaser.GameObjects.Text;
 
   constructor() {
     super({ key: SCENE_KEYS.LOBBY });
   }
 
-  init(data: { rules?: GameRules }): void {
-    // Load from localStorage first, then override with passed-in rules if any
+  init(data: { rules?: GameRules; authUser?: AuthUser | null }): void {
     this.rules = loadSavedRules();
     if (data?.rules) {
       this.rules = { ...data.rules };
     }
+    this.authUser = data?.authUser || null;
+    this.opponentJoined = false;
+    this.isHosting = false;
   }
 
   create(): void {
     this.createBackground();
     this.createTitle();
     this.createMainMenu();
+    this.createHostUI();
     this.createWaitingUI();
     this.createJoinUI();
     this.createStatusBar();
@@ -114,50 +126,162 @@ export class LobbyScene extends Phaser.Scene {
       color: COLORS.WHITE,
       fontStyle: 'italic'
     }).setOrigin(0.5);
+
+    // Show logged-in username
+    if (this.authUser) {
+      this.add.text(this.cameras.main.width - 80, 75, `${this.authUser.username}`, {
+        fontSize: '16px',
+        color: COLORS.GOLD,
+        fontStyle: 'bold'
+      }).setOrigin(0.5);
+
+      this.add.text(this.cameras.main.width - 80, 95, `${this.authUser.wins} wins`, {
+        fontSize: '13px',
+        color: COLORS.LIGHT_GRAY
+      }).setOrigin(0.5);
+    } else {
+      this.add.text(this.cameras.main.width - 80, 80, 'Guest', {
+        fontSize: '16px',
+        color: COLORS.LIGHT_GRAY,
+        fontStyle: 'italic'
+      }).setOrigin(0.5);
+    }
   }
 
-  // ---- Main menu (Rules panel + Create / Join buttons) ----
+  // ---- Main menu (just 3 buttons, no rules panel) ----
 
   private createMainMenu(): void {
     const centerX = this.cameras.main.centerX;
+    const centerY = this.cameras.main.centerY;
     this.mainMenuContainer = this.add.container(0, 0);
 
-    // Rules panel
-    this.createRulesPanel();
-
-    // Buttons below the rules panel
-    const buttonsStartY = 590;
-
-    const createBtn = this.createButton(centerX, buttonsStartY, 'CREATE ROOM', () => {
-      // Validate at least one rule
-      const hasActiveRule = Object.values(this.rules).some(v => v === true);
-      if (!hasActiveRule) {
-        this.statusText.setText('Please enable at least one rule!');
-        this.time.delayedCall(2000, () => {
-          if (this.statusText) this.statusText.setText('');
-        });
-        return;
-      }
-      saveRules(this.rules);
-      this.socket.emit('createRoom', { rules: this.rules });
+    const createBtn = this.createButton(centerX, centerY - 70, 'CREATE ROOM', () => {
+      // Create the room on server first, then show host UI with rules
+      this.socket.emit('createRoom', {
+        userId: this.authUser?.userId,
+        username: this.authUser?.username,
+        token: this.authUser?.token,
+      });
     });
 
-    const joinBtn = this.createButton(centerX, buttonsStartY + 70, 'JOIN ROOM', () => {
+    const joinBtn = this.createButton(centerX, centerY, 'JOIN ROOM', () => {
       this.showJoinUI();
     });
 
-    const backBtn = this.createButton(centerX, buttonsStartY + 140, 'BACK TO MENU', () => {
+    const backBtn = this.createButton(centerX, centerY + 70, 'BACK TO MENU', () => {
       this.cleanupAndReturn();
     });
 
     this.mainMenuContainer.add([createBtn, joinBtn, backBtn]);
   }
 
-  private createRulesPanel(): void {
+  // ---- Host UI (room code + rules panel + start game) ----
+
+  private createHostUI(): void {
+    const centerX = this.cameras.main.centerX;
+    this.hostContainer = this.add.container(0, 0);
+
+    // Room code at top
+    const codeLabel = this.add.text(centerX, 195, 'ROOM CODE:', {
+      fontSize: '20px',
+      color: COLORS.WHITE,
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+
+    this.roomCodeDisplay = this.add.text(centerX, 230, '----', {
+      fontSize: '48px',
+      color: COLORS.GOLD,
+      fontStyle: 'bold',
+      stroke: COLORS.BLACK,
+      strokeThickness: 3
+    }).setOrigin(0.5);
+
+    // Opponent status
+    this.opponentStatusText = this.add.text(centerX, 265, 'Waiting for opponent...', {
+      fontSize: '16px',
+      color: COLORS.LIGHT_GRAY,
+      fontStyle: 'italic'
+    }).setOrigin(0.5);
+
+    this.tweens.add({
+      targets: this.opponentStatusText,
+      alpha: 0.4,
+      duration: 800,
+      yoyo: true,
+      repeat: -1
+    });
+
+    this.hostContainer.add([codeLabel, this.roomCodeDisplay, this.opponentStatusText]);
+
+    // Rules panel
+    this.createHostRulesPanel();
+
+    // Start Game button (disabled by default)
+    this.startGameBtn = this.add.container(centerX, 690);
+    this.startGameBg = this.add.rectangle(0, 0, 320, 60, 0x444444);
+    this.startGameBg.setStrokeStyle(3, 0x666666);
+    this.startGameText = this.add.text(0, 0, 'START GAME', {
+      fontSize: '24px',
+      color: '#666666',
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+    this.startGameBtn.add([this.startGameBg, this.startGameText]);
+    this.startGameBtn.setSize(320, 60);
+    this.startGameBtn.setInteractive();
+
+    this.startGameBtn.on('pointerup', () => {
+      if (!this.canStartGame()) return;
+
+      // Validate at least one rule
+      const hasActiveRule = Object.values(this.rules).some(v => v === true);
+      if (!hasActiveRule) {
+        this.statusText.setText('Enable at least one rule!');
+        this.time.delayedCall(2000, () => {
+          if (this.statusText) this.statusText.setText('');
+        });
+        return;
+      }
+
+      saveRules(this.rules);
+      // Tell server to start the game with selected rules
+      this.socket.emit('startGame', {
+        roomCode: this.myRoomCode,
+        rules: this.rules,
+      });
+    });
+
+    this.startGameBtn.on('pointerover', () => {
+      if (this.canStartGame()) {
+        this.startGameBg.setFillStyle(0xa0522d);
+        this.startGameBtn.setScale(1.05);
+      }
+    });
+
+    this.startGameBtn.on('pointerout', () => {
+      if (this.canStartGame()) {
+        this.startGameBg.setFillStyle(0x8B4513);
+      } else {
+        this.startGameBg.setFillStyle(0x444444);
+      }
+      this.startGameBtn.setScale(1);
+    });
+
+    // Cancel button
+    const cancelBtn = this.createButton(centerX, 760, 'CANCEL', () => {
+      this.socket.disconnect();
+      this.connectSocket();
+      this.showMainMenu();
+    });
+
+    this.hostContainer.add([this.startGameBtn, cancelBtn]);
+    this.hostContainer.setVisible(false);
+  }
+
+  private createHostRulesPanel(): void {
     const centerX = this.cameras.main.centerX;
     const panelWidth = 820;
     const panelHeight = 370;
-    const panelY = 190;
+    const panelY = 290;
 
     // Panel background
     const panelBg = this.add.rectangle(
@@ -177,7 +301,7 @@ export class LobbyScene extends Phaser.Scene {
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    this.mainMenuContainer.add([panelBg, panelTitle]);
+    this.hostContainer.add([panelBg, panelTitle]);
 
     // Create rule toggles in a 2-column grid
     const ruleKeys = Object.keys(this.rules) as Array<keyof GameRules>;
@@ -196,7 +320,7 @@ export class LobbyScene extends Phaser.Scene {
       this.createRuleToggle(ruleKey, x, y);
     });
 
-    // Reset defaults button (small, bottom-right of panel)
+    // Reset defaults button
     const resetBtn = this.add.container(centerX + panelWidth / 2 - 90, panelY + panelHeight - 25);
     const resetBg = this.add.rectangle(0, 0, 140, 30, 0x333333);
     resetBg.setStrokeStyle(1, 0x666666);
@@ -222,9 +346,10 @@ export class LobbyScene extends Phaser.Scene {
         toggle.checkmark.setVisible(this.rules[key]);
         toggle.box.setFillStyle(this.rules[key] ? 0x2a5a2a : 0x333333);
       });
+      this.updateStartButton();
     });
 
-    this.mainMenuContainer.add(resetBtn);
+    this.hostContainer.add(resetBtn);
   }
 
   private createRuleToggle(ruleKey: keyof GameRules, x: number, y: number): void {
@@ -272,49 +397,49 @@ export class LobbyScene extends Phaser.Scene {
       checkmark.setVisible(this.rules[ruleKey]);
       box.setFillStyle(this.rules[ruleKey] ? 0x2a5a2a : 0x333333);
       saveRules(this.rules);
+      this.updateStartButton();
     });
 
     this.ruleToggles.set(ruleKey, { box, checkmark });
-    this.mainMenuContainer.add(container);
+    this.hostContainer.add(container);
   }
 
-  // ---- Waiting UI (after creating a room) ----
+  private canStartGame(): boolean {
+    const hasActiveRule = Object.values(this.rules).some(v => v === true);
+    return this.opponentJoined && hasActiveRule;
+  }
+
+  private updateStartButton(): void {
+    if (this.canStartGame()) {
+      this.startGameBg.setFillStyle(0x8B4513);
+      this.startGameBg.setStrokeStyle(3, 0xffd700);
+      this.startGameText.setColor(COLORS.GOLD);
+    } else {
+      this.startGameBg.setFillStyle(0x444444);
+      this.startGameBg.setStrokeStyle(3, 0x666666);
+      this.startGameText.setColor('#666666');
+    }
+  }
+
+  // ---- Waiting UI (for player 2 after joining — waiting for host to start) ----
 
   private createWaitingUI(): void {
     const centerX = this.cameras.main.centerX;
     const centerY = this.cameras.main.centerY;
     this.waitingContainer = this.add.container(0, 0);
 
-    // Room code label
-    const codeLabel = this.add.text(centerX, centerY - 80, 'ROOM CODE:', {
-      fontSize: '24px',
-      color: COLORS.WHITE,
+    const joinedLabel = this.add.text(centerX, centerY - 60, 'JOINED ROOM', {
+      fontSize: '28px',
+      color: COLORS.GOLD,
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    // Room code display (large)
-    this.roomCodeDisplay = this.add.text(centerX, centerY - 30, '----', {
-      fontSize: '64px',
-      color: COLORS.GOLD,
-      fontStyle: 'bold',
-      stroke: COLORS.BLACK,
-      strokeThickness: 4
-    }).setOrigin(0.5);
-
-    // Instruction
-    const shareText = this.add.text(centerX, centerY + 30, 'Share this code with your friend!', {
-      fontSize: '20px',
-      color: COLORS.WHITE
-    }).setOrigin(0.5);
-
-    // Waiting indicator
-    const waitingText = this.add.text(centerX, centerY + 80, 'Waiting for opponent...', {
+    const waitingText = this.add.text(centerX, centerY, 'Waiting for host to start the game...', {
       fontSize: '22px',
       color: COLORS.LIGHT_GRAY,
       fontStyle: 'italic'
     }).setOrigin(0.5);
 
-    // Pulsing animation on waiting text
     this.tweens.add({
       targets: waitingText,
       alpha: 0.4,
@@ -323,13 +448,13 @@ export class LobbyScene extends Phaser.Scene {
       repeat: -1
     });
 
-    const cancelBtn = this.createButton(centerX, centerY + 160, 'CANCEL', () => {
+    const cancelBtn = this.createButton(centerX, centerY + 80, 'LEAVE ROOM', () => {
       this.socket.disconnect();
       this.connectSocket();
       this.showMainMenu();
     });
 
-    this.waitingContainer.add([codeLabel, this.roomCodeDisplay, shareText, waitingText, cancelBtn]);
+    this.waitingContainer.add([joinedLabel, waitingText, cancelBtn]);
     this.waitingContainer.setVisible(false);
   }
 
@@ -375,7 +500,12 @@ export class LobbyScene extends Phaser.Scene {
 
     const joinBtn = this.createButton(centerX, centerY + 50, 'JOIN', () => {
       if (this.joinInput.length === 4) {
-        this.socket.emit('joinRoom', { roomCode: this.joinInput });
+        this.socket.emit('joinRoom', {
+          roomCode: this.joinInput,
+          userId: this.authUser?.userId,
+          username: this.authUser?.username,
+          token: this.authUser?.token,
+        });
       }
     });
 
@@ -414,7 +544,7 @@ export class LobbyScene extends Phaser.Scene {
         this.joinInput = '';
         this.isJoining = false;
         this.showMainMenu();
-      } else if (this.isWaiting) {
+      } else if (this.isWaiting || this.isHosting) {
         this.socket.disconnect();
         this.connectSocket();
         this.showMainMenu();
@@ -434,7 +564,12 @@ export class LobbyScene extends Phaser.Scene {
       }
 
       if (event.key === 'Enter' && this.joinInput.length === 4) {
-        this.socket.emit('joinRoom', { roomCode: this.joinInput });
+        this.socket.emit('joinRoom', {
+          roomCode: this.joinInput,
+          userId: this.authUser?.userId,
+          username: this.authUser?.username,
+          token: this.authUser?.token,
+        });
         return;
       }
 
@@ -448,8 +583,6 @@ export class LobbyScene extends Phaser.Scene {
 
   private updateJoinInputDisplay(): void {
     this.joinInputText.setText(this.joinInput);
-
-    // Position cursor after text
     const textWidth = this.joinInputText.width;
     this.inputCursor.setX(this.cameras.main.centerX + textWidth / 2 + 5);
   }
@@ -471,24 +604,58 @@ export class LobbyScene extends Phaser.Scene {
       this.statusText.setText('Cannot connect to server. Is it running?');
     });
 
+    // Host: room was created
     this.socket.on('roomCreated', (data: { roomCode: string; playerNumber: number }) => {
       console.log('[Lobby] Room created:', data.roomCode);
       this.myRoomCode = data.roomCode;
       this.myPlayerNumber = 1;
       this.roomCodeDisplay.setText(data.roomCode);
-      this.showWaitingUI();
+      this.opponentJoined = false;
+      this.updateStartButton();
+      this.showHostUI();
     });
 
+    // Player 2: successfully joined a room
     this.socket.on('roomJoined', (data: { roomCode: string; playerNumber: number }) => {
       console.log('[Lobby] Joined room:', data.roomCode, 'as player', data.playerNumber);
       this.myRoomCode = data.roomCode;
       this.myPlayerNumber = data.playerNumber as 1 | 2;
-      this.statusText.setText('Joined! Starting game...');
+      this.showWaitingUI();
+    });
+
+    // Host: notified that opponent has joined
+    this.socket.on('playerJoined', (data: { message: string; playerCount: number }) => {
+      console.log('[Lobby] Player joined:', data.message);
+      this.opponentJoined = data.playerCount >= 2;
+      if (this.opponentJoined) {
+        this.opponentStatusText.setText('Opponent joined! Select rules and start.');
+        this.opponentStatusText.setColor(COLORS.GREEN);
+        this.tweens.killTweensOf(this.opponentStatusText);
+        this.opponentStatusText.setAlpha(1);
+      }
+      this.updateStartButton();
+    });
+
+    // Host: notified that opponent left
+    this.socket.on('playerLeft', (data: { message: string; playerCount: number }) => {
+      console.log('[Lobby] Player left:', data.message);
+      this.opponentJoined = data.playerCount >= 2;
+      if (!this.opponentJoined && this.isHosting) {
+        this.opponentStatusText.setText('Opponent left. Waiting for opponent...');
+        this.opponentStatusText.setColor(COLORS.LIGHT_GRAY);
+        this.tweens.add({
+          targets: this.opponentStatusText,
+          alpha: 0.4,
+          duration: 800,
+          yoyo: true,
+          repeat: -1
+        });
+      }
+      this.updateStartButton();
     });
 
     this.socket.on('roomError', (data: { message: string }) => {
       this.statusText.setText(data.message);
-      // Clear error after 3 seconds
       this.time.delayedCall(3000, () => {
         if (this.statusText) this.statusText.setText('');
       });
@@ -498,10 +665,10 @@ export class LobbyScene extends Phaser.Scene {
       console.log('[Lobby]', data.message);
     });
 
-    this.socket.on('gameStart', (data: { gameState: any; rules: any }) => {
+    // Both: game is starting
+    this.socket.on('gameStart', (data: { gameState: any; rules: any; playerInfo?: any }) => {
       console.log('[Lobby] Game starting! Room:', this.myRoomCode, 'Player:', this.myPlayerNumber);
 
-      // Transition to game scene with multiplayer config
       this.cameras.main.fadeOut(500, 0, 0, 0);
       this.cameras.main.once('camerafadeoutcomplete', () => {
         this.scene.start(SCENE_KEYS.GAME, {
@@ -509,7 +676,9 @@ export class LobbyScene extends Phaser.Scene {
           multiplayer: true,
           playerNumber: this.myPlayerNumber,
           roomCode: this.myRoomCode,
-          socket: this.socket, // Pass the socket directly
+          socket: this.socket,
+          authUser: this.authUser,
+          playerInfo: data.playerInfo || {},
         });
       });
     });
@@ -520,16 +689,31 @@ export class LobbyScene extends Phaser.Scene {
   private showMainMenu(): void {
     this.isJoining = false;
     this.isWaiting = false;
+    this.isHosting = false;
+    this.opponentJoined = false;
     this.mainMenuContainer.setVisible(true);
+    this.hostContainer.setVisible(false);
     this.waitingContainer.setVisible(false);
     this.joinContainer.setVisible(false);
     this.statusText.setText('');
   }
 
-  private showWaitingUI(): void {
-    this.isWaiting = true;
+  private showHostUI(): void {
+    this.isHosting = true;
+    this.isWaiting = false;
     this.isJoining = false;
     this.mainMenuContainer.setVisible(false);
+    this.hostContainer.setVisible(true);
+    this.waitingContainer.setVisible(false);
+    this.joinContainer.setVisible(false);
+  }
+
+  private showWaitingUI(): void {
+    this.isWaiting = true;
+    this.isHosting = false;
+    this.isJoining = false;
+    this.mainMenuContainer.setVisible(false);
+    this.hostContainer.setVisible(false);
     this.waitingContainer.setVisible(true);
     this.joinContainer.setVisible(false);
   }
@@ -537,9 +721,11 @@ export class LobbyScene extends Phaser.Scene {
   private showJoinUI(): void {
     this.isJoining = true;
     this.isWaiting = false;
+    this.isHosting = false;
     this.joinInput = '';
     this.updateJoinInputDisplay();
     this.mainMenuContainer.setVisible(false);
+    this.hostContainer.setVisible(false);
     this.waitingContainer.setVisible(false);
     this.joinContainer.setVisible(true);
   }

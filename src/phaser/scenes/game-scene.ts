@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser';
-import { SCENE_KEYS, ASSET_KEYS, COLORS, CARD_SCALE, CARD_WIDTH, CARD_HEIGHT, GameState, Player, Suit, GameRules, RULE_NAMES } from '../common';
+import { SCENE_KEYS, ASSET_KEYS, COLORS, CARD_SCALE, CARD_WIDTH, CARD_HEIGHT, GameState, Player, Suit, GameRules, RULE_NAMES, AuthUser } from '../common';
 import { RatScrew } from '../lib/ratscrew';
 import { Card } from '../lib/card';
 import type { Socket } from 'socket.io-client';
@@ -22,12 +22,19 @@ interface ServerGameState {
   lastAction: { type: string; player: number } | null;
 }
 
+interface PlayerInfo {
+  username: string;
+  wins?: number;
+}
+
 interface GameSceneData {
   rules?: GameRules;
   multiplayer?: boolean;
   playerNumber?: 1 | 2;
   roomCode?: string;
   socket?: Socket;
+  authUser?: AuthUser | null;
+  playerInfo?: Record<number, PlayerInfo>;
 }
 
 export class GameScene extends Phaser.Scene {
@@ -65,6 +72,12 @@ export class GameScene extends Phaser.Scene {
   private disconnectOverlay: Phaser.GameObjects.Container | null = null;
   private winScreenShown: boolean = false;
 
+  // ---- Auth / player info ----
+  private authUser: AuthUser | null = null;
+  private playerInfo: Record<number, PlayerInfo> = {};
+  private player1NameText!: Phaser.GameObjects.Text;
+  private player2NameText!: Phaser.GameObjects.Text;
+
   constructor() {
     super({ key: SCENE_KEYS.GAME });
   }
@@ -83,6 +96,10 @@ export class GameScene extends Phaser.Scene {
     this.lastServerState = null;
     this.disconnectOverlay = null;
     this.winScreenShown = false;
+
+    // Auth / player info
+    this.authUser = data?.authUser || null;
+    this.playerInfo = data?.playerInfo || {};
   }
 
   create(): void {
@@ -290,6 +307,30 @@ export class GameScene extends Phaser.Scene {
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
+    // Player name / win count labels (multiplayer only)
+    if (this.isMultiplayer) {
+      const p1Info = this.playerInfo[1];
+      const p2Info = this.playerInfo[2];
+      const p1Label = p1Info
+        ? `${p1Info.username}${p1Info.wins != null ? ` (${p1Info.wins} wins)` : ''}`
+        : 'Player 1';
+      const p2Label = p2Info
+        ? `${p2Info.username}${p2Info.wins != null ? ` (${p2Info.wins} wins)` : ''}`
+        : 'Player 2';
+
+      this.player1NameText = this.add.text(180, this.cameras.main.height - 155, p1Label, {
+        fontSize: '14px',
+        color: COLORS.GOLD,
+        fontStyle: 'bold'
+      }).setOrigin(0.5);
+
+      this.player2NameText = this.add.text(this.cameras.main.width - 200, 85, p2Label, {
+        fontSize: '14px',
+        color: COLORS.GOLD,
+        fontStyle: 'bold'
+      }).setOrigin(0.5);
+    }
+
     this.centerCountText = this.add.text(centerX, centerY + 80, 'Center: 0', {
       fontSize: '16px',
       color: COLORS.GOLD,
@@ -410,6 +451,21 @@ export class GameScene extends Phaser.Scene {
       this.showDisconnectOverlay(data.message);
     });
 
+    // Listen for win recorded (updated win counts)
+    this.socket.on('winRecorded', (winData: Record<number, { username: string; wins: number }>) => {
+      // Update stored playerInfo with new win counts
+      for (const [playerNum, data] of Object.entries(winData)) {
+        const pn = Number(playerNum);
+        if (this.playerInfo[pn]) {
+          this.playerInfo[pn].wins = data.wins;
+        } else {
+          this.playerInfo[pn] = { username: data.username, wins: data.wins };
+        }
+      }
+      // Update the name labels
+      this.updatePlayerNameLabels();
+    });
+
     // Listen for game restart
     this.socket.on('gameStart', (data: { gameState: ServerGameState; rules: any }) => {
       this.winScreenShown = false;
@@ -420,6 +476,24 @@ export class GameScene extends Phaser.Scene {
       this.lastServerState = data.gameState;
       this.updateDisplayFromServerState(data.gameState);
     });
+  }
+
+  private updatePlayerNameLabels(): void {
+    if (!this.isMultiplayer) return;
+
+    const p1Info = this.playerInfo[1];
+    const p2Info = this.playerInfo[2];
+
+    if (this.player1NameText && p1Info) {
+      this.player1NameText.setText(
+        `${p1Info.username}${p1Info.wins != null ? ` (${p1Info.wins} wins)` : ''}`
+      );
+    }
+    if (this.player2NameText && p2Info) {
+      this.player2NameText.setText(
+        `${p2Info.username}${p2Info.wins != null ? ` (${p2Info.wins} wins)` : ''}`
+      );
+    }
   }
 
   private handleMultiplayerPlay(): void {
@@ -987,10 +1061,17 @@ export class GameScene extends Phaser.Scene {
       }
     ).setOrigin(0.5);
 
+    // Show opponent name if available
+    const opponentNum = this.myPlayerNumber === 1 ? 2 : 1;
+    const opponentInfo = this.playerInfo[opponentNum];
+    const myInfo = this.playerInfo[this.myPlayerNumber];
+
     const reasonText = this.add.text(
       this.cameras.main.centerX,
       this.cameras.main.centerY - 10,
-      iWon ? 'Opponent ran out of cards!' : 'You ran out of cards!',
+      iWon
+        ? `${opponentInfo?.username || 'Opponent'} ran out of cards!`
+        : 'You ran out of cards!',
       {
         fontSize: '20px',
         color: COLORS.WHITE,
@@ -998,19 +1079,26 @@ export class GameScene extends Phaser.Scene {
       }
     ).setOrigin(0.5);
 
+    // Show win record if authenticated
+    let recordLine = `Final Scores - P1: ${state.player1Count} | P2: ${state.player2Count}`;
+    if (myInfo?.wins != null) {
+      recordLine += `\nYour total wins: ${myInfo.wins}`;
+    }
+
     const scoresText = this.add.text(
       this.cameras.main.centerX,
       this.cameras.main.centerY + 30,
-      `Final Scores - P1: ${state.player1Count} | P2: ${state.player2Count}`,
+      recordLine,
       {
         fontSize: '18px',
-        color: COLORS.LIGHT_GRAY
+        color: COLORS.LIGHT_GRAY,
+        align: 'center'
       }
     ).setOrigin(0.5);
 
     const controlsText = this.add.text(
       this.cameras.main.centerX,
-      this.cameras.main.centerY + 80,
+      this.cameras.main.centerY + 90,
       'Press SPACE for rematch or ESC for menu',
       {
         fontSize: '20px',
@@ -1115,6 +1203,7 @@ export class GameScene extends Phaser.Scene {
       this.socket.off('opponentDisconnected');
       this.socket.off('roomError');
       this.socket.off('gameStart');
+      this.socket.off('winRecorded');
     }
   }
 }

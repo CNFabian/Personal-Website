@@ -6,6 +6,7 @@ import './EgyptianRatscrew.scss';
 // You may need to adjust the import paths based on your project structure
 import { PreloadScene } from '../phaser/scenes/preload-scene';
 import { MenuScene } from '../phaser/scenes/menu-scene';
+import { AuthScene } from '../phaser/scenes/auth-scene';
 import { RulesScene } from '../phaser/scenes/rules-scene';
 import { LobbyScene } from '../phaser/scenes/lobby-scene';
 import { GameScene } from '../phaser/scenes/game-scene';
@@ -24,7 +25,7 @@ const EgyptianRatscrew = () => {
       height: GAME_HEIGHT,
       parent: gameContainerRef.current,
       backgroundColor: COLORS.BACKGROUND,
-      scene: [PreloadScene, MenuScene, RulesScene, LobbyScene, GameScene],
+      scene: [PreloadScene, MenuScene, AuthScene, RulesScene, LobbyScene, GameScene],
       physics: {
         default: 'arcade',
         arcade: {
