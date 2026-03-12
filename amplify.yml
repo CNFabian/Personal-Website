@@ -7,10 +7,10 @@ frontend:
         - nvm install 20
         - nvm use 20
         - node -v
-        - yarn install
+        - npm install --legacy-peer-deps
     build:
       commands:
-        - yarn build
+        - CI=false npm run build
   artifacts:
     baseDirectory: build
     files:
