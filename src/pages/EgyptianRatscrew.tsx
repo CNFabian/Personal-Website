@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import * as Phaser from 'phaser';
-import './EgyptianRatscrew.scss';
+import '../styles/pages/_egyptian-ratscrew.scss';
 
 // Import your Phaser scenes (you'll need to make sure these are accessible)
 // You may need to adjust the import paths based on your project structure
@@ -13,8 +13,8 @@ import { GameScene } from '../phaser/scenes/game-scene';
 import { COLORS, getGameDimensions } from '../phaser/common';
 
 const EgyptianRatscrew = () => {
-  const gameContainerRef = useRef(null);
-  const gameInstanceRef = useRef(null);
+  const gameContainerRef = useRef<HTMLDivElement>(null);
+  const gameInstanceRef = useRef<Phaser.Game | null>(null);
 
   useEffect(() => {
     if (!gameContainerRef.current || gameInstanceRef.current) return;

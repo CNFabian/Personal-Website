@@ -7,23 +7,18 @@ require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const { Server } = require('socket.io');
-const jwt = require('jsonwebtoken');
 const { RatScrew, DEFAULT_RULES } = require('./gameLogic');
 const {
   initDatabase,
-  createUser,
-  findUserByUsername,
-  findUserById,
-  verifyPassword,
   incrementWins,
-  getTopPlayers,
   getUserStats,
 } = require('./db');
+const { router: authRouter, verifyToken } = require('./routes/auth');
+const { router: leaderboardRouter } = require('./routes/leaderboard');
 
 const PORT = process.env.PORT || 3001;
-const JWT_SECRET = process.env.JWT_SECRET || 'ratscrew_default_secret';
-const JWT_EXPIRY = '30d';
 
 // ---- Initialize database ----
 initDatabase();
@@ -42,38 +37,14 @@ app.use(cors({
 
 app.use(express.json());
 
-// ---- JWT helpers ----
-
-function generateToken(user) {
-  return jwt.sign(
-    { userId: user.id, username: user.username },
-    JWT_SECRET,
-    { expiresIn: JWT_EXPIRY }
-  );
-}
-
-function verifyToken(token) {
-  try {
-    return jwt.verify(token, JWT_SECRET);
-  } catch {
-    return null;
-  }
-}
-
-/** Express middleware to verify auth token */
-function authMiddleware(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'No token provided.' });
-  }
-  const decoded = verifyToken(authHeader.slice(7));
-  if (!decoded) {
-    return res.status(401).json({ error: 'Invalid or expired token.' });
-  }
-  req.userId = decoded.userId;
-  req.username = decoded.username;
-  next();
-}
+// ---- Rate limiting middleware for API routes ----
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // 100 requests per 15 minutes per IP
+  message: 'Too many requests, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 // ============================================================
 // REST API Routes
@@ -84,80 +55,14 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok', rooms: rooms.size });
 });
 
-// ---- Auth ----
+// Apply rate limiting to API routes
+app.use('/api', apiLimiter);
 
-app.post('/api/auth/register', (req, res) => {
-  try {
-    const { username, password } = req.body;
-    const user = createUser(username, password || null);
-    const token = generateToken(user);
-    res.json({ success: true, token, user: { id: user.id, username: user.username, wins: user.wins } });
-  } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
-  }
-});
+// Auth routes
+app.use('/api/auth', authRouter);
 
-app.post('/api/auth/login', (req, res) => {
-  try {
-    const { username, password } = req.body;
-    if (!username) {
-      return res.status(400).json({ success: false, error: 'Username is required.' });
-    }
-
-    const user = findUserByUsername(username.trim());
-    if (!user) {
-      return res.status(404).json({ success: false, error: 'User not found.' });
-    }
-
-    // If the account has a password, verify it
-    if (user.password_hash) {
-      if (!password) {
-        return res.status(401).json({ success: false, error: 'Password required for this account.' });
-      }
-      if (!verifyPassword(password, user.password_hash)) {
-        return res.status(401).json({ success: false, error: 'Incorrect password.' });
-      }
-    }
-
-    const token = generateToken(user);
-    res.json({
-      success: true,
-      token,
-      user: { id: user.id, username: user.username, wins: user.wins },
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-// Verify token & return user data (for auto-login)
-app.get('/api/auth/me', authMiddleware, (req, res) => {
-  const user = findUserById(req.userId);
-  if (!user) {
-    return res.status(404).json({ success: false, error: 'User not found.' });
-  }
-  res.json({
-    success: true,
-    user: { id: user.id, username: user.username, wins: user.wins },
-  });
-});
-
-// ---- Leaderboard ----
-
-app.get('/api/leaderboard', (_req, res) => {
-  const leaderboard = getTopPlayers(5);
-  res.json({ leaderboard });
-});
-
-// ---- User stats ----
-
-app.get('/api/user/:username', (req, res) => {
-  const user = findUserByUsername(req.params.username);
-  if (!user) {
-    return res.status(404).json({ error: 'User not found.' });
-  }
-  res.json({ username: user.username, wins: user.wins });
-});
+// Leaderboard routes
+app.use('/api/leaderboard', leaderboardRouter);
 
 // ============================================================
 // HTTP + Socket.io setup
