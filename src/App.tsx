@@ -17,8 +17,9 @@ import Puzzle3Page from './pages/puzzle/Puzzle3Page';
 
 import ImageCaptioner from './pages/ImageCaptioner';
 
-// Lazy-load the game page so Phaser is not bundled with portfolio pages
+// Lazy-load the game pages so Phaser is not bundled with portfolio pages
 const EgyptianRatscrew = lazy(() => import('./pages/EgyptianRatscrew'));
+const Casino = lazy(() => import('./pages/Casino'));
 
 const GameLoadingFallback = () => (
   <div style={{
@@ -61,6 +62,14 @@ const App = () => {
           element={
             <Suspense fallback={<GameLoadingFallback />}>
               <EgyptianRatscrew />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/casino"
+          element={
+            <Suspense fallback={<GameLoadingFallback />}>
+              <Casino />
             </Suspense>
           }
         />

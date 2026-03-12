@@ -59,9 +59,16 @@ const Navbar = () => {
             Contact
           </Link>
         </li>
-        <li> 
-          <Link to="/secret" className={`nav-link ${location.pathname.startsWith('/secret') ? 'active-link' : ''}`} 
-            data-tooltip="Explore hidden content" 
+        <li>
+          <Link to="/casino" className={`nav-link ${location.pathname.startsWith('/casino') ? 'active-link' : ''}`}
+            data-tooltip="Enter the casino"
+            onClick={closeMenu}>
+            Casino
+          </Link>
+        </li>
+        <li>
+          <Link to="/secret" className={`nav-link ${location.pathname.startsWith('/secret') ? 'active-link' : ''}`}
+            data-tooltip="Explore hidden content"
             onClick={closeMenu}>
             Secret
           </Link>

@@ -103,7 +103,7 @@ function findUserByUsername(username) {
  * Find a user by ID.
  */
 function findUserById(id) {
-  return db.prepare('SELECT id, username, wins, created_at FROM users WHERE id = ?').get(id);
+  return db.prepare('SELECT id, username, total_wins, avatar_data, chip_balance, created_at FROM users WHERE id = ?').get(id);
 }
 
 /**
@@ -117,10 +117,10 @@ function verifyPassword(plainPassword, hash) {
 
 /**
  * Increment the win count for a user.
- * @returns {{ id: number, username: string, wins: number }}
+ * @returns {{ id: number, username: string, total_wins: number }}
  */
 function incrementWins(userId) {
-  db.prepare('UPDATE users SET wins = wins + 1 WHERE id = ?').run(userId);
+  db.prepare('UPDATE users SET total_wins = total_wins + 1 WHERE id = ?').run(userId);
   return findUserById(userId);
 }
 
@@ -321,6 +321,40 @@ function getUserAchievements(userId) {
   ).all(userId);
 }
 
+// ---- Avatar operations ----
+
+/**
+ * Update the avatar_data for a user.
+ * @param {number} userId - user ID
+ * @param {string} avatarData - JSON string representing avatar customization
+ * @returns {void}
+ */
+function updateAvatar(userId, avatarData) {
+  db.prepare('UPDATE users SET avatar_data = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(avatarData, userId);
+}
+
+/**
+ * Get the public profile for a user (no sensitive data).
+ * Returns id, username, avatar_data, chip_balance, total_wins, created_at.
+ * @returns {{ id: number, username: string, avatar_data: string|null, chip_balance: number, total_wins: number, created_at: string } | null}
+ */
+function getPublicProfile(userId) {
+  return db.prepare(
+    'SELECT id, username, avatar_data, chip_balance, total_wins, created_at FROM users WHERE id = ?'
+  ).get(userId);
+}
+
+/**
+ * Get the full profile for a user (auth required).
+ * Returns id, username, avatar_data, chip_balance, total_wins, total_losses, total_games_played, daily_streak, created_at.
+ * @returns {{ id: number, username: string, avatar_data: string|null, chip_balance: number, total_wins: number, total_losses: number, total_games_played: number, daily_streak: number, created_at: string } | null}
+ */
+function getFullProfile(userId) {
+  return db.prepare(
+    'SELECT id, username, avatar_data, chip_balance, total_wins, total_losses, total_games_played, daily_streak, created_at FROM users WHERE id = ?'
+  ).get(userId);
+}
+
 module.exports = {
   initDatabase,
   getDb,
@@ -345,4 +379,7 @@ module.exports = {
   getAchievements,
   unlockAchievement,
   getUserAchievements,
+  updateAvatar,
+  getPublicProfile,
+  getFullProfile,
 };

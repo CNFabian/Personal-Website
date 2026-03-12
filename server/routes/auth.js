@@ -58,7 +58,26 @@ router.post('/register', (req, res) => {
     const { username, password } = req.body;
     const user = createUser(username, password || null);
     const token = generateToken(user);
-    res.json({ success: true, token, user: { id: user.id, username: user.username, wins: user.wins } });
+    const fullUser = findUserById(user.id);
+    // Parse avatar_data if it exists
+    if (fullUser && fullUser.avatar_data) {
+      try {
+        fullUser.avatar_data = JSON.parse(fullUser.avatar_data);
+      } catch {
+        fullUser.avatar_data = null;
+      }
+    }
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: fullUser.id,
+        username: fullUser.username,
+        total_wins: fullUser.total_wins,
+        avatar_data: fullUser.avatar_data,
+        chip_balance: fullUser.chip_balance,
+      },
+    });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
   }
@@ -87,10 +106,25 @@ router.post('/login', (req, res) => {
     }
 
     const token = generateToken(user);
+    const fullUser = findUserById(user.id);
+    // Parse avatar_data if it exists
+    if (fullUser && fullUser.avatar_data) {
+      try {
+        fullUser.avatar_data = JSON.parse(fullUser.avatar_data);
+      } catch {
+        fullUser.avatar_data = null;
+      }
+    }
     res.json({
       success: true,
       token,
-      user: { id: user.id, username: user.username, wins: user.wins },
+      user: {
+        id: fullUser.id,
+        username: fullUser.username,
+        total_wins: fullUser.total_wins,
+        avatar_data: fullUser.avatar_data,
+        chip_balance: fullUser.chip_balance,
+      },
     });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -102,9 +136,24 @@ router.get('/me', authMiddleware, (req, res) => {
   if (!user) {
     return res.status(404).json({ success: false, error: 'User not found.' });
   }
+  // Parse avatar_data if it exists
+  let avatarData = null;
+  if (user.avatar_data) {
+    try {
+      avatarData = JSON.parse(user.avatar_data);
+    } catch {
+      avatarData = null;
+    }
+  }
   res.json({
     success: true,
-    user: { id: user.id, username: user.username, wins: user.wins },
+    user: {
+      id: user.id,
+      username: user.username,
+      total_wins: user.total_wins,
+      avatar_data: avatarData,
+      chip_balance: user.chip_balance,
+    },
   });
 });
 

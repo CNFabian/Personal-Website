@@ -17,6 +17,7 @@ const {
 } = require('./db');
 const { router: authRouter, verifyToken } = require('./routes/auth');
 const { router: leaderboardRouter } = require('./routes/leaderboard');
+const { router: userRouter } = require('./routes/user');
 
 const PORT = process.env.PORT || 3001;
 
@@ -32,7 +33,7 @@ app.use(cors({
     'https://www.cnfabian.com',
     'http://localhost:3000',
   ],
-  methods: ['GET', 'POST'],
+  methods: ['GET', 'POST', 'PUT'],
 }));
 
 app.use(express.json());
@@ -63,6 +64,9 @@ app.use('/api/auth', authRouter);
 
 // Leaderboard routes
 app.use('/api/leaderboard', leaderboardRouter);
+
+// User routes
+app.use('/api/user', userRouter);
 
 // ============================================================
 // HTTP + Socket.io setup
