@@ -114,6 +114,67 @@ function removeCardsFromHand(hand: Card[], cards: Card[]): Card[] {
 }
 
 /**
+ * Find melds based on the physical arrangement of cards in the hand.
+ * Only adjacent cards that form valid runs or sets count as melds.
+ * Returns meld groups with their start/end indices in the hand.
+ */
+export function findMeldsFromArrangement(hand: Card[]): {
+  melds: Meld[];
+  meldRanges: { start: number; end: number }[];
+  deadwood: Card[];
+  deadwoodValue: number;
+} {
+  const melds: Meld[] = [];
+  const meldRanges: { start: number; end: number }[] = [];
+  const usedIndices = new Set<number>();
+
+  let i = 0;
+  while (i < hand.length) {
+    // Try to find a run starting at position i (3+ same-suit consecutive rank)
+    let runLen = 1;
+    while (
+      i + runLen < hand.length &&
+      hand[i + runLen].suit === hand[i].suit &&
+      RANK_VALUES[hand[i + runLen].rank] === RANK_VALUES[hand[i + runLen - 1].rank] + 1
+    ) {
+      runLen++;
+    }
+    if (runLen >= 3) {
+      const cards = hand.slice(i, i + runLen);
+      melds.push({ cards, type: 'run' });
+      meldRanges.push({ start: i, end: i + runLen - 1 });
+      for (let j = i; j < i + runLen; j++) usedIndices.add(j);
+      i += runLen;
+      continue;
+    }
+
+    // Try to find a set starting at position i (3-4 same-rank cards)
+    let setLen = 1;
+    while (
+      i + setLen < hand.length &&
+      hand[i + setLen].rank === hand[i].rank
+    ) {
+      setLen++;
+    }
+    if (setLen >= 3) {
+      const cards = hand.slice(i, i + setLen);
+      melds.push({ cards, type: 'set' });
+      meldRanges.push({ start: i, end: i + setLen - 1 });
+      for (let j = i; j < i + setLen; j++) usedIndices.add(j);
+      i += setLen;
+      continue;
+    }
+
+    i++;
+  }
+
+  const deadwood = hand.filter((_, idx) => !usedIndices.has(idx));
+  const deadwoodValue = deadwood.reduce((sum, c) => sum + getDeadwoodValue(c), 0);
+
+  return { melds, meldRanges, deadwood, deadwoodValue };
+}
+
+/**
  * Find all possible melds (sets and runs) from a hand
  */
 function findAllPossibleMelds(hand: Card[]): Meld[] {
@@ -307,8 +368,10 @@ export class GinRummy {
     this._discardPile.push(card);
     this._drawnCard = null;
 
-    // Sort hand after discard
-    this.sortHand(this._currentPlayer);
+    // Only auto-sort for AI (player 2); player 1 arranges their own hand
+    if (this._currentPlayer === 2) {
+      this.sortHand(this._currentPlayer);
+    }
 
     // Check if stock is almost empty (last 2 cards - round is a draw)
     if (this._stockPile.length <= 2) {
@@ -367,7 +430,10 @@ export class GinRummy {
     const testHand = [...hand];
     const discardCard = testHand.splice(cardIndex, 1)[0];
 
-    const knockerResult = findBestMelds(testHand);
+    // Player 1 uses arrangement-based melds; AI (player 2) uses auto-optimized melds
+    const knockerResult = this._currentPlayer === 1
+      ? findMeldsFromArrangement(testHand)
+      : findBestMelds(testHand);
     if (knockerResult.deadwoodValue > 10) {
       this._statusMessage = 'Deadwood too high to knock! Need 10 or less.';
       return null;
@@ -380,7 +446,7 @@ export class GinRummy {
 
     const isGin = knockerResult.deadwoodValue === 0;
 
-    // Evaluate opponent's hand
+    // Evaluate opponent's hand (AI always uses auto-optimized melds)
     const opponent: 1 | 2 = this._currentPlayer === 1 ? 2 : 1;
     const opponentHand = this.getHand(opponent);
     const opponentResult = findBestMelds(opponentHand);
@@ -470,11 +536,13 @@ export class GinRummy {
     const hand = this.getHand(this._currentPlayer);
     if (hand.length !== 11) return false;
 
-    // Check if any discard results in deadwood <= 10
+    // Player 1 uses arrangement-based melds; AI uses auto-optimized
     for (let i = 0; i < hand.length; i++) {
       const testHand = [...hand];
       testHand.splice(i, 1);
-      const result = findBestMelds(testHand);
+      const result = this._currentPlayer === 1
+        ? findMeldsFromArrangement(testHand)
+        : findBestMelds(testHand);
       if (result.deadwoodValue <= 10) return true;
     }
     return false;
@@ -485,6 +553,10 @@ export class GinRummy {
    */
   getPlayerDeadwood(player: 1 | 2): number {
     const hand = this.getHand(player);
+    // Player 1 uses arrangement-based melds; AI uses auto-optimized
+    if (player === 1) {
+      return findMeldsFromArrangement(hand).deadwoodValue;
+    }
     return findBestMelds(hand).deadwoodValue;
   }
 
@@ -492,6 +564,9 @@ export class GinRummy {
    * Get melds for a hand
    */
   getPlayerMelds(player: 1 | 2): { melds: Meld[]; deadwood: Card[]; deadwoodValue: number } {
+    if (player === 1) {
+      return findMeldsFromArrangement(this.getHand(player));
+    }
     return findBestMelds(this.getHand(player));
   }
 

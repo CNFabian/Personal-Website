@@ -17,6 +17,7 @@ import {
   GinRummy,
   GinRummyState,
   findBestMelds,
+  findMeldsFromArrangement,
   getDeadwoodValue,
   Meld,
   RoundResult,
@@ -277,14 +278,14 @@ export class GinRummyGameScene extends Phaser.Scene {
     if (this.isAnimating) return;
     if (this.gameLogic.state !== GinRummyState.PLAYER_TURN_DISCARD) return;
 
-    // Knock: find the best card to discard that results in lowest deadwood
+    // Knock: find the best card to discard using arrangement-based melds
     const hand = this.gameLogic.player1Hand;
     let bestIdx = 0;
     let bestDW = Infinity;
     for (let i = 0; i < hand.length; i++) {
       const t = [...hand];
       t.splice(i, 1);
-      const r = findBestMelds(t);
+      const r = findMeldsFromArrangement(t);
       if (r.deadwoodValue < bestDW) {
         bestDW = r.deadwoodValue;
         bestIdx = i;
@@ -366,19 +367,14 @@ export class GinRummyGameScene extends Phaser.Scene {
   // --- Drag & Drop Logic ---
 
   private getHandSlotIndex(worldX: number): number {
-    const w = +this.game.config.width;
-    const hand = this.gameLogic.player1Hand;
-    const scale = this.isMobile ? CARD_DISPLAY_SCALE_MOBILE : CARD_DISPLAY_SCALE;
-    const spacing = this.isMobile ? HAND_CARD_SPACING_MOBILE : HAND_CARD_SPACING;
+    // Use the stored sprite positions for accurate slot detection (accounts for meld gaps)
+    if (this.playerHandSprites.length === 0) return 0;
 
-    const totalWidth = (hand.length - 1) * spacing + CARD_WIDTH * scale;
-    const startX = (w - totalWidth) / 2 + (CARD_WIDTH * scale) / 2;
-
-    // Find closest slot
     let closestIdx = 0;
     let closestDist = Infinity;
-    for (let i = 0; i < hand.length; i++) {
-      const slotX = startX + i * spacing;
+    for (let i = 0; i < this.playerHandSprites.length; i++) {
+      const sprite = this.playerHandSprites[i] as CardSprite;
+      const slotX = sprite.originalX || sprite.x;
       const dist = Math.abs(worldX - slotX);
       if (dist < closestDist) {
         closestDist = dist;
@@ -553,15 +549,43 @@ export class GinRummyGameScene extends Phaser.Scene {
     const w = +this.game.config.width;
     const scale = this.isMobile ? CARD_DISPLAY_SCALE_MOBILE : CARD_DISPLAY_SCALE;
     const spacing = this.isMobile ? HAND_CARD_SPACING_MOBILE : HAND_CARD_SPACING;
-
-    const totalWidth = (hand.length - 1) * spacing + CARD_WIDTH * scale;
-    const startX = (w - totalWidth) / 2 + (CARD_WIDTH * scale) / 2;
+    const meldGap = this.isMobile ? 14 : 20; // extra gap between meld groups and deadwood
     const y = this.handY;
 
-    const meldInfo = findBestMelds(hand);
+    // Detect melds from the player's physical card arrangement
+    const meldInfo = findMeldsFromArrangement(hand);
 
+    // Build a group ID for each card position to detect boundaries
+    // Cards in a meld get the meld index, deadwood cards get -1
+    const groupIds: number[] = new Array(hand.length).fill(-1);
+    meldInfo.meldRanges.forEach((range, meldIdx) => {
+      for (let j = range.start; j <= range.end; j++) {
+        groupIds[j] = meldIdx;
+      }
+    });
+
+    // Count number of group boundaries (transitions between different groups)
+    let gapCount = 0;
+    for (let i = 1; i < hand.length; i++) {
+      if (groupIds[i] !== groupIds[i - 1]) {
+        gapCount++;
+      }
+    }
+
+    // Calculate total width with gaps
+    const totalWidth =
+      (hand.length - 1) * spacing + CARD_WIDTH * scale + gapCount * meldGap;
+    const startX = (w - totalWidth) / 2 + (CARD_WIDTH * scale) / 2;
+
+    let cumulativeGap = 0;
     hand.forEach((card, i) => {
-      const x = startX + i * spacing;
+      // Add gap at group boundaries
+      if (i > 0 && groupIds[i] !== groupIds[i - 1]) {
+        cumulativeGap += meldGap;
+      }
+
+      const x = startX + i * spacing + cumulativeGap;
+      const isInMeld = groupIds[i] >= 0;
 
       const sprite = this.createCardFace(card, x, y, scale) as CardSprite;
       sprite.cardData = card;
@@ -570,10 +594,7 @@ export class GinRummyGameScene extends Phaser.Scene {
       sprite.originalY = y;
       sprite.setDepth(20 + i);
 
-      // Highlight melds with subtle glow
-      const isInMeld = meldInfo.melds.some((m) =>
-        m.cards.some((c) => c.rank === card.rank && c.suit === card.suit)
-      );
+      // Highlight meld cards with green glow
       if (isInMeld) {
         const glow = this.add.graphics();
         glow.lineStyle(2, 0x00FF00, 0.6);
@@ -645,8 +666,10 @@ export class GinRummyGameScene extends Phaser.Scene {
       this.gameLogic.state === GinRummyState.PLAYER_TURN_DISCARD ||
       this.gameLogic.state === GinRummyState.PLAYER_TURN_DRAW
     ) {
-      const dw = this.gameLogic.getPlayerDeadwood(1);
-      this.deadwoodText.setText(`Deadwood: ${dw}`);
+      // Use arrangement-based melds so deadwood reflects how the player organized their hand
+      const hand = this.gameLogic.player1Hand;
+      const arranged = findMeldsFromArrangement(hand);
+      this.deadwoodText.setText(`Deadwood: ${arranged.deadwoodValue}`);
       this.deadwoodText.setVisible(true);
     } else {
       this.deadwoodText.setVisible(false);
