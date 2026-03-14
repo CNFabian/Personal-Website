@@ -575,7 +575,7 @@ export class GinRummy {
   /**
    * AI draws a card (simple strategy: take discard if it helps, otherwise stock)
    */
-  aiDraw(): Card | null {
+  aiDraw(): { card: Card | null; fromDiscard: boolean; discardCard?: Card } {
     const hand = this.getHand(2);
     const topDiscard = this.topDiscard;
 
@@ -594,11 +594,12 @@ export class GinRummy {
       }
 
       if (bestDW < currentResult.deadwoodValue) {
-        return this.drawFromDiscard();
+        const savedDiscard = topDiscard;
+        return { card: this.drawFromDiscard(), fromDiscard: true, discardCard: savedDiscard };
       }
     }
 
-    return this.drawFromStock();
+    return { card: this.drawFromStock(), fromDiscard: false };
   }
 
   /**

@@ -261,17 +261,37 @@ export class GinRummyGameScene extends Phaser.Scene {
     if (this.isAnimating) return;
     if (this.gameLogic.state !== GinRummyState.PLAYER_TURN_DRAW) return;
 
+    this.isAnimating = true;
+    const fromX = this.stockPileX;
+    const fromY = this.centerZoneY;
+
     this.gameLogic.drawFromStock();
-    this.renderAll();
+
+    // Animate card from stock to hand area
+    this.animateCard(null, fromX, fromY, +this.game.config.width / 2, this.handY, false, 300, () => {
+      this.isAnimating = false;
+      this.renderAll();
+    });
   }
 
   private onDrawDiscard(): void {
     if (this.isAnimating) return;
     if (this.gameLogic.state !== GinRummyState.PLAYER_TURN_DRAW) return;
-    if (!this.gameLogic.topDiscard) return;
+
+    const discardCard = this.gameLogic.topDiscard;
+    if (!discardCard) return;
+
+    this.isAnimating = true;
+    const fromX = this.discardPileX;
+    const fromY = this.centerZoneY;
 
     this.gameLogic.drawFromDiscard();
-    this.renderAll();
+
+    // Animate the face-up discard card to hand area
+    this.animateCard(discardCard, fromX, fromY, +this.game.config.width / 2, this.handY, true, 300, () => {
+      this.isAnimating = false;
+      this.renderAll();
+    });
   }
 
   private onKnock(): void {
@@ -331,27 +351,58 @@ export class GinRummyGameScene extends Phaser.Scene {
   }
 
   private doAiTurn(): void {
-    this.gameLogic.aiDraw();
-    this.renderAll();
+    const opponentY = this.isMobile ? 85 : 100;
+    const w = +this.game.config.width;
 
-    this.time.delayedCall(600, () => {
-      const result = this.gameLogic.aiDiscard();
-      this.isAnimating = false;
+    // Determine draw source before the draw happens
+    const drawResult = this.gameLogic.aiDraw();
+    const drawFromX = drawResult.fromDiscard ? this.discardPileX : this.stockPileX;
+    const drawFromY = this.centerZoneY;
+    const drawFaceUp = drawResult.fromDiscard;
+    const drawCard = drawResult.fromDiscard ? (drawResult.discardCard || null) : null;
 
-      if (result.action === 'knock' && result.result) {
-        this.showRoundResult(result.result);
-      }
-
+    // Animate AI drawing a card from pile to opponent hand area
+    this.animateCard(drawCard, drawFromX, drawFromY, w / 2, opponentY, drawFaceUp, 350, () => {
       this.renderAll();
 
-      if (
-        this.gameLogic.state === GinRummyState.ROUND_OVER ||
-        this.gameLogic.state === GinRummyState.GAME_OVER
-      ) {
-        if (this.gameLogic.roundResult) {
-          this.showRoundResult(this.gameLogic.roundResult);
+      // Brief pause before AI discards
+      this.time.delayedCall(400, () => {
+        // Capture the card the AI will discard before it happens
+        const hand = this.gameLogic.player2Hand;
+        const aiDiscardResult = this.gameLogic.aiDiscard();
+        const discardedCard = this.gameLogic.topDiscard;
+
+        if (aiDiscardResult.action === 'knock' && aiDiscardResult.result) {
+          this.isAnimating = false;
+          this.showRoundResult(aiDiscardResult.result);
+          this.renderAll();
+          return;
         }
-      }
+
+        // Animate AI discarding from hand area to discard pile
+        this.animateCard(
+          discardedCard || null,
+          w / 2,
+          opponentY,
+          this.discardPileX,
+          this.centerZoneY,
+          true,
+          350,
+          () => {
+            this.isAnimating = false;
+            this.renderAll();
+
+            if (
+              this.gameLogic.state === GinRummyState.ROUND_OVER ||
+              this.gameLogic.state === GinRummyState.GAME_OVER
+            ) {
+              if (this.gameLogic.roundResult) {
+                this.showRoundResult(this.gameLogic.roundResult);
+              }
+            }
+          }
+        );
+      });
     });
   }
 
@@ -649,16 +700,13 @@ export class GinRummyGameScene extends Phaser.Scene {
   private renderButtons(): void {
     const state = this.gameLogic.state;
     const isDiscardPhase = state === GinRummyState.PLAYER_TURN_DISCARD;
-    const isRoundOver =
-      state === GinRummyState.ROUND_OVER || state === GinRummyState.GAME_OVER;
 
     const canKnock = isDiscardPhase && this.gameLogic.canKnock();
     this.knockButton.setVisible(canKnock);
 
-    this.newRoundButton.setVisible(
-      state === GinRummyState.ROUND_OVER && !this.gameLogic.isGameOver
-    );
-    this.newGameButton.setVisible(isRoundOver);
+    // Old buttons are hidden; round-over buttons are now created inside the overlay
+    this.newRoundButton.setVisible(false);
+    this.newGameButton.setVisible(false);
   }
 
   private renderDeadwood(): void {
@@ -788,10 +836,30 @@ export class GinRummyGameScene extends Phaser.Scene {
       );
     });
 
-    // Reposition buttons
+    // Create buttons inside the result overlay so they are above the blocker
     const btnY = panelY + panelH + 25;
-    this.newRoundButton.setPosition(w / 2 - 80, btnY);
-    this.newGameButton.setPosition(w / 2 + 80, btnY);
+
+    if (!this.gameLogic.isGameOver) {
+      const nextRoundBtn = this.createButton(
+        w / 2 - 80,
+        btnY,
+        'Next\nRound',
+        0x27AE60,
+        () => this.onNewRound()
+      );
+      nextRoundBtn.setDepth(90);
+      this.roundResultContainer.add(nextRoundBtn);
+    }
+
+    const newGameBtn = this.createButton(
+      this.gameLogic.isGameOver ? w / 2 : w / 2 + 80,
+      btnY,
+      'New\nGame',
+      0xE74C3C,
+      () => this.onNewGame()
+    );
+    newGameBtn.setDepth(90);
+    this.roundResultContainer.add(newGameBtn);
   }
 
   private clearRoundResult(): void {
@@ -799,6 +867,43 @@ export class GinRummyGameScene extends Phaser.Scene {
       this.roundResultContainer.destroy();
       this.roundResultContainer = null;
     }
+  }
+
+  // --- Card Animation Helpers ---
+
+  /**
+   * Animate a card sprite flying from one position to another, then call onComplete.
+   * Returns the temporary sprite so it can be destroyed later.
+   */
+  private animateCard(
+    card: Card | null,
+    fromX: number,
+    fromY: number,
+    toX: number,
+    toY: number,
+    faceUp: boolean,
+    duration: number,
+    onComplete: () => void
+  ): Phaser.GameObjects.Container {
+    const scale = this.isMobile ? CARD_DISPLAY_SCALE_MOBILE : CARD_DISPLAY_SCALE;
+    const sprite = faceUp && card
+      ? this.createCardFace(card, fromX, fromY, scale)
+      : this.createCardBack(fromX, fromY, scale);
+    sprite.setDepth(100);
+
+    this.tweens.add({
+      targets: sprite,
+      x: toX,
+      y: toY,
+      duration,
+      ease: 'Power2',
+      onComplete: () => {
+        sprite.destroy();
+        onComplete();
+      },
+    });
+
+    return sprite;
   }
 
   // --- Card Rendering Helpers ---
