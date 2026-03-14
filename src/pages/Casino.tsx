@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import * as Phaser from 'phaser';
 import '../styles/pages/_casino.scss';
 import { CasinoPreloadScene } from '../phaser/scenes/casino-preload-scene';
@@ -7,7 +8,7 @@ import AvatarCreator from '../components/AvatarCreator';
 import type { AvatarData } from '../phaser/avatar/AvatarRenderer';
 import { COLORS, getGameDimensions } from '../phaser/common';
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://ws.cnfabian.com';
+const API_URL = process.env.REACT_APP_SOCKET_URL || 'http://localhost:3001';
 
 interface UserProfile {
   id: number;
@@ -20,7 +21,7 @@ const Casino = () => {
   const gameInstanceRef = useRef<Phaser.Game | null>(null);
   const [authState, setAuthState] = useState<'loading' | 'auth' | 'avatar' | 'lobby'>('loading');
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [showNavbar, setShowNavbar] = useState(true);
+  const navigate = useNavigate();
 
   // Check authentication on mount
   useEffect(() => {
@@ -50,7 +51,6 @@ const Casino = () => {
           setUserProfile(data.user);
           if (data.user.avatar_data) {
             setAuthState('lobby');
-            setShowNavbar(false);
           } else {
             setAuthState('avatar');
           }
@@ -115,7 +115,7 @@ const Casino = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(avatarData),
+        body: JSON.stringify({ avatarData }),
       });
 
       if (!response.ok) {
@@ -129,7 +129,6 @@ const Casino = () => {
           prev ? { ...prev, avatar_data: avatarData } : null
         );
         setAuthState('lobby');
-        setShowNavbar(false);
       }
     } catch (err) {
       console.error('Avatar save error:', err);
@@ -186,7 +185,9 @@ const Casino = () => {
     // Listen for game events
     gameInstanceRef.current.events.on('startGame', (gameType: string) => {
       if (gameType === 'ratscrew') {
-        window.location.href = '/egyptian-ratscrew';
+        navigate('/egyptian-ratscrew');
+      } else if (gameType === 'gin-rummy') {
+        navigate('/gin-rummy');
       }
     });
 

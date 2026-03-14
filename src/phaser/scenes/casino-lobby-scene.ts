@@ -225,12 +225,22 @@ export class CasinoLobbyScene extends Phaser.Scene {
   private createGameTables(): void {
     // Create Egyptian Ratscrew table
     this.createGameTable(
-      this.roomWidth / 2,
+      this.roomWidth / 2 - 150,
       200,
       'EGYPTIAN\nRATSCREW',
       120,
       100,
       'ratscrew'
+    );
+
+    // Create Gin Rummy table
+    this.createGameTable(
+      this.roomWidth / 2 + 150,
+      200,
+      'GIN\nRUMMY',
+      120,
+      100,
+      'gin-rummy'
     );
   }
 

@@ -1,21 +1,25 @@
 .casino-page {
-  width: 100%;
-  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   background: linear-gradient(135deg, #0a5f38 0%, #1a8e5a 100%);
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
+  z-index: 1000;
 
   &.casino-loading {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 80vh;
   }
 
   &.casino-auth,
   &.casino-avatar {
-    min-height: 100vh;
+    overflow-y: auto;
     padding: 20px;
   }
 }
@@ -185,7 +189,7 @@
 
 .phaser-game-container {
   width: 100%;
-  height: 100vh;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;

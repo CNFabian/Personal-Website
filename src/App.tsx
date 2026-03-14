@@ -19,6 +19,7 @@ import ImageCaptioner from './pages/ImageCaptioner';
 
 // Lazy-load the game pages so Phaser is not bundled with portfolio pages
 const EgyptianRatscrew = lazy(() => import('./pages/EgyptianRatscrew'));
+const GinRummy = lazy(() => import('./pages/GinRummy'));
 const Casino = lazy(() => import('./pages/Casino'));
 
 const GameLoadingFallback = () => (
@@ -43,9 +44,11 @@ const App = () => {
     document.body.className = `page-${pageName}`;
   }, [location]);
 
+  const isFullscreenRoute = ['/casino', '/egyptian-ratscrew', '/gin-rummy'].includes(location.pathname);
+
   return (
     <>
-      <Navbar />
+      {!isFullscreenRoute && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
@@ -66,6 +69,14 @@ const App = () => {
           }
         />
         <Route
+          path="/gin-rummy"
+          element={
+            <Suspense fallback={<GameLoadingFallback />}>
+              <GinRummy />
+            </Suspense>
+          }
+        />
+        <Route
           path="/casino"
           element={
             <Suspense fallback={<GameLoadingFallback />}>
@@ -74,7 +85,7 @@ const App = () => {
           }
         />
       </Routes>
-      <Footer />
+      {!isFullscreenRoute && <Footer />}
     </>
   );
 };

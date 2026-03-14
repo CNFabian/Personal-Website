@@ -1,17 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as Phaser from 'phaser';
-import '../styles/pages/_egyptian-ratscrew.scss';
+import '../styles/pages/_gin-rummy.scss';
 
-import { PreloadScene } from '../phaser/scenes/preload-scene';
-import { MenuScene } from '../phaser/scenes/menu-scene';
-import { AuthScene } from '../phaser/scenes/auth-scene';
-import { RulesScene } from '../phaser/scenes/rules-scene';
-import { LobbyScene } from '../phaser/scenes/lobby-scene';
-import { GameScene } from '../phaser/scenes/game-scene';
+import { GinRummyPreloadScene } from '../phaser/scenes/gin-rummy-preload-scene';
+import { GinRummyGameScene } from '../phaser/scenes/gin-rummy-game-scene';
 import { COLORS, getGameDimensions } from '../phaser/common';
 
-const EgyptianRatscrew = () => {
+const GinRummy = () => {
   const gameContainerRef = useRef<HTMLDivElement>(null);
   const gameInstanceRef = useRef<Phaser.Game | null>(null);
   const navigate = useNavigate();
@@ -27,13 +23,13 @@ const EgyptianRatscrew = () => {
       height: dims.height,
       parent: gameContainerRef.current,
       backgroundColor: COLORS.BACKGROUND,
-      scene: [PreloadScene, MenuScene, AuthScene, RulesScene, LobbyScene, GameScene],
+      scene: [GinRummyPreloadScene, GinRummyGameScene],
       physics: {
         default: 'arcade',
         arcade: {
           gravity: { y: 0, x: 0 },
-          debug: false
-        }
+          debug: false,
+        },
       },
       scale: {
         mode: Phaser.Scale.FIT,
@@ -45,14 +41,14 @@ const EgyptianRatscrew = () => {
       input: {
         keyboard: true,
         mouse: true,
-        touch: true
+        touch: true,
       },
       render: {
         antialias: true,
         pixelArt: false,
-        roundPixels: true
+        roundPixels: true,
       },
-      disableContextMenu: true
+      disableContextMenu: true,
     };
 
     gameInstanceRef.current = new Phaser.Game(config);
@@ -66,7 +62,7 @@ const EgyptianRatscrew = () => {
   }, []);
 
   return (
-    <div className="egyptian-ratscrew-page">
+    <div className="gin-rummy-page">
       <button
         className="exit-button"
         onClick={() => navigate('/casino')}
@@ -79,4 +75,4 @@ const EgyptianRatscrew = () => {
   );
 };
 
-export default EgyptianRatscrew;
+export default GinRummy;

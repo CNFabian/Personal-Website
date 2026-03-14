@@ -55,7 +55,7 @@ router.put('/avatar', authMiddleware, (req, res) => {
     }
 
     // Validate required fields within avatarData
-    const requiredFields = ['body', 'hair', 'face', 'clothing', 'accessories', 'colors'];
+    const requiredFields = ['body', 'skinColor', 'hair', 'hairColor', 'eyes', 'top', 'topColor', 'bottom', 'bottomColor', 'hat', 'hatColor'];
     const missingFields = requiredFields.filter(field => !(field in avatarData));
     if (missingFields.length > 0) {
       return res.status(400).json({

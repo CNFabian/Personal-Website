@@ -20,7 +20,8 @@
 -- ============================================================
 -- Add new columns to support expanded features
 
-ALTER TABLE users ADD COLUMN email TEXT UNIQUE COLLATE NOCASE DEFAULT NULL;
+ALTER TABLE users ADD COLUMN email TEXT COLLATE NOCASE DEFAULT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email);
 ALTER TABLE users ADD COLUMN chip_balance INTEGER DEFAULT 1000;
 ALTER TABLE users ADD COLUMN avatar_data TEXT DEFAULT NULL;
 ALTER TABLE users ADD COLUMN total_losses INTEGER DEFAULT 0;
