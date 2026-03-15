@@ -249,10 +249,63 @@ function getRecentImportantEmails(limit = 10) {
   ).all(limit);
 }
 
+// ---- Send Email ----
+
+/**
+ * Send an email via Gmail API.
+ * @param {string} to      - Recipient email address
+ * @param {string} subject - Email subject
+ * @param {string} body    - Plain-text email body
+ * @returns {object}       - Gmail API response (includes id, threadId)
+ */
+async function sendEmail(to, subject, body) {
+  if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET || !GOOGLE_REFRESH_TOKEN) {
+    throw new Error('Gmail OAuth not configured');
+  }
+  if (!to || !subject || !body) {
+    throw new Error('to, subject, and body are required');
+  }
+
+  await refreshAccessToken();
+
+  // Build RFC 2822 email and base64url-encode it
+  const rawLines = [
+    `To: ${to}`,
+    `Subject: ${subject}`,
+    'Content-Type: text/plain; charset=utf-8',
+    '',
+    body,
+  ];
+  const rawEmail = rawLines.join('\r\n');
+  const encoded = Buffer.from(rawEmail)
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+
+  const res = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ raw: encoded }),
+  });
+
+  const data = await res.json();
+
+  if (data.error) {
+    throw new Error(`Gmail send error: ${data.error.message || data.error}`);
+  }
+
+  return data;
+}
+
 module.exports = {
   getImportantEmails,
   getEmail,
   searchEmails,
   syncGmailActivity,
   getRecentImportantEmails,
+  sendEmail,
 };

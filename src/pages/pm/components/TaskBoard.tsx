@@ -12,8 +12,6 @@ const COLUMNS = [
   { status: 'DONE',        label: 'Done'        },
 ] as const;
 
-type ColStatus = typeof COLUMNS[number]['status'];
-
 function daysSince(dateStr?: string): number {
   if (!dateStr) return 0;
   return Math.max(0, Math.floor((Date.now() - new Date(dateStr).getTime()) / 86_400_000));
@@ -51,8 +49,13 @@ const TaskBoard: React.FC<Props> = ({ token }) => {
   const [error, setError]               = useState('');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showNewTask, setShowNewTask]   = useState(false);
-  const { showToast } = useToast();
 
+  // Drag state
+  const [draggingTaskId, setDraggingTaskId] = useState<number | null>(null);
+  const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
+  const [justDroppedId, setJustDroppedId]   = useState<number | null>(null);
+
+  const { showToast } = useToast();
   const headers = { Authorization: `Bearer ${token}` };
 
   const fetchTasks = useCallback(async () => {
@@ -75,6 +78,7 @@ const TaskBoard: React.FC<Props> = ({ token }) => {
 
   useEffect(() => { fetchTasks(); }, [fetchTasks]);
 
+  // ── Arrow-button move (unchanged path) ──────────────────────
   const handleMove = useCallback(async (task: Task, newStatus: string) => {
     try {
       const res = await fetch(`${PM_API}/tasks/${task.id}/move`, {
@@ -93,6 +97,78 @@ const TaskBoard: React.FC<Props> = ({ token }) => {
     }
   }, [token, fetchTasks, showToast]);
 
+  // ── Drag handlers ────────────────────────────────────────────
+  const handleDragStart = useCallback((e: React.DragEvent, task: Task) => {
+    e.dataTransfer.setData('taskId', String(task.id));
+    e.dataTransfer.effectAllowed = 'move';
+    setDraggingTaskId(task.id);
+  }, []);
+
+  const handleDragEnd = useCallback(() => {
+    setDraggingTaskId(null);
+    setDragOverColumn(null);
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  }, []);
+
+  const handleDragEnter = useCallback((e: React.DragEvent, status: string) => {
+    e.preventDefault();
+    setDragOverColumn(status);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent, status: string) => {
+    // Only clear if the pointer genuinely left the column (not just moved to a child)
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setDragOverColumn(prev => prev === status ? null : prev);
+    }
+  }, []);
+
+  const handleDrop = useCallback(async (e: React.DragEvent, targetStatus: string) => {
+    e.preventDefault();
+    setDragOverColumn(null);
+    setDraggingTaskId(null);
+
+    const taskId = parseInt(e.dataTransfer.getData('taskId'), 10);
+    const task   = tasks.find(t => t.id === taskId);
+    if (!task || task.status === targetStatus) return;
+
+    const originalStatus = task.status;
+
+    // Optimistic update — move card immediately
+    setTasks(prev => prev.map(t =>
+      t.id === taskId ? { ...t, status: targetStatus } : t
+    ));
+    setJustDroppedId(taskId);
+    setTimeout(() => setJustDroppedId(null), 400);
+
+    try {
+      const res = await fetch(`${PM_API}/tasks/${taskId}/move`, {
+        method: 'PATCH',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: targetStatus }),
+      });
+      if (res.ok) {
+        showToast(`Moved to ${targetStatus.replace(/_/g, ' ').toLowerCase()}`);
+      } else {
+        // Snap back
+        setTasks(prev => prev.map(t =>
+          t.id === taskId ? { ...t, status: originalStatus } : t
+        ));
+        showToast('Failed to move task', 'error');
+      }
+    } catch {
+      // Snap back
+      setTasks(prev => prev.map(t =>
+        t.id === taskId ? { ...t, status: originalStatus } : t
+      ));
+      showToast('Connection error', 'error');
+    }
+  }, [tasks, token, showToast]);
+
+  // ── Render ───────────────────────────────────────────────────
   if (loading) return (
     <div className="task-board-wrapper">
       <div className="pm-section-header">
@@ -119,8 +195,17 @@ const TaskBoard: React.FC<Props> = ({ token }) => {
           const colTasks   = tasks.filter(t => t.status === col.status);
           const prevStatus = colIdx > 0 ? COLUMNS[colIdx - 1].status : null;
           const nextStatus = colIdx < COLUMNS.length - 1 ? COLUMNS[colIdx + 1].status : null;
+          const isDropTarget = dragOverColumn === col.status && draggingTaskId !== null;
+
           return (
-            <div key={col.status} className="task-column">
+            <div
+              key={col.status}
+              className={`task-column${isDropTarget ? ' task-column--drop-target' : ''}`}
+              onDragOver={handleDragOver}
+              onDragEnter={e => handleDragEnter(e, col.status)}
+              onDragLeave={e => handleDragLeave(e, col.status)}
+              onDrop={e => handleDrop(e, col.status)}
+            >
               <div className="task-column__header">
                 <span className="task-column__label">{col.label}</span>
                 <span className="task-column__count">{colTasks.length}</span>
@@ -134,6 +219,10 @@ const TaskBoard: React.FC<Props> = ({ token }) => {
                     onMove={handleMove}
                     prevStatus={prevStatus}
                     nextStatus={nextStatus}
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
+                    isDragging={draggingTaskId === task.id}
+                    isJustDropped={justDroppedId === task.id}
                   />
                 ))}
               </div>

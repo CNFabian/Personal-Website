@@ -25,13 +25,34 @@ interface Props {
   onMove: (task: Task, newStatus: string) => void;
   prevStatus: string | null;
   nextStatus: string | null;
+  onDragStart: (e: React.DragEvent, task: Task) => void;
+  onDragEnd: () => void;
+  isDragging: boolean;
+  isJustDropped: boolean;
 }
 
-const TaskCard: React.FC<Props> = ({ task, onClick, onMove, prevStatus, nextStatus }) => {
+const TaskCard: React.FC<Props> = ({
+  task, onClick, onMove,
+  prevStatus, nextStatus,
+  onDragStart, onDragEnd,
+  isDragging, isJustDropped,
+}) => {
   const days = task.days_in_status ?? 0;
 
+  const classes = [
+    'task-card',
+    isDragging    ? 'task-card--dragging'    : '',
+    isJustDropped ? 'task-card--just-dropped' : '',
+  ].filter(Boolean).join(' ');
+
   return (
-    <div className="task-card" onClick={() => onClick(task)}>
+    <div
+      className={classes}
+      draggable
+      onClick={() => onClick(task)}
+      onDragStart={e => onDragStart(e, task)}
+      onDragEnd={onDragEnd}
+    >
       <p className="task-card__title">{task.title}</p>
       <div className="task-card__meta">
         <span className="task-card__assignee">

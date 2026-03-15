@@ -13,14 +13,20 @@ const Secret = () => {
   const [countdownTime, setCountdownTime] = useState(1800); 
   const [flickerStyle, setFlickerStyle] = useState({ color: '#ff0000', textShadow: '0px 0px 30px #ff0000' });
   const inputRef = useRef<HTMLInputElement>(null);
-  const correctPasswords = ['chowking0', 'ChowKing0', 'chowKing0', 'Chowking0'];
+  const normalizePassword = (input: string): string => {
+    return input
+      .toLowerCase()
+      .replace(/\s+/g, '')       // remove all spaces
+      .replace(/zero/g, '0');    // accept "zero" as "0"
+  };
+  const correctPassword = 'chowking0';
   let countdownTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value);
 
   const handleRevealSecret = () => {
-    if (correctPasswords.includes(password)) {
+    if (normalizePassword(password) === correctPassword) {
       setIsRevealed(true);
       setErrorMessage('');
     } else {
@@ -173,7 +179,7 @@ const Secret = () => {
           onKeyDown={handleKeyDown} 
           ref={inputRef} 
         />
-        <p className="ominous-list">Connect all pieces with no spaces in between</p>
+        <p className="ominous-list">Combine all piece answers into one word</p>
         <button className="reveal-button" onClick={handleRevealSecret}>
           Reveal
         </button>

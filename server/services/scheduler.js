@@ -10,12 +10,14 @@
 const { syncGithubActivity } = require('./github');
 const { syncSlackMessages } = require('./slack');
 const { syncGmailActivity } = require('./gmail');
+const { syncDriveChecklist } = require('./drive');
 const { runFullAnalysis } = require('./ai');
 
 // Intervals (in milliseconds)
 const GITHUB_INTERVAL = 15 * 60 * 1000;   // Every 15 minutes
 const SLACK_INTERVAL = 15 * 60 * 1000;    // Every 15 minutes
 const GMAIL_INTERVAL = 30 * 60 * 1000;    // Every 30 minutes
+const DRIVE_INTERVAL = 30 * 60 * 1000;    // Every 30 minutes
 const AI_ANALYSIS_INTERVAL = 60 * 60 * 1000; // Every 60 minutes
 
 let intervals = [];
@@ -72,6 +74,17 @@ function startScheduler() {
     setTimeout(() => safeSync('Gmail', syncGmailActivity), 20000);
   } else {
     console.log('[scheduler] Gmail sync: SKIPPED (Google OAuth not configured)');
+  }
+
+  // Google Drive checklist sync
+  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_REFRESH_TOKEN && process.env.DRIVE_CHECKLIST_DOC_ID) {
+    console.log('[scheduler] Drive checklist sync: every 30 min');
+    intervals.push(
+      setInterval(() => safeSync('Drive', syncDriveChecklist), DRIVE_INTERVAL)
+    );
+    setTimeout(() => safeSync('Drive', syncDriveChecklist), 25000);
+  } else {
+    console.log('[scheduler] Drive checklist sync: SKIPPED (DRIVE_CHECKLIST_DOC_ID not set)');
   }
 
   // AI analysis (only if Claude API key is set)

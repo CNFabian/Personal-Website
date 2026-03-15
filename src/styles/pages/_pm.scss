@@ -563,6 +563,18 @@ $pm-accent-dim:   $color-accent-600;
   display: flex;
   flex-direction: column;
   gap: $space-3;
+  border-radius: $radius-xl;
+  @include transition(background 150ms ease);
+
+  &--drop-target {
+    background: oklch(from $pm-accent l c h / 0.04);
+
+    .task-column__cards {
+      border: 1px dashed $pm-accent-dim;
+      border-radius: $radius-lg;
+      min-height: 3.5rem;
+    }
+  }
 
   &__header {
     display: flex;
@@ -608,16 +620,29 @@ $pm-accent-dim:   $color-accent-600;
   background: $pm-card;
   border: 1px solid $pm-border;
   border-radius: $radius-lg;
-  cursor: pointer;
-  @include transition(all);
+  cursor: grab;
+  transition: border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
   display: flex;
   flex-direction: column;
   gap: $space-2_5;
+  user-select: none;
 
   &:hover {
     border-color: $pm-accent;
     transform: translateY(-$space-px);
     box-shadow: 0 $space-2 $space-4 oklch(0 0 0 / 0.3);
+  }
+
+  &--dragging {
+    opacity: 0.4;
+    transform: rotate(1deg) scale(1.02);
+    box-shadow: 0 $space-4 $space-8 oklch(0 0 0 / 0.5);
+    cursor: grabbing;
+    border-color: $pm-accent;
+  }
+
+  &--just-dropped {
+    animation: card-settle 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   &__title {
@@ -944,6 +969,12 @@ $pm-accent-dim:   $color-accent-600;
   to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
+@keyframes card-settle {
+  0%   { transform: scale(1.04); }
+  55%  { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+
 // ============================================================
 // REDUCED MOTION
 // ============================================================
@@ -972,4 +1003,1218 @@ $pm-accent-dim:   $color-accent-600;
 @include media(sm) {
   .pm-content { padding: $space-3; }
   .pm-form__row { grid-template-columns: 1fr; }
+}
+
+// ============================================================
+// COMMAND CENTER
+// ============================================================
+
+.pm-command-center {
+  max-width: 100%;
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    margin-bottom: $space-5;
+    flex-wrap: wrap;
+  }
+
+  &__stat {
+    font-size: $text-xs;
+    font-weight: 600;
+    padding: $space-1 $space-3;
+    border-radius: $radius-full;
+    background: $pm-card;
+    border: 1px solid $pm-border;
+    color: $pm-text-muted;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+
+    &--active  { color: $color-success; border-color: oklch(from $color-success l c h / 0.4); }
+    &--blocked { color: $color-error;   border-color: oklch(from $color-error l c h / 0.4); }
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr));
+    gap: $space-4;
+  }
+}
+
+// ── Station card ─────────────────────────────────────────────
+
+.pm-station {
+  background: $pm-card;
+  border: 1px solid $pm-border;
+  border-radius: $radius-xl;
+  padding: $space-5;
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  cursor: pointer;
+  position: relative;
+  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+  outline: none;
+
+  &:hover, &:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 $space-2 $space-6 oklch(0 0 0 / 0.3);
+  }
+
+  // Status glow variants
+  &--active {
+    border-color: oklch(from $color-success l c h / 0.5);
+    box-shadow: 0 0 0 1px oklch(from $color-success l c h / 0.2),
+                0 0 $space-6 oklch(from $color-success l c h / 0.08);
+    &:hover { box-shadow: 0 0 0 1px oklch(from $color-success l c h / 0.4),
+                           0 $space-2 $space-8 oklch(from $color-success l c h / 0.2); }
+  }
+
+  &--warning {
+    border-color: oklch(from $color-warning l c h / 0.5);
+    box-shadow: 0 0 0 1px oklch(from $color-warning l c h / 0.2),
+                0 0 $space-6 oklch(from $color-warning l c h / 0.06);
+    &:hover { box-shadow: 0 0 0 1px oklch(from $color-warning l c h / 0.4),
+                           0 $space-2 $space-8 oklch(from $color-warning l c h / 0.15); }
+  }
+
+  &--blocked {
+    border-color: oklch(from $color-error l c h / 0.5);
+    box-shadow: 0 0 0 1px oklch(from $color-error l c h / 0.2),
+                0 0 $space-6 oklch(from $color-error l c h / 0.08);
+    &:hover { box-shadow: 0 0 0 1px oklch(from $color-error l c h / 0.4),
+                           0 $space-2 $space-8 oklch(from $color-error l c h / 0.2); }
+  }
+
+  &--inactive {
+    opacity: 0.6;
+    &:hover { opacity: 0.8; }
+  }
+}
+
+// ── Station header ───────────────────────────────────────────
+
+.pm-station__header {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-3;
+}
+
+.pm-station__avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $text-sm;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+
+  // Role-based colors
+  &--frontend  { background: oklch(from $color-accent-500 l c h / 0.2); color: $color-accent-400; }
+  &--backend   { background: oklch(from $color-info l c h / 0.2);       color: $color-info; }
+  &--fullstack { background: oklch(from $color-success l c h / 0.2);    color: $color-success; }
+  &--design    { background: oklch(from $color-warning l c h / 0.2);    color: $color-warning; }
+  &--data      { background: oklch(from $color-primary-500 l c h / 0.25); color: $color-primary-300; }
+  &--default   { background: $pm-card-hover;                              color: $pm-text-muted; }
+}
+
+.pm-station__identity {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $space-0_5;
+}
+
+.pm-station__name {
+  font-size: $text-sm;
+  font-weight: 600;
+  color: $pm-text;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pm-station__role {
+  font-size: $text-xs;
+  color: $pm-text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ── Status dot ───────────────────────────────────────────────
+
+.pm-station__status-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-1;
+  flex-shrink: 0;
+}
+
+.pm-station__dot {
+  width: $space-2_5;
+  height: $space-2_5;
+  border-radius: $radius-full;
+  flex-shrink: 0;
+
+  &--active   {
+    background: $color-success;
+    animation: station-breathe 2s ease-in-out infinite;
+  }
+  &--warning  { background: $color-warning; }
+  &--blocked  {
+    background: $color-error;
+    animation: station-breathe 1.4s ease-in-out infinite;
+  }
+  &--inactive { background: $pm-text-dim; }
+}
+
+.pm-station__status-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  &--active   { color: $color-success; }
+  &--warning  { color: $color-warning; }
+  &--blocked  { color: $color-error; }
+  &--inactive { color: $pm-text-dim; }
+}
+
+// ── Task area ────────────────────────────────────────────────
+
+.pm-station__task {
+  padding: $space-2 $space-3;
+  background: $pm-bg;
+  border-radius: $radius-md;
+  border: 1px solid $pm-border;
+  min-height: 2.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.pm-station__task-name {
+  font-size: $text-xs;
+  color: $pm-text;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.pm-station__task-empty {
+  font-size: $text-xs;
+  color: $pm-text-dim;
+  font-style: italic;
+}
+
+// ── Progress bar ─────────────────────────────────────────────
+
+.pm-station__progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+}
+
+.pm-station__progress-bar {
+  flex: 1;
+  height: 4px;
+  background: $pm-card-hover;
+  border-radius: $radius-full;
+  overflow: hidden;
+}
+
+.pm-station__progress-fill {
+  height: 100%;
+  background: $pm-accent;
+  border-radius: $radius-full;
+  transition: width 600ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pm-station__progress-pct {
+  font-size: $text-xs;
+  font-weight: 600;
+  color: $pm-text-muted;
+  white-space: nowrap;
+  min-width: 2.5rem;
+  text-align: right;
+}
+
+// ── Time tracking ────────────────────────────────────────────
+
+.pm-station__time {
+  font-size: $text-xs;
+  color: $pm-text-dim;
+  letter-spacing: 0.02em;
+}
+
+// ── Bottom stats row ─────────────────────────────────────────
+
+.pm-station__stats {
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+  padding-top: $space-2;
+  border-top: 1px solid $pm-border;
+  margin-top: auto;
+}
+
+.pm-station__stat {
+  font-size: $text-xs;
+  color: $pm-text-muted;
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+
+  &--alert { color: $color-error; }
+}
+
+// ── Breathing animation ──────────────────────────────────────
+
+@keyframes station-breathe {
+  0%, 100% { transform: scale(1);    opacity: 1; }
+  50%       { transform: scale(1.15); opacity: 0.75; }
+}
+
+// ── Responsive ───────────────────────────────────────────────
+
+@include media(md) {
+  .pm-command-center__grid {
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  }
+}
+
+@include media(sm) {
+  .pm-command-center__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@include media(xs) {
+  .pm-command-center__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ============================================================
+// MEMBER DETAIL PANEL
+// ============================================================
+
+.pm-detail-backdrop {
+  position: fixed;
+  inset: 0;
+  background: oklch(0 0 0 / 0.5);
+  z-index: 100;
+  backdrop-filter: blur(2px);
+}
+
+.pm-detail-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(480px, 100vw);
+  background: $pm-card;
+  border-left: 1px solid $pm-border;
+  z-index: 101;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateX(100%);
+  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  &--visible {
+    transform: translateX(0);
+  }
+
+  // ── Header ────────────────────────────────────────────────
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    gap: $space-4;
+    padding: $space-6;
+    border-bottom: 1px solid $pm-border;
+    flex-shrink: 0;
+  }
+
+  &__avatar {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $text-base;
+    font-weight: 700;
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+
+    &--frontend  { background: oklch(0.25 0.06 250); color: oklch(0.75 0.12 250); }
+    &--backend   { background: oklch(0.22 0.06 145); color: oklch(0.72 0.12 145); }
+    &--fullstack { background: oklch(0.23 0.07 285); color: oklch(0.73 0.14 285); }
+    &--design    { background: oklch(0.25 0.07 330); color: oklch(0.75 0.14 330); }
+    &--data      { background: oklch(0.24 0.07  50); color: oklch(0.74 0.14  50); }
+    &--default   { background: $color-neutral-800;   color: $pm-text-muted; }
+  }
+
+  &__identity {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+  }
+
+  &__name {
+    margin: 0;
+    font-size: $text-lg;
+    font-weight: 600;
+    color: $pm-text;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__role {
+    font-size: $text-sm;
+    color: $pm-text-muted;
+  }
+
+  &__email {
+    font-size: $text-xs;
+    color: $pm-accent;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &:hover { text-decoration: underline; }
+  }
+
+  &__close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: $pm-text-muted;
+    font-size: $text-base;
+    cursor: pointer;
+    padding: $space-1;
+    border-radius: $radius-sm;
+    line-height: 1;
+    transition: color 150ms ease, background 150ms ease;
+
+    &:hover {
+      color: $pm-text;
+      background: $pm-card-hover;
+    }
+  }
+
+  // ── Scrollable body ────────────────────────────────────────
+
+  &__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: $space-6;
+    display: flex;
+    flex-direction: column;
+    gap: $space-6;
+
+    &::-webkit-scrollbar       { width: 4px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+    &::-webkit-scrollbar-thumb { background: $pm-border; border-radius: 2px; }
+  }
+
+  // ── Quick actions ──────────────────────────────────────────
+
+  &__quick-actions {
+    display: flex;
+    gap: $space-2;
+  }
+
+  &__action-btn {
+    flex: 1;
+    background: $pm-card-hover;
+    border: 1px solid $pm-border;
+    border-radius: $radius-md;
+    color: $pm-text;
+    font-size: $text-sm;
+    padding: $space-2 $space-3;
+    cursor: pointer;
+    transition: border-color 150ms ease, background 150ms ease;
+
+    &:hover {
+      border-color: $pm-accent;
+      background: oklch(0.14 0.02 45);
+    }
+  }
+
+  // ── Sections ──────────────────────────────────────────────
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+  }
+
+  &__section-title {
+    margin: 0;
+    font-size: $text-xs;
+    font-weight: 600;
+    color: $pm-text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  &__empty {
+    margin: 0;
+    font-size: $text-sm;
+    color: $pm-text-dim;
+    font-style: italic;
+  }
+
+  // ── Current work ───────────────────────────────────────────
+
+  &__current-task {
+    background: $pm-card-hover;
+    border: 1px solid $pm-border;
+    border-radius: $radius-md;
+    padding: $space-4;
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+  }
+
+  &__task-title {
+    margin: 0;
+    font-size: $text-sm;
+    font-weight: 500;
+    color: $pm-text;
+    line-height: 1.4;
+  }
+
+  &__task-meta {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    flex-wrap: wrap;
+  }
+
+  &__task-age {
+    margin: 0;
+    font-size: $text-xs;
+    color: $pm-text-muted;
+  }
+
+  // ── Activity ───────────────────────────────────────────────
+
+  &__activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: $space-3;
+    padding: $space-2 0;
+    border-bottom: 1px solid $pm-border;
+
+    &:last-child { border-bottom: none; }
+  }
+
+  &__activity-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: $radius-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+
+    &--github { background: oklch(0.18 0.01 260); }
+    &--slack  { background: oklch(0.20 0.06 285); }
+    &--gmail  { background: oklch(0.18 0.05 25);  }
+    &--manual { background: $pm-card-hover; }
+  }
+
+  &__activity-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+  }
+
+  &__activity-text {
+    margin: 0;
+    font-size: $text-sm;
+    color: $pm-text;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-transform: capitalize;
+  }
+
+  &__activity-summary {
+    margin: 0;
+    font-size: $text-xs;
+    color: $pm-text-muted;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__activity-time {
+    font-size: $text-xs;
+    color: $pm-text-dim;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  // ── Task list ──────────────────────────────────────────────
+
+  &__task-group {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+  }
+
+  &__task-group-label {
+    font-size: $text-xs;
+    font-weight: 600;
+    color: $pm-text-dim;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: $space-1;
+  }
+
+  &__task-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-3;
+    padding: $space-2 $space-3;
+    background: $pm-card-hover;
+    border: 1px solid $pm-border;
+    border-radius: $radius-md;
+  }
+
+  &__task-item-title {
+    font-size: $text-sm;
+    color: $pm-text;
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__task-item-meta {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    flex-shrink: 0;
+  }
+
+  &__task-item-age {
+    font-size: $text-xs;
+    color: $pm-text-dim;
+  }
+}
+
+// ============================================================
+// QUICK ACTION COMPOSERS
+// ============================================================
+
+@keyframes composer-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.pm-composer {
+  background: $pm-bg;
+  border: 1px solid $pm-border;
+  border-radius: $radius-lg;
+  padding: $space-4;
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  animation: composer-fade-in 180ms ease;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__title {
+    font-size: $text-sm;
+    font-weight: 600;
+    color: $pm-text;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+  }
+
+  &__label {
+    font-size: $text-xs;
+    font-weight: 600;
+    color: $pm-text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  &__input,
+  &__select {
+    background: $pm-card;
+    border: 1px solid $pm-border;
+    border-radius: $radius-md;
+    color: $pm-text;
+    font-size: $text-sm;
+    padding: $space-2 $space-3;
+    width: 100%;
+    outline: none;
+    transition: border-color 150ms ease;
+    font-family: inherit;
+
+    &:focus { border-color: $pm-accent; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+
+  &__select {
+    cursor: pointer;
+  }
+
+  &__textarea {
+    background: $pm-card;
+    border: 1px solid $pm-border;
+    border-radius: $radius-md;
+    color: $pm-text;
+    font-size: $text-sm;
+    padding: $space-2 $space-3;
+    width: 100%;
+    min-height: 100px;
+    resize: vertical;
+    outline: none;
+    line-height: 1.5;
+    font-family: inherit;
+    transition: border-color 150ms ease;
+
+    &:focus { border-color: $pm-accent; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+
+  &__error {
+    margin: 0;
+    font-size: $text-xs;
+    color: $color-error;
+  }
+
+  &__success {
+    margin: 0;
+    font-size: $text-sm;
+    font-weight: 600;
+    color: $color-success;
+    text-align: center;
+    padding: $space-3 0;
+    animation: composer-fade-in 200ms ease;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-2;
+    flex-wrap: wrap;
+  }
+
+  &__actions-right {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    margin-left: auto;
+  }
+
+  &__send-btn {
+    background: $pm-accent;
+    border: none;
+    border-radius: $radius-md;
+    color: oklch(0.08 0.02 45);
+    font-size: $text-sm;
+    font-weight: 700;
+    padding: $space-2 $space-4;
+    cursor: pointer;
+    transition: opacity 150ms ease;
+
+    &:hover:not(:disabled)  { opacity: 0.85; }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    &--sm {
+      padding: $space-1 $space-3;
+      font-size: $text-xs;
+    }
+  }
+
+  &__cancel-btn {
+    background: transparent;
+    border: none;
+    color: $pm-text-muted;
+    font-size: $text-sm;
+    padding: $space-2 $space-3;
+    cursor: pointer;
+    border-radius: $radius-md;
+    transition: color 150ms ease, background 150ms ease;
+
+    &:hover:not(:disabled) {
+      color: $pm-text;
+      background: $pm-card-hover;
+    }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    &--sm {
+      padding: $space-1 $space-2;
+      font-size: $text-xs;
+    }
+  }
+
+  &__ai-btn {
+    background: transparent;
+    border: 1px solid $color-info;
+    border-radius: $radius-md;
+    color: $color-info;
+    font-size: $text-xs;
+    padding: $space-1 $space-3;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: $space-1;
+    transition: background 150ms ease, opacity 150ms ease;
+
+    &:hover:not(:disabled) { background: oklch(0.55 0.15 250 / 0.12); }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+  }
+
+  &__spinner {
+    display: inline-block;
+    width: 0.875rem;
+    height: 0.875rem;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 600ms linear infinite;
+  }
+}
+
+// ============================================================
+// AI SUGGESTIONS PANEL
+// ============================================================
+
+.pm-ai-suggestions {
+  background: $pm-bg;
+  border: 1px solid $pm-border;
+  border-radius: $radius-lg;
+  padding: $space-4;
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  animation: composer-fade-in 180ms ease;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__title {
+    font-size: $text-sm;
+    font-weight: 600;
+    color: $pm-text;
+  }
+
+  &__loading {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+    padding: $space-2 0;
+  }
+
+  &__assessment {
+    background: oklch(0.55 0.15 250 / 0.10);
+    border-left: 3px solid $color-info;
+    border-radius: $radius-md;
+    padding: $space-3;
+    font-size: $text-sm;
+    color: $pm-text;
+    line-height: 1.5;
+  }
+
+  &__error {
+    margin: 0;
+    font-size: $text-sm;
+    color: $color-error;
+  }
+
+  &__card {
+    background: $pm-card-hover;
+    border: 1px solid $pm-border-subtle;
+    border-radius: $radius-md;
+    padding: $space-3;
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+  }
+
+  &__card-header {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+  }
+
+  &__type-icon {
+    font-size: $text-base;
+    line-height: 1;
+  }
+
+  &__label {
+    font-size: $text-sm;
+    font-weight: 600;
+    color: $pm-text;
+  }
+
+  &__draft {
+    margin: 0;
+    font-size: $text-sm;
+    font-style: italic;
+    color: $pm-text-muted;
+    border-left: 2px solid $pm-border;
+    padding-left: $space-3;
+    line-height: 1.5;
+  }
+
+  &__reasoning {
+    margin: 0;
+    font-size: $text-xs;
+    color: $pm-text-dim;
+    line-height: 1.4;
+  }
+
+  &__card-actions {
+    display: flex;
+    gap: $space-2;
+    flex-wrap: wrap;
+  }
+}
+
+// ============================================================
+// DAILY QUESTS PANEL
+// ============================================================
+
+@keyframes quest-check-pop {
+  0%   { transform: scale(0.6); }
+  60%  { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.pm-quests-panel {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  background: $pm-card;  // ensures content scrolling behind is hidden
+}
+
+// ── Collapsed bar ─────────────────────────────────────────
+
+.pm-quests-bar {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-3 $space-4;
+  border-top: 1px solid $pm-border;
+  cursor: pointer;
+  user-select: none;
+  transition: background 150ms ease;
+
+  &:hover  { background: $pm-card-hover; }
+  &:focus  { outline: 2px solid $pm-accent; outline-offset: -2px; }
+
+  &__progress {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background: oklch(from #{$color-success} l c h / 0.08);
+    transition: width 400ms ease;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  &__label {
+    font-size: $text-sm;
+    font-weight: 600;
+    color: $pm-text;
+    position: relative; // above progress fill
+  }
+
+  &__count {
+    font-size: $text-xs;
+    color: $pm-text-muted;
+    position: relative;
+  }
+
+  &__streak {
+    font-size: $text-xs;
+    font-weight: 600;
+    color: $pm-text-dim;
+    position: relative;
+    margin-left: auto;
+
+    &--active { color: $color-warning; }
+  }
+
+  &__chevron {
+    font-size: $text-sm;
+    color: $pm-text-dim;
+    position: relative;
+    flex-shrink: 0;
+  }
+}
+
+// ── Expanded drawer ────────────────────────────────────────
+
+.pm-quests-drawer {
+  background: $pm-card;
+  border-top: 1px solid $pm-border;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 300ms cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 200ms ease;
+
+  &--open {
+    max-height: 50vh;
+    overflow-y: auto;
+    opacity: 1;
+
+    &::-webkit-scrollbar       { width: 4px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+    &::-webkit-scrollbar-thumb { background: $pm-border; border-radius: 2px; }
+  }
+
+  &__loading {
+    padding: $space-4;
+  }
+
+  &__all-clear {
+    margin: 0 $space-4 $space-2;
+    padding: $space-3;
+    text-align: center;
+    color: $color-success;
+    font-weight: 500;
+    font-size: $text-sm;
+  }
+
+  &__section {
+    padding: $space-3 $space-4 0;
+
+    &:last-of-type { padding-bottom: $space-2; }
+  }
+
+  &__section-title {
+    display: block;
+    font-size: $text-xs;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: $pm-text-muted;
+    margin-bottom: $space-2;
+  }
+
+  &__add {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    padding: $space-3 $space-4;
+    border-top: 1px solid $pm-border;
+    margin-top: $space-1;
+  }
+
+  &__add-input {
+    flex: 1;
+    font-size: $text-sm !important;
+    padding: $space-2 $space-3 !important;
+  }
+
+  &__add-btn {
+    flex-shrink: 0;
+    background: transparent;
+    border: none;
+    color: $pm-accent;
+    font-size: $text-xl;
+    line-height: 1;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: $radius-sm;
+    transition: background 150ms ease, opacity 150ms ease;
+
+    &:hover:not(:disabled)  { background: $pm-card-hover; }
+    &:disabled { opacity: 0.35; cursor: not-allowed; }
+  }
+}
+
+// ── Quest item ────────────────────────────────────────────
+
+.pm-quest {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-3;
+  padding: $space-2 0;
+  border-bottom: 1px solid $pm-border-subtle;
+
+  &:last-child { border-bottom: none; }
+
+  &--done { opacity: 0.65; }
+
+  // Show delete button on hover
+  &:hover .pm-quest__delete {
+    opacity: 1;
+  }
+
+  &__check {
+    flex-shrink: 0;
+    margin-top: 1px;
+    width: 18px;
+    height: 18px;
+    border: 2px solid $pm-border;
+    border-radius: $radius-sm;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 150ms ease, border-color 150ms ease;
+    padding: 0;
+
+    &:hover:not(.pm-quest__check--done) {
+      border-color: $color-success;
+    }
+
+    &--done {
+      background: $color-success;
+      border-color: $color-success;
+    }
+  }
+
+  &__check-mark {
+    font-size: 10px;
+    color: oklch(0.08 0.02 145);
+    font-weight: 700;
+    line-height: 1;
+    animation: quest-check-pop 200ms ease;
+  }
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+  }
+
+  &__title-row {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    flex-wrap: wrap;
+  }
+
+  &__title {
+    font-size: $text-sm;
+    color: $pm-text;
+    line-height: 1.4;
+
+    &--done {
+      text-decoration: line-through;
+      color: $pm-text-dim;
+    }
+  }
+
+  &__desc {
+    margin: 0;
+    font-size: $text-xs;
+    color: $pm-text-muted;
+    line-height: 1.4;
+  }
+
+  &__badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: $radius-full;
+    flex-shrink: 0;
+    letter-spacing: 0.03em;
+
+    &--ai_priority {
+      background: oklch(from #{$pm-accent} l c h / 0.15);
+      color: $pm-accent;
+    }
+
+    &--manual {
+      background: $pm-border;
+      color: $pm-text-muted;
+    }
+
+    &--drive_checklist {
+      background: oklch(from #{$color-info} l c h / 0.15);
+      color: $color-info;
+    }
+  }
+
+  &__delete {
+    flex-shrink: 0;
+    background: transparent;
+    border: none;
+    color: $pm-text-dim;
+    font-size: $text-xs;
+    cursor: pointer;
+    padding: $space-1;
+    border-radius: $radius-sm;
+    opacity: 0;
+    transition: opacity 150ms ease, color 150ms ease, background 150ms ease;
+    line-height: 1;
+
+    &:hover {
+      color: $color-error;
+      background: oklch(from #{$color-error} l c h / 0.1);
+    }
+  }
+}
+
+// ── Reduced motion ────────────────────────────────────────
+
+@media (prefers-reduced-motion: reduce) {
+  .pm-quests-bar__progress { transition: none; }
+  .pm-quests-drawer        { transition: none; }
+  .pm-quest__check-mark    { animation: none; }
 }

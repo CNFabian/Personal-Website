@@ -251,6 +251,49 @@ function getUnprocessedMessages(limit = 50) {
   ).all(limit);
 }
 
+// ---- Send Message ----
+
+/**
+ * Send a message to a Slack channel.
+ * @param {string} channel - Channel ID
+ * @param {string} text    - Message text
+ * @returns {object}       - Slack API response (includes ts, channel)
+ */
+async function sendMessage(channel, text) {
+  if (!SLACK_BOT_TOKEN) throw new Error('SLACK_BOT_TOKEN not configured');
+  if (!channel || !text) throw new Error('channel and text are required');
+
+  const res = await fetch(`${SLACK_API}/chat.postMessage`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${SLACK_BOT_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ channel, text }),
+  });
+
+  const data = await res.json();
+
+  if (!data.ok) {
+    throw new Error(`Slack chat.postMessage error: ${data.error}`);
+  }
+
+  return data;
+}
+
+/**
+ * List channels the bot has access to (for channel picker).
+ * Returns id + name pairs.
+ */
+async function listChannels() {
+  const data = await slackFetch('conversations.list', {
+    types: 'public_channel,private_channel',
+    exclude_archived: true,
+    limit: 200,
+  });
+  return (data.channels || []).map(ch => ({ id: ch.id, name: ch.name }));
+}
+
 module.exports = {
   getChannelHistory,
   getThreadReplies,
@@ -261,4 +304,6 @@ module.exports = {
   getMemberSlackActivity,
   getUnprocessedMessages,
   formatMessagesForAI,
+  sendMessage,
+  listChannels,
 };

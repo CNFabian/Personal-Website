@@ -188,6 +188,8 @@ const Casino = () => {
         navigate('/egyptian-ratscrew');
       } else if (gameType === 'gin-rummy') {
         navigate('/gin-rummy');
+      } else if (gameType === 'speed') {
+        navigate('/speed');
       }
     });
 

@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser';
-import { COLORS } from '../common';
+import { COLORS, isMobileDevice } from '../common';
 import { AvatarSprite } from '../avatar/AvatarSprite';
 import type { AvatarData } from '../avatar/AvatarRenderer';
 import { CASINO_SCENE_KEYS } from './casino-preload-scene';
@@ -24,6 +24,16 @@ export class CasinoLobbyScene extends Phaser.Scene {
   private playerInZone: InteractionZone | null = null;
   private roomWidth = 1600;
   private roomHeight = 1200;
+
+  // Mobile controls
+  private joystickOuter: Phaser.GameObjects.Arc | null = null;
+  private joystickInner: Phaser.GameObjects.Arc | null = null;
+  private joystickBase: { x: number; y: number } = { x: 0, y: 0 };
+  private joystickVector: { x: number; y: number } = { x: 0, y: 0 };
+  private joystickActive = false;
+  private joystickPointerId: number | null = null;
+  private interactButton: Phaser.GameObjects.Container | null = null;
+  private isMobile = false;
 
   constructor() {
     super({ key: CASINO_LOBBY_KEY });
@@ -225,7 +235,7 @@ export class CasinoLobbyScene extends Phaser.Scene {
   private createGameTables(): void {
     // Create Egyptian Ratscrew table
     this.createGameTable(
-      this.roomWidth / 2 - 150,
+      this.roomWidth / 2 - 200,
       200,
       'EGYPTIAN\nRATSCREW',
       120,
@@ -235,12 +245,22 @@ export class CasinoLobbyScene extends Phaser.Scene {
 
     // Create Gin Rummy table
     this.createGameTable(
-      this.roomWidth / 2 + 150,
+      this.roomWidth / 2,
       200,
       'GIN\nRUMMY',
       120,
       100,
       'gin-rummy'
+    );
+
+    // Create Speed table
+    this.createGameTable(
+      this.roomWidth / 2 + 200,
+      200,
+      'SPEED',
+      120,
+      100,
+      'speed'
     );
   }
 
@@ -279,8 +299,9 @@ export class CasinoLobbyScene extends Phaser.Scene {
     this.physics.add.existing(zoneRect, true);
     const zoneBody = zoneRect.body as Phaser.Physics.Arcade.Body;
 
-    // Create prompt text
-    const promptText = this.add.text(x, y + height / 2 + 60, 'Press E to play', {
+    // Create prompt text (only used on desktop — mobile uses the interact button)
+    const promptLabel = isMobileDevice() ? '' : 'Press E to play';
+    const promptText = this.add.text(x, y + height / 2 + 60, promptLabel, {
       fontSize: '14px',
       color: '#FFD700',
       fontStyle: 'bold',
@@ -310,7 +331,10 @@ export class CasinoLobbyScene extends Phaser.Scene {
         () => {
           if (!zoneData.isActive) {
             zoneData.isActive = true;
-            zoneData.promptText.setVisible(true);
+            // On desktop show the "Press E" text; on mobile the interact button handles this
+            if (!this.isMobile) {
+              zoneData.promptText.setVisible(true);
+            }
             this.playerInZone = zoneData;
           }
         },
@@ -329,7 +353,9 @@ export class CasinoLobbyScene extends Phaser.Scene {
   }
 
   private setupInput(): void {
-    // Setup cursor keys
+    this.isMobile = isMobileDevice();
+
+    // Setup keyboard controls (desktop)
     if (this.input.keyboard) {
       this.cursors = this.input.keyboard.createCursorKeys();
       this.wasdKeys = this.input.keyboard.addKeys({
@@ -347,6 +373,148 @@ export class CasinoLobbyScene extends Phaser.Scene {
         }
       });
     }
+
+    // Setup mobile touch controls
+    if (this.isMobile) {
+      this.createVirtualJoystick();
+      this.createInteractButton();
+    }
+  }
+
+  private createVirtualJoystick(): void {
+    const cam = this.cameras.main;
+    const outerRadius = 60;
+    const innerRadius = 28;
+    const margin = 40;
+    const baseX = margin + outerRadius;
+    const baseY = cam.height - margin - outerRadius;
+
+    this.joystickBase = { x: baseX, y: baseY };
+
+    // Outer ring (the boundary)
+    this.joystickOuter = this.add.circle(baseX, baseY, outerRadius, 0x000000, 0.3);
+    this.joystickOuter.setStrokeStyle(2, 0xffd700, 0.6);
+    this.joystickOuter.setScrollFactor(0);
+    this.joystickOuter.setDepth(200);
+
+    // Inner thumb (the draggable knob)
+    this.joystickInner = this.add.circle(baseX, baseY, innerRadius, 0xffd700, 0.5);
+    this.joystickInner.setScrollFactor(0);
+    this.joystickInner.setDepth(201);
+
+    // Handle touch input on the whole scene for joystick
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      // Only claim this pointer if it's on the left half of the screen
+      if (pointer.x < cam.width / 2 && !this.joystickActive) {
+        this.joystickActive = true;
+        this.joystickPointerId = pointer.id;
+        this.updateJoystickPosition(pointer.x, pointer.y);
+      }
+    });
+
+    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      if (this.joystickActive && pointer.id === this.joystickPointerId) {
+        this.updateJoystickPosition(pointer.x, pointer.y);
+      }
+    });
+
+    this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+      if (pointer.id === this.joystickPointerId) {
+        this.resetJoystick();
+      }
+    });
+  }
+
+  private updateJoystickPosition(px: number, py: number): void {
+    if (!this.joystickInner || !this.joystickOuter) return;
+
+    const outerRadius = 60;
+    const dx = px - this.joystickBase.x;
+    const dy = py - this.joystickBase.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    // Clamp the inner knob to within the outer ring
+    let clampedX: number;
+    let clampedY: number;
+    if (dist > outerRadius) {
+      clampedX = this.joystickBase.x + (dx / dist) * outerRadius;
+      clampedY = this.joystickBase.y + (dy / dist) * outerRadius;
+    } else {
+      clampedX = px;
+      clampedY = py;
+    }
+
+    this.joystickInner.setPosition(clampedX, clampedY);
+
+    // Normalize the vector (-1 to 1 range)
+    const normalizedDist = Math.min(dist, outerRadius) / outerRadius;
+    // Apply a small deadzone to prevent drift
+    if (normalizedDist < 0.15) {
+      this.joystickVector = { x: 0, y: 0 };
+    } else {
+      this.joystickVector = {
+        x: (dx / dist) * normalizedDist,
+        y: (dy / dist) * normalizedDist,
+      };
+    }
+  }
+
+  private resetJoystick(): void {
+    this.joystickActive = false;
+    this.joystickPointerId = null;
+    this.joystickVector = { x: 0, y: 0 };
+    if (this.joystickInner) {
+      this.joystickInner.setPosition(this.joystickBase.x, this.joystickBase.y);
+    }
+  }
+
+  private createInteractButton(): void {
+    const cam = this.cameras.main;
+    const btnWidth = 120;
+    const btnHeight = 54;
+    const margin = 40;
+    const btnX = cam.width - margin - btnWidth / 2;
+    const btnY = cam.height - margin - btnHeight / 2;
+
+    // Button background
+    const bg = this.add.rectangle(0, 0, btnWidth, btnHeight, 0xffd700, 0.85);
+    bg.setStrokeStyle(2, 0xffd700, 1);
+
+    // Button label
+    const label = this.add.text(0, 0, 'PLAY', {
+      fontSize: '18px',
+      color: '#000000',
+      fontStyle: 'bold',
+      align: 'center',
+    }).setOrigin(0.5);
+
+    // Container for the button
+    this.interactButton = this.add.container(btnX, btnY, [bg, label]);
+    this.interactButton.setScrollFactor(0);
+    this.interactButton.setDepth(200);
+    this.interactButton.setSize(btnWidth, btnHeight);
+    this.interactButton.setInteractive();
+    this.interactButton.setVisible(false); // Hidden until near a table
+    this.interactButton.setAlpha(0);
+
+    // Touch handlers with visual feedback
+    this.interactButton.on('pointerdown', () => {
+      bg.setFillStyle(0xccaa00, 1);
+      this.interactButton?.setScale(0.95);
+    });
+
+    this.interactButton.on('pointerup', () => {
+      bg.setFillStyle(0xffd700, 0.85);
+      this.interactButton?.setScale(1);
+      if (this.playerInZone) {
+        this.game.events.emit('startGame', this.playerInZone.gameType);
+      }
+    });
+
+    this.interactButton.on('pointerout', () => {
+      bg.setFillStyle(0xffd700, 0.85);
+      this.interactButton?.setScale(1);
+    });
   }
 
   private createUI(): void {
@@ -365,16 +533,19 @@ export class CasinoLobbyScene extends Phaser.Scene {
     ).setOrigin(1, 0).setScrollFactor(0).setDepth(100);
 
     // Instructions text (bottom, fixed to camera)
-    this.instructionsText = this.add.text(
-      this.cameras.main.centerX,
-      this.cameras.main.height - 30,
-      'WASD / Arrows to move | E to interact',
-      {
-        fontSize: '14px',
-        color: '#FFFFFF',
-        align: 'center',
-      }
-    ).setOrigin(0.5).setScrollFactor(0).setDepth(100);
+    // On mobile, the joystick + button replace the need for text instructions
+    if (!this.isMobile) {
+      this.instructionsText = this.add.text(
+        this.cameras.main.centerX,
+        this.cameras.main.height - 30,
+        'WASD / Arrows to move | E to interact',
+        {
+          fontSize: '14px',
+          color: '#FFFFFF',
+          align: 'center',
+        }
+      ).setOrigin(0.5).setScrollFactor(0).setDepth(100);
+    }
   }
 
   update(): void {
@@ -385,17 +556,24 @@ export class CasinoLobbyScene extends Phaser.Scene {
     let vy = 0;
     const speed = 150;
 
-    if (this.cursors?.left.isDown || this.wasdKeys?.A.isDown) {
-      vx = -speed;
-    }
-    if (this.cursors?.right.isDown || this.wasdKeys?.D.isDown) {
-      vx = speed;
-    }
-    if (this.cursors?.up.isDown || this.wasdKeys?.W.isDown) {
-      vy = -speed;
-    }
-    if (this.cursors?.down.isDown || this.wasdKeys?.S.isDown) {
-      vy = speed;
+    if (this.isMobile) {
+      // Mobile: use virtual joystick
+      vx = this.joystickVector.x * speed;
+      vy = this.joystickVector.y * speed;
+    } else {
+      // Desktop: keyboard input
+      if (this.cursors?.left.isDown || this.wasdKeys?.A.isDown) {
+        vx = -speed;
+      }
+      if (this.cursors?.right.isDown || this.wasdKeys?.D.isDown) {
+        vx = speed;
+      }
+      if (this.cursors?.up.isDown || this.wasdKeys?.W.isDown) {
+        vy = -speed;
+      }
+      if (this.cursors?.down.isDown || this.wasdKeys?.S.isDown) {
+        vy = speed;
+      }
     }
 
     this.player.setVelocity(vx, vy);
@@ -413,7 +591,6 @@ export class CasinoLobbyScene extends Phaser.Scene {
     this.interactionZones.forEach((zoneData) => {
       const zone = zoneData.zone;
       const zoneBounds = zone.getBounds() as Phaser.Geom.Rectangle;
-      const playerBody = this.player!.getBody();
       const playerPos = this.player!.getPosition();
 
       // Check if player is still overlapping with zone
@@ -432,5 +609,35 @@ export class CasinoLobbyScene extends Phaser.Scene {
         }
       }
     });
+
+    // Show/hide the mobile interact button based on zone proximity
+    if (this.isMobile && this.interactButton) {
+      if (this.playerInZone) {
+        if (!this.interactButton.visible) {
+          this.interactButton.setVisible(true);
+          this.tweens.add({
+            targets: this.interactButton,
+            alpha: 1,
+            duration: 150,
+            ease: 'Power2',
+          });
+        }
+      } else {
+        if (this.interactButton.visible && this.interactButton.alpha > 0) {
+          this.tweens.add({
+            targets: this.interactButton,
+            alpha: 0,
+            duration: 150,
+            ease: 'Power2',
+            onComplete: () => {
+              this.interactButton?.setVisible(false);
+            },
+          });
+        }
+      }
+    }
+
+    // Update nameplate position to follow avatar
+    const currentPos = this.player.getPosition();
   }
 }

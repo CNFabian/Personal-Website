@@ -38,9 +38,9 @@ function pmAccess(req, res, next) {
     ? process.env.PM_ALLOWED_IPS.split(',').map(ip => ip.trim())
     : [];
 
-  // In development with no IPs configured, allow localhost
+  // Always allow localhost (dev), plus any configured IPs
   const isLocalhost = clientIP === '127.0.0.1' || clientIP === '::1' || clientIP === '::ffff:127.0.0.1';
-  const ipAllowed = allowedIPs.length === 0 ? isLocalhost : allowedIPs.includes(clientIP);
+  const ipAllowed = isLocalhost || allowedIPs.includes(clientIP);
 
   if (!ipAllowed) {
     return res.status(404).json({ error: 'Not found' });
