@@ -6,6 +6,8 @@ import Resume from './pages/Resume';
 import Secret from './pages/Secret';
 import Contact from './pages/Contact';
 import Projects from './pages/Projects';
+import PMLogin from './pages/pm/PMLogin';
+import PMDashboard from './pages/pm/PMDashboard';
 
 import './styles/base/_app.scss';
 
@@ -44,7 +46,8 @@ const App = () => {
     document.body.className = `page-${pageName}`;
   }, [location]);
 
-  const isFullscreenRoute = ['/casino', '/egyptian-ratscrew', '/gin-rummy'].includes(location.pathname);
+  const isFullscreenRoute = ['/casino', '/egyptian-ratscrew', '/gin-rummy'].includes(location.pathname)
+    || location.pathname.startsWith('/pm');
 
   return (
     <>
@@ -60,6 +63,8 @@ const App = () => {
         <Route path="/puzzle2" element={<Puzzle2Page />} />
         <Route path="/puzzle3" element={<Puzzle3Page />} />
         <Route path="/image_captioner" element={<ImageCaptioner />} />
+        <Route path="/pm/login" element={<PMLogin />} />
+        <Route path="/pm" element={<PMDashboard />} />
         <Route
           path="/egyptian-ratscrew"
           element={

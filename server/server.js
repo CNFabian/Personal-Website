@@ -18,6 +18,7 @@ const {
 const { router: authRouter, verifyToken } = require('./routes/auth');
 const { router: leaderboardRouter } = require('./routes/leaderboard');
 const { router: userRouter } = require('./routes/user');
+const { router: pmRouter } = require('./routes/pm');
 
 const PORT = process.env.PORT || 3001;
 
@@ -33,7 +34,7 @@ app.use(cors({
     'https://www.cnfabian.com',
     'http://localhost:3000',
   ],
-  methods: ['GET', 'POST', 'PUT'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }));
@@ -69,6 +70,9 @@ app.use('/api/leaderboard', leaderboardRouter);
 
 // User routes
 app.use('/api/user', userRouter);
+
+// PM Dashboard routes (IP-restricted)
+app.use('/api/pm', pmRouter);
 
 // ============================================================
 // HTTP + Socket.io setup

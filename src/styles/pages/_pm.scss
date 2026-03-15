@@ -1,0 +1,975 @@
+@import '../base/_design-system';
+
+// ============================================================
+// PM Dashboard — dark theme using OKLCH design system
+// ============================================================
+
+// Local dark-theme tokens
+$pm-bg:           oklch(0.07 0.005 45);   // deeper than neutral-900
+$pm-card:         $color-neutral-900;      // oklch(0.10 0.01 45)
+$pm-card-hover:   $color-neutral-800;      // oklch(0.20 0.015 45)
+$pm-border:       $color-neutral-800;
+$pm-border-subtle: $color-neutral-700;
+
+$pm-text:         $color-neutral-200;
+$pm-text-muted:   $color-neutral-500;
+$pm-text-dim:     $color-neutral-600;
+
+$pm-accent:       $color-accent-500;
+$pm-accent-dim:   $color-accent-600;
+
+// ============================================================
+// PM LOGIN
+// ============================================================
+
+.pm-login {
+  @include flex-center;
+  min-height: 100vh;
+  background: $pm-bg;
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+    width: 100%;
+    max-width: 20rem;
+    padding: $space-8;
+    background: $pm-card;
+    border: 1px solid $pm-border;
+    border-radius: $radius-xl;
+  }
+
+  &__title {
+    margin: 0 0 $space-2;
+    font-size: $text-xl;
+    font-weight: 600;
+    color: $pm-text;
+    letter-spacing: 0.025em;
+  }
+
+  &__input {
+    padding: $space-3 $space-4;
+    background: $pm-bg;
+    border: 1px solid $pm-border;
+    border-radius: $radius-lg;
+    color: $pm-text;
+    font-size: $text-base;
+    outline: none;
+    @include transition(border-color);
+
+    &::placeholder { color: $pm-text-dim; }
+
+    &:focus {
+      border-color: $pm-accent;
+    }
+  }
+
+  &__btn {
+    padding: $space-3 $space-4;
+    background: $pm-accent;
+    border: none;
+    border-radius: $radius-lg;
+    color: $color-neutral-900;
+    font-size: $text-sm;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    @include transition(background);
+
+    &:hover:not(:disabled) { background: $pm-accent-dim; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+
+  &__error {
+    margin: 0;
+    font-size: $text-sm;
+    color: $color-error;
+  }
+}
+
+// ============================================================
+// PM DASHBOARD SHELL
+// ============================================================
+
+.pm-dashboard {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: $pm-bg;
+  color: $pm-text;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.pm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $space-4 $space-6;
+  background: $pm-card;
+  border-bottom: 1px solid $pm-border;
+  flex-shrink: 0;
+
+  &__title {
+    margin: 0;
+    font-size: $text-lg;
+    font-weight: 700;
+    color: $pm-text;
+    letter-spacing: 0.025em;
+  }
+
+  &__logout {
+    padding: $space-1_5 $space-4;
+    background: transparent;
+    border: 1px solid $pm-border;
+    border-radius: $radius-lg;
+    color: $pm-text-muted;
+    font-size: $text-sm;
+    cursor: pointer;
+    @include transition(all);
+
+    &:hover {
+      border-color: $color-error;
+      color: $color-error;
+    }
+  }
+}
+
+.pm-tabs {
+  display: flex;
+  gap: $space-px;
+  padding: 0 $space-6;
+  background: $pm-card;
+  border-bottom: 1px solid $pm-border;
+  flex-shrink: 0;
+}
+
+.pm-tab {
+  padding: $space-3 $space-5;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: $pm-text-muted;
+  font-size: $text-sm;
+  font-weight: 500;
+  cursor: pointer;
+  @include transition(all);
+  margin-bottom: -1px;
+
+  &:hover { color: $pm-text; }
+
+  &--active {
+    color: $pm-accent;
+    border-bottom-color: $pm-accent;
+  }
+}
+
+.pm-content {
+  flex: 1;
+  padding: $space-6;
+  overflow-y: auto;
+  max-width: 100%;
+}
+
+// ============================================================
+// SHARED UTILITIES
+// ============================================================
+
+.pm-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $space-5;
+}
+
+.pm-section-title {
+  margin: 0;
+  font-size: $text-lg;
+  font-weight: 600;
+  color: $pm-text;
+}
+
+.pm-loading {
+  padding: $space-8;
+  text-align: center;
+  color: $pm-text-muted;
+  font-size: $text-sm;
+}
+
+.pm-empty {
+  padding: $space-8;
+  text-align: center;
+  color: $pm-text-muted;
+  font-size: $text-sm;
+  font-style: italic;
+}
+
+.pm-error {
+  margin: 0 0 $space-4;
+  padding: $space-3 $space-4;
+  background: oklch(from $color-error l c h / 0.12);
+  border: 1px solid oklch(from $color-error l c h / 0.3);
+  border-radius: $radius-lg;
+  color: $color-error;
+  font-size: $text-sm;
+}
+
+.pm-badge {
+  padding: $space-0_5 $space-2;
+  background: $pm-card-hover;
+  border-radius: $radius-full;
+  color: $pm-text-muted;
+  font-size: $text-xs;
+  font-weight: 600;
+}
+
+// ============================================================
+// BUTTONS
+// ============================================================
+
+.pm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-2 $space-4;
+  border-radius: $radius-lg;
+  font-size: $text-sm;
+  font-weight: 600;
+  cursor: pointer;
+  @include transition(all);
+  border: 1px solid transparent;
+
+  &--primary {
+    background: $pm-accent;
+    color: $color-neutral-900;
+    border-color: $pm-accent;
+    &:hover { background: $pm-accent-dim; border-color: $pm-accent-dim; }
+  }
+
+  &--ghost {
+    background: transparent;
+    color: $pm-text-muted;
+    border-color: $pm-border;
+    &:hover { color: $pm-text; border-color: $pm-border-subtle; }
+  }
+
+  &--sm {
+    padding: $space-1_5 $space-3;
+    font-size: $text-xs;
+  }
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+
+.pm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: oklch(0 0 0 / 0.7);
+  @include flex-center;
+  z-index: 1000;
+  padding: $space-4;
+  animation: overlay-in 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.pm-modal {
+  background: $pm-card;
+  border: 1px solid $pm-border;
+  border-radius: $radius-xl;
+  padding: $space-6;
+  width: 100%;
+  max-width: 24rem;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modal-in 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &--wide { max-width: 32rem; }
+
+  &__title {
+    margin: 0 0 $space-5;
+    font-size: $text-base;
+    font-weight: 700;
+    color: $pm-text;
+  }
+}
+
+// ============================================================
+// FORMS
+// ============================================================
+
+.pm-form {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+
+  &__actions {
+    display: flex;
+    gap: $space-3;
+    justify-content: flex-end;
+    margin-top: $space-2;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $space-3;
+  }
+}
+
+.pm-input {
+  width: 100%;
+  padding: $space-2_5 $space-3;
+  background: $pm-bg;
+  border: 1px solid $pm-border;
+  border-radius: $radius-lg;
+  color: $pm-text;
+  font-size: $text-sm;
+  outline: none;
+  @include transition(border-color);
+  resize: none;
+
+  &::placeholder { color: $pm-text-dim; }
+  &:focus { border-color: $pm-accent; }
+
+  &--textarea {
+    font-family: inherit;
+    line-height: 1.5;
+  }
+}
+
+.pm-select {
+  width: 100%;
+  padding: $space-2_5 $space-3;
+  background: $pm-bg;
+  border: 1px solid $pm-border;
+  border-radius: $radius-lg;
+  color: $pm-text;
+  font-size: $text-sm;
+  outline: none;
+  cursor: pointer;
+  @include transition(border-color);
+
+  &:focus { border-color: $pm-accent; }
+
+  option {
+    background: $pm-card;
+    color: $pm-text;
+  }
+}
+
+// ============================================================
+// STATUS BADGE
+// ============================================================
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: $space-0_5 $space-2;
+  border-radius: $radius-full;
+  font-size: $text-xs;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+
+  &--sm {
+    padding: $space-px $space-1_5;
+    font-size: 0.65rem;
+  }
+
+  &--backlog      { background: $color-neutral-700; color: $color-neutral-200; }
+  &--in-progress  { background: oklch(from $color-accent-600 l c h / 0.25); color: $color-accent-500; }
+  &--in-review    { background: oklch(from $color-info l c h / 0.2); color: $color-info; }
+  &--done         { background: oklch(from $color-success l c h / 0.2); color: $color-success; }
+  &--planning     { background: $color-neutral-700; color: $color-neutral-300; }
+  &--active       { background: oklch(from $color-success l c h / 0.2); color: $color-success; }
+  &--completed    { background: $color-neutral-700; color: $color-neutral-400; }
+}
+
+// ============================================================
+// PRIORITY BADGE
+// ============================================================
+
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: $space-px $space-1_5;
+  border-radius: $radius-sm;
+  font-size: $text-xs;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+
+  &--low      { color: $pm-text-muted; }
+  &--medium   { color: $color-accent-400; }
+  &--high     { color: $color-warning; }
+  &--critical { color: $color-error; }
+}
+
+// ============================================================
+// TEAM OVERVIEW
+// ============================================================
+
+.team-overview {
+  max-width: 100%;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: $space-4;
+}
+
+.team-card {
+  background: $pm-card;
+  border: 1px solid $pm-border;
+  border-radius: $radius-xl;
+  padding: $space-5;
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  @include transition(border-color);
+
+  &:hover { border-color: $pm-border-subtle; }
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    gap: $space-3;
+  }
+
+  &__status-dot {
+    width: $space-2;
+    height: $space-2;
+    border-radius: $radius-full;
+    flex-shrink: 0;
+
+    &--active   { background: $color-success; box-shadow: 0 0 $space-1_5 oklch(from $color-success l c h / 0.6); }
+    &--inactive { background: $pm-text-dim; }
+  }
+
+  &__avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: $radius-lg;
+    background: oklch(from $color-accent-500 l c h / 0.15);
+    color: $color-accent-400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $text-sm;
+    font-weight: 700;
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+
+    img {
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      object-fit: cover;
+    }
+  }
+
+  &__meta {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__name-row {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    margin-bottom: $space-0_5;
+  }
+
+  &__name {
+    margin: 0;
+    font-size: $text-base;
+    font-weight: 600;
+    color: $pm-text;
+  }
+
+  &__role {
+    margin: $space-0_5 0 0;
+    font-size: $text-xs;
+    color: $pm-text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  &__github {
+    margin: 0;
+    font-size: $text-xs;
+    color: $pm-text-dim;
+    font-family: monospace;
+  }
+
+  &__task {
+    padding-top: $space-3;
+    border-top: 1px solid $pm-border;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-2;
+  }
+
+  &__task-name {
+    margin: 0;
+    font-size: $text-sm;
+    color: $pm-text;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__no-task {
+    margin: 0;
+    font-size: $text-sm;
+    color: $pm-text-dim;
+    font-style: italic;
+  }
+
+  &__days {
+    font-size: $text-xs;
+    font-weight: 700;
+    white-space: nowrap;
+    padding: $space-0_5 $space-2;
+    border-radius: $radius-full;
+
+    &--green  { color: $color-success; background: oklch(from $color-success l c h / 0.15); }
+    &--yellow { color: $color-warning; background: oklch(from $color-warning l c h / 0.15); }
+    &--red    { color: $color-error;   background: oklch(from $color-error l c h / 0.15);   }
+  }
+}
+
+// ============================================================
+// TASK BOARD
+// ============================================================
+
+.task-board-wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.task-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(13rem, 1fr));
+  gap: $space-4;
+  min-width: 52rem;
+}
+
+.task-column {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $space-3 $space-3;
+    background: $pm-card;
+    border: 1px solid $pm-border;
+    border-radius: $radius-lg;
+  }
+
+  &__label {
+    font-size: $text-sm;
+    font-weight: 600;
+    color: $pm-text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  &__count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: $space-5;
+    height: $space-5;
+    padding: 0 $space-1_5;
+    background: $pm-card-hover;
+    border-radius: $radius-full;
+    font-size: $text-xs;
+    font-weight: 700;
+    color: $pm-text-muted;
+  }
+
+  &__cards {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+  }
+}
+
+.task-card {
+  padding: $space-4;
+  background: $pm-card;
+  border: 1px solid $pm-border;
+  border-radius: $radius-lg;
+  cursor: pointer;
+  @include transition(all);
+  display: flex;
+  flex-direction: column;
+  gap: $space-2_5;
+
+  &:hover {
+    border-color: $pm-accent;
+    transform: translateY(-$space-px);
+    box-shadow: 0 $space-2 $space-4 oklch(0 0 0 / 0.3);
+  }
+
+  &__title {
+    margin: 0;
+    font-size: $text-sm;
+    font-weight: 600;
+    color: $pm-text;
+    line-height: 1.4;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-2;
+  }
+
+  &__assignee {
+    font-size: $text-xs;
+    color: $pm-text-muted;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__days {
+    font-size: $text-xs;
+    color: $pm-text-dim;
+  }
+
+  &__move {
+    display: flex;
+    gap: $space-1;
+  }
+
+  &__move-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.375rem;
+    height: 1.375rem;
+    background: transparent;
+    border: 1px solid $pm-border;
+    border-radius: $radius-base;
+    color: $pm-text-dim;
+    font-size: $text-xs;
+    cursor: pointer;
+    @include transition(all);
+    line-height: 1;
+
+    &:hover {
+      border-color: $pm-accent;
+      color: $pm-accent;
+      background: oklch(from $pm-accent l c h / 0.1);
+    }
+  }
+}
+
+// ============================================================
+// ACTIVITY FEED
+// ============================================================
+
+.activity-feed {
+  max-width: 48rem;
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-4;
+  padding: $space-4 0;
+  border-bottom: 1px solid $pm-border;
+
+  &:last-child { border-bottom: none; }
+
+  &__icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: $radius-lg;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: $text-sm;
+    background: $pm-card-hover;
+    color: $pm-text-muted;
+
+    &--github  { background: $pm-card-hover; color: $pm-text; }
+    &--slack   { background: oklch(from $color-accent-500 l c h / 0.15); color: $color-accent-400; }
+    &--gmail   { background: oklch(from $color-error l c h / 0.15); color: $color-error; }
+    &--manual  { background: oklch(from $color-info l c h / 0.15); color: $color-info; }
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__title {
+    margin: 0 0 $space-1;
+    font-size: $text-sm;
+    color: $pm-text;
+    line-height: 1.4;
+  }
+
+  &__summary {
+    margin: 0 0 $space-1;
+    font-size: $text-sm;
+    color: $pm-text-muted;
+    line-height: 1.5;
+  }
+
+  &__time {
+    margin: 0;
+    font-size: $text-xs;
+    color: $pm-text-dim;
+  }
+
+  &__link {
+    flex-shrink: 0;
+    padding: $space-1 $space-2;
+    color: $pm-text-dim;
+    text-decoration: none;
+    font-size: $text-sm;
+    border-radius: $radius-base;
+    @include transition(color);
+
+    &:hover { color: $pm-accent; }
+  }
+}
+
+// ============================================================
+// ALERTS PANEL
+// ============================================================
+
+.alerts-panel {
+  max-width: 48rem;
+}
+
+.alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+}
+
+.alert-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $space-4;
+  padding: $space-4 $space-5;
+  background: $pm-card;
+  border: 1px solid $pm-border;
+  border-radius: $radius-lg;
+  border-left-width: 3px;
+
+  &--low      { border-left-color: $color-info; }
+  &--medium   { border-left-color: $color-warning; }
+  &--high     { border-left-color: $color-error; }
+  &--critical {
+    border-left-color: $color-error;
+    background: oklch(from $color-error l c h / 0.08);
+  }
+
+  &__body { flex: 1; min-width: 0; }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    margin-bottom: $space-2;
+    flex-wrap: wrap;
+  }
+
+  &__message {
+    margin: 0 0 $space-2;
+    font-size: $text-sm;
+    color: $pm-text;
+    line-height: 1.5;
+  }
+
+  &__action {
+    margin: 0;
+    font-size: $text-sm;
+    color: $pm-text-muted;
+    font-style: italic;
+  }
+
+  &__type {
+    font-size: $text-xs;
+    color: $pm-text-dim;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__time {
+    font-size: $text-xs;
+    color: $pm-text-dim;
+    margin-left: auto;
+  }
+}
+
+.alert-severity {
+  &--low      { color: $color-info;    font-size: $text-xs; font-weight: 700; }
+  &--medium   { color: $color-warning; font-size: $text-xs; font-weight: 700; }
+  &--high     { color: $color-error;   font-size: $text-xs; font-weight: 700; }
+  &--critical { color: $color-error;   font-size: $text-xs; font-weight: 800; }
+}
+
+// ============================================================
+// SKELETON LOADING
+// ============================================================
+
+.skeleton {
+  background: $pm-card-hover;
+  border-radius: $radius-md;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      oklch(from $pm-border-subtle l c h / 0.5) 50%,
+      transparent 100%
+    );
+    transform: translateX(-100%);
+    animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  }
+}
+
+.skeleton-text   { height: 0.875rem; margin-bottom: $space-2; }
+.skeleton-title  { height: 1.125rem; margin-bottom: $space-3; }
+.skeleton-avatar { width: 2.5rem; height: 2.5rem; border-radius: $radius-lg; }
+.skeleton-badge  { width: 3.75rem; height: 1.375rem; border-radius: $radius-md; }
+.skeleton-card   { height: 7.5rem; border-radius: $radius-xl; }
+
+@keyframes skeleton-shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+// ============================================================
+// TOAST NOTIFICATIONS
+// ============================================================
+
+.pm-toast-container {
+  position: fixed;
+  bottom: $space-6;
+  right: $space-6;
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  z-index: 2000;
+  pointer-events: none;
+}
+
+.pm-toast {
+  padding: $space-3 $space-4;
+  border-radius: $radius-lg;
+  background: $pm-card-hover;
+  border: 1px solid $pm-border-subtle;
+  color: $pm-text;
+  font-size: $text-sm;
+  box-shadow: 0 $space-2 $space-6 oklch(0 0 0 / 0.4);
+  pointer-events: auto;
+  cursor: pointer;
+  animation: toast-in 300ms cubic-bezier(0.34, 1.56, 0.64, 1),
+             toast-out 200ms cubic-bezier(0.4, 0, 1, 1) 3s forwards;
+  min-width: 14rem;
+  max-width: 22rem;
+
+  &--success { border-left: 3px solid $color-success; }
+  &--error   { border-left: 3px solid $color-error; }
+  &--warning { border-left: 3px solid $color-warning; }
+  &--info    { border-left: 3px solid $color-info; }
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY($space-4) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes toast-out {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY($space-2); }
+}
+
+// ============================================================
+// ANIMATIONS
+// ============================================================
+
+.pm-tab-content {
+  animation: tab-fade-in 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+@keyframes tab-fade-in {
+  from { opacity: 0; transform: translateY($space-2); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.95) translateY($space-2); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+// ============================================================
+// REDUCED MOTION
+// ============================================================
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// ============================================================
+// RESPONSIVE
+// ============================================================
+
+@include media(md) {
+  .pm-content { padding: $space-4; }
+  .pm-header { padding: $space-3 $space-4; }
+  .pm-tabs { padding: 0 $space-4; }
+
+  .team-grid {
+    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  }
+}
+
+@include media(sm) {
+  .pm-content { padding: $space-3; }
+  .pm-form__row { grid-template-columns: 1fr; }
+}
