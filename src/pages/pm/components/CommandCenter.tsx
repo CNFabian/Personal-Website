@@ -15,6 +15,15 @@ interface EnrichedMember {
   currentTask?: Task;
   status: StationStatus;
   daysInStatus: number;
+  openPRs: number;
+  slackMessages: number;
+}
+
+interface ActivityItem {
+  member_id?: number;
+  source: string;
+  activity_type: string;
+  timestamp: string;
 }
 
 function daysSince(dateStr?: string): number {
@@ -61,15 +70,18 @@ const CommandCenter: React.FC<Props> = ({ token }) => {
 
   const fetchData = useCallback(async () => {
     try {
-      const [memberRes, taskRes] = await Promise.all([
-        fetch(`${PM_API}/team`,  { headers }),
-        fetch(`${PM_API}/tasks`, { headers }),
+      const [memberRes, taskRes, activityRes] = await Promise.all([
+        fetch(`${PM_API}/team`,              { headers }),
+        fetch(`${PM_API}/tasks`,             { headers }),
+        fetch(`${PM_API}/activity?limit=200`, { headers }),
       ]);
-      const memberData = await memberRes.json();
-      const taskData   = await taskRes.json();
+      const memberData   = await memberRes.json();
+      const taskData     = await taskRes.json();
+      const activityData = await activityRes.json();
 
-      const allTasks: Task[]    = taskData.tasks ?? [];
-      const members: StationMember[] = memberData.members ?? [];
+      const allTasks: Task[]             = taskData.tasks ?? [];
+      const members: StationMember[]     = memberData.members ?? [];
+      const allActivity: ActivityItem[]  = activityData.activity ?? [];
 
       // Map each member to their first IN_PROGRESS task
       const taskByAssignee: Record<number, Task> = {};
@@ -81,11 +93,32 @@ const CommandCenter: React.FC<Props> = ({ token }) => {
           }
         });
 
+      // Count per-member activity from today
+      const today = new Date().toISOString().slice(0, 10);
+      const prCountByMember:    Record<number, number> = {};
+      const slackCountByMember: Record<number, number> = {};
+      for (const a of allActivity) {
+        if (!a.member_id) continue;
+        if (a.source === 'github' && a.activity_type === 'pull_request') {
+          prCountByMember[a.member_id] = (prCountByMember[a.member_id] || 0) + 1;
+        }
+        if (a.source === 'slack' && a.timestamp?.startsWith(today)) {
+          slackCountByMember[a.member_id] = (slackCountByMember[a.member_id] || 0) + 1;
+        }
+      }
+
       const result: EnrichedMember[] = members.map(m => {
         const task   = taskByAssignee[m.id];
         const status = deriveStatus(m, task);
         const days   = task ? daysSince(task.updated_at) : 0;
-        return { member: m, currentTask: task, status, daysInStatus: days };
+        return {
+          member: m,
+          currentTask: task,
+          status,
+          daysInStatus: days,
+          openPRs:      prCountByMember[m.id]    ?? 0,
+          slackMessages: slackCountByMember[m.id] ?? 0,
+        };
       });
 
       // Sort: blocked first, then warning, active, inactive
@@ -148,16 +181,24 @@ const CommandCenter: React.FC<Props> = ({ token }) => {
       {error && <p className="pm-error">{error}</p>}
 
       {enriched.length === 0 ? (
-        <p className="pm-empty">No team members yet. Add members from the Team tab.</p>
+        <div className="pm-empty-state">
+          <span className="pm-empty-state__icon">👥</span>
+          <p className="pm-empty-state__title">No team members yet</p>
+          <p className="pm-empty-state__desc">
+            Switch to the Team tab to add your first team member.
+          </p>
+        </div>
       ) : (
         <div className="pm-command-center__grid">
-          {enriched.map(({ member, currentTask, status, daysInStatus }) => (
+          {enriched.map(({ member, currentTask, status, daysInStatus, openPRs, slackMessages }) => (
             <MemberStation
               key={member.id}
               member={member}
               currentTask={currentTask}
               status={status}
               daysInStatus={daysInStatus}
+              openPRs={openPRs}
+              slackMessages={slackMessages}
               onSelect={handleSelect}
             />
           ))}

@@ -79,3 +79,39 @@ When building PM features, follow these principles:
 - No external UI libraries — build components from scratch with SCSS
 - Use semantic HTML elements
 - Keep components focused — one responsibility per file
+
+## Build Progress (Command Center View)
+
+Build order from `PM-GAME-VIEW-SPEC.md`:
+
+1. ✅ CommandCenter + MemberStation — operations hub with team member station cards
+2. ✅ MemberDetailPanel — slide-in detail panel on member click
+3. ✅ QuickActionMenu + SlackComposer + EmailComposer + AISuggestions — messaging + AI suggestions
+4. ✅ DailyQuestsPanel + QuestItem — daily checklist with AI priorities
+5. ✅ GoogleDriveChecklist — synced tech checklist from Google Drive
+6. ✅ StreakTracker + Confetti — gamification polish (streak fire animation, confetti on all-clear)
+7. ✅ CommandBar — unified top navigation bar replacing old header + tabs
+8. ✅ Additional polish — empty states, keyboard shortcuts, live PR/Slack counts, reduced-motion audit
+9. ⬜ AI PM Chat — conversational assistant tab (💬 Chat) with full project context
+
+### Backend Services
+- `server/services/ai.js` — Claude API: Slack/email analysis, task risk scoring, PM chat
+- `server/services/github.js` — PR/commit sync via GitHub Search API
+- `server/services/slack.js` — Channel monitoring, message sync, sendMessage
+- `server/services/gmail.js` — OAuth token refresh, email sync, sendEmail
+- `server/services/drive.js` — Google Drive checklist (Doc or Sheet), sync to daily quests
+- `server/services/scheduler.js` — Background sync: GitHub/Slack 15min, Gmail/Drive 30min, AI 60min
+
+### Frontend Components (`src/pages/pm/components/`)
+CommandBar, CommandCenter, MemberStation, MemberDetailPanel, SlackComposer, EmailComposer,
+AISuggestions, DailyQuestsPanel, QuestItem, GoogleDriveChecklist, StreakTracker, Confetti,
+TaskBoard, TaskCard, TaskModal, TeamOverview, TeamMemberCard, ActivityFeed, AlertsPanel,
+AlertCard, StatusBadge, Toast, PMChat
+
+### Integration Status
+See `INTEGRATION-SETUP-GUIDE.md` for setup instructions. None configured yet:
+- ⬜ GitHub PAT (`GITHUB_TOKEN`)
+- ⬜ Slack Bot (`SLACK_BOT_TOKEN`)
+- ⬜ Gmail OAuth (`GOOGLE_CLIENT_ID` + `GOOGLE_REFRESH_TOKEN`)
+- ⬜ Google Drive (`DRIVE_CHECKLIST_DOC_ID`)
+- ⬜ Anthropic API (`ANTHROPIC_API_KEY`)

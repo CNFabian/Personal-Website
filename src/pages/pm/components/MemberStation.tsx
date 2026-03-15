@@ -17,6 +17,8 @@ interface Props {
   currentTask?: Task;
   status: StationStatus;
   daysInStatus: number;
+  openPRs: number;
+  slackMessages: number;
   onSelect: (memberId: number) => void;
 }
 
@@ -62,7 +64,7 @@ const STATUS_LABELS: Record<StationStatus, string> = {
   inactive: 'Away',
 };
 
-const MemberStation: React.FC<Props> = ({ member, currentTask, status, daysInStatus, onSelect }) => {
+const MemberStation: React.FC<Props> = ({ member, currentTask, status, daysInStatus, openPRs, slackMessages, onSelect }) => {
   const initials    = getInitials(member.name);
   const roleKey     = getRoleKey(member.role);
   const progressPct = currentTask ? getProgressPct(currentTask) : null;
@@ -128,8 +130,11 @@ const MemberStation: React.FC<Props> = ({ member, currentTask, status, daysInSta
         <span className="pm-station__stat" title="Days in status">
           🕐 {daysInStatus}d
         </span>
+        <span className="pm-station__stat" title="Slack messages today">
+          💬 {slackMessages}
+        </span>
         <span className="pm-station__stat" title="Open PRs">
-          🔀 0
+          🔀 {openPRs}
         </span>
         <span
           className={`pm-station__stat${blockerCount > 0 ? ' pm-station__stat--alert' : ''}`}

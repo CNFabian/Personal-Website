@@ -101,6 +101,7 @@ $pm-accent-dim:   $color-accent-600;
   font-family: system-ui, -apple-system, sans-serif;
 }
 
+// DEPRECATED — replaced by .pm-command-bar (Step 7). Safe to remove.
 .pm-header {
   display: flex;
   align-items: center;
@@ -135,6 +136,7 @@ $pm-accent-dim:   $color-accent-600;
   }
 }
 
+// DEPRECATED — replaced by .pm-command-bar__nav (Step 7). Safe to remove.
 .pm-tabs {
   display: flex;
   gap: $space-px;
@@ -1942,7 +1944,6 @@ $pm-accent-dim:   $color-accent-600;
 
 .pm-quests-bar {
   position: relative;
-  overflow: hidden;
   display: flex;
   align-items: center;
   gap: $space-3;
@@ -2211,10 +2212,797 @@ $pm-accent-dim:   $color-accent-600;
   }
 }
 
+// ── Google Drive Checklist ────────────────────────────────
+
+@keyframes pm-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.pm-drive-checklist {
+  padding: $space-3 $space-4 0;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $space-2;
+  }
+
+  &__title {
+    font-size: $text-xs;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: $pm-text-muted;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+  }
+
+  &__count {
+    font-size: $text-xs;
+    color: $pm-text-dim;
+  }
+
+  &__sync-btn {
+    background: transparent;
+    border: none;
+    color: $pm-text-dim;
+    font-size: $text-sm;
+    cursor: pointer;
+    padding: $space-1;
+    border-radius: $radius-sm;
+    transition: color 150ms ease, background 150ms ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+
+    &:hover:not(:disabled) { color: $pm-accent; background: $pm-card-hover; }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    &--syncing {
+      animation: pm-spin 800ms linear infinite;
+    }
+  }
+
+  &__empty {
+    font-size: $text-xs;
+    color: $pm-text-dim;
+    padding: $space-2 0 $space-3;
+    font-style: italic;
+  }
+
+  &__unconfigured {
+    font-size: $text-xs;
+    color: $pm-text-dim;
+    padding: $space-2 0 $space-3;
+    line-height: 1.5;
+
+    code {
+      font-family: monospace;
+      background: $pm-card-hover;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 10px;
+    }
+  }
+}
+
+// ── Streak Tracker ────────────────────────────────────────
+
+.pm-streak-tracker {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  margin-left: auto;
+  cursor: default;
+  z-index: 2; // above bar progress fill
+
+  &__fire {
+    font-size: $text-sm;
+    line-height: 1;
+    transition: filter 300ms ease;
+  }
+
+  &__fire--active {
+    filter: drop-shadow(0 0 4px oklch(from #{$color-warning} l c h / 0.6));
+    animation: streak-glow 2s ease-in-out infinite;
+  }
+
+  &__fire--inactive {
+    filter: grayscale(1) opacity(0.4);
+  }
+
+  &__count {
+    font-size: $text-xs;
+    font-weight: 700;
+    color: $pm-text-dim;
+    transition: color 300ms ease;
+    line-height: 1;
+  }
+
+  &__count--active {
+    color: $color-warning;
+  }
+
+  &__count--pop {
+    animation: streak-pop 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  // Tooltip
+  &__tooltip {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    right: 0;
+    background: $pm-card;
+    border: 1px solid $pm-border;
+    border-radius: $radius-md;
+    padding: $space-2 $space-3;
+    min-width: 148px;
+    opacity: 0;
+    transform: translateY(4px);
+    pointer-events: none;
+    transition: opacity 150ms ease, transform 150ms ease;
+    z-index: 20;
+    box-shadow: 0 4px 16px oklch(0 0 0 / 0.4);
+
+    // Arrow pointing down
+    &::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      right: 14px;
+      border: 5px solid transparent;
+      border-top-color: $pm-border;
+    }
+  }
+
+  &:hover &__tooltip {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  &__tooltip-row {
+    display: flex;
+    justify-content: space-between;
+    gap: $space-3;
+    font-size: $text-xs;
+    color: $pm-text-muted;
+    line-height: 1.9;
+    white-space: nowrap;
+
+    span:last-child {
+      font-weight: 600;
+      color: $pm-text;
+    }
+  }
+}
+
+@keyframes streak-glow {
+  0%, 100% { filter: drop-shadow(0 0 4px oklch(from #{$color-warning} l c h / 0.5)); }
+  50%       { filter: drop-shadow(0 0 8px oklch(from #{$color-warning} l c h / 0.85)); }
+}
+
+@keyframes streak-pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+
+// ── Confetti ──────────────────────────────────────────────
+
+.pm-confetti {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.pm-confetti__particle {
+  position: absolute;
+  top: 75%; // burst from near the bottom (quests bar area)
+  left: 50%;
+  width: var(--size, 6px);
+  height: var(--size, 6px);
+  border-radius: var(--radius, 2px);
+  background: var(--color);
+  opacity: 0;
+  animation: confetti-burst var(--duration, 2s) cubic-bezier(0.25, 0.46, 0.45, 0.94) var(--delay, 0s) forwards;
+}
+
+@keyframes confetti-burst {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform:
+      translate(var(--tx, 0px), var(--ty, -300px))
+      rotate(var(--rot, 720deg))
+      scale(0.3);
+  }
+}
+
 // ── Reduced motion ────────────────────────────────────────
 
+// ── Empty States ──────────────────────────────────────────
+
+.pm-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $space-10 $space-6;
+  text-align: center;
+
+  &--wide {
+    grid-column: 1 / -1;
+  }
+
+  &__icon {
+    font-size: 2.5rem;
+    margin-bottom: $space-3;
+    opacity: 0.5;
+  }
+
+  &__title {
+    font-size: $text-sm;
+    font-weight: 600;
+    color: $pm-text;
+    margin: 0 0 $space-1;
+  }
+
+  &__desc {
+    font-size: $text-xs;
+    color: $pm-text-muted;
+    margin: 0;
+    max-width: 28ch;
+    line-height: 1.5;
+  }
+}
+
+// ============================================================
+// PM CHAT
+// ============================================================
+
+.pm-chat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: calc(100vh - 56px); // subtract command bar height
+  padding: $space-6;
+  gap: $space-4;
+
+  &__messages {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+    padding-right: $space-2;
+
+    // Custom scrollbar
+    &::-webkit-scrollbar       { width: 4px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+    &::-webkit-scrollbar-thumb { background: $pm-border; border-radius: 2px; }
+  }
+
+  &__loading {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+    padding: $space-4;
+  }
+
+  // ── Welcome / empty state ────────────────────────────────
+  &__welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-3;
+    padding: $space-10 $space-4;
+    text-align: center;
+  }
+
+  &__welcome-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+  }
+
+  &__welcome-title {
+    margin: 0;
+    font-size: $text-lg;
+    font-weight: 600;
+    color: $pm-text;
+  }
+
+  &__welcome-body {
+    margin: 0;
+    font-size: $text-sm;
+    color: $pm-text-muted;
+    max-width: 36ch;
+    line-height: 1.6;
+  }
+
+  // ── Quick prompts ────────────────────────────────────────
+  &__quick-prompts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+    justify-content: center;
+
+    &--bottom {
+      justify-content: flex-start;
+      padding-top: $space-1;
+    }
+  }
+
+  &__quick-pill {
+    padding: $space-1 $space-3;
+    background: $pm-card;
+    border: 1px solid $pm-border;
+    border-radius: $radius-full;
+    color: $pm-text-muted;
+    font-size: $text-xs;
+    cursor: pointer;
+    transition: color 150ms ease, border-color 150ms ease, background 150ms ease;
+
+    &:hover:not(:disabled) {
+      color: $pm-text;
+      border-color: $pm-accent-dim;
+      background: $pm-card-hover;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+
+  // ── Messages ─────────────────────────────────────────────
+  &__message {
+    display: flex;
+    align-items: flex-start;
+    gap: $space-3;
+
+    &--user {
+      flex-direction: row-reverse;
+
+      .pm-chat__message-bubble {
+        background: $pm-accent-dim;
+        border-color: transparent;
+      }
+
+      .pm-chat__message-text {
+        color: $color-neutral-50;
+      }
+    }
+
+    &--assistant {
+      .pm-chat__message-bubble {
+        background: $pm-card;
+      }
+    }
+  }
+
+  &__message-avatar {
+    font-size: 1.1rem;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  &__message-bubble {
+    max-width: 70%;
+    padding: $space-3 $space-4;
+    border: 1px solid $pm-border;
+    border-radius: $radius-xl;
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+
+    &--typing {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: $space-1;
+      padding: $space-3 $space-4;
+      min-width: 56px;
+    }
+  }
+
+  &__message-text {
+    margin: 0;
+    font-size: $text-sm;
+    color: $pm-text;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+
+    &--md {
+      white-space: normal;
+
+      ul {
+        margin: $space-1 0;
+        padding-left: $space-5;
+      }
+
+      li {
+        margin-bottom: $space-1;
+      }
+
+      code {
+        font-family: 'SF Mono', 'Fira Code', monospace;
+        font-size: 0.85em;
+        background: $pm-card-hover;
+        padding: 1px 5px;
+        border-radius: $radius-sm;
+        color: $pm-accent;
+      }
+
+      pre {
+        background: $pm-card-hover;
+        border: 1px solid $pm-border;
+        border-radius: $radius-md;
+        padding: $space-3;
+        overflow-x: auto;
+        margin: $space-2 0;
+
+        code {
+          background: none;
+          padding: 0;
+          color: $pm-text;
+        }
+      }
+
+      strong {
+        color: $pm-text;
+        font-weight: 600;
+      }
+    }
+  }
+
+  &__message-time {
+    font-size: $text-xs;
+    color: $pm-text-dim;
+    align-self: flex-end;
+  }
+
+  // ── Typing indicator ─────────────────────────────────────
+  &__typing-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: $pm-text-muted;
+    animation: chat-typing 1.2s ease-in-out infinite;
+
+    &:nth-child(2) { animation-delay: 0.2s; }
+    &:nth-child(3) { animation-delay: 0.4s; }
+  }
+
+  // ── Unconfigured notice ──────────────────────────────────
+  &__notice {
+    display: flex;
+    align-items: flex-start;
+    gap: $space-3;
+    padding: $space-4;
+    background: oklch(0.75 0.15 85 / 0.1);
+    border: 1px solid $color-warning;
+    border-radius: $radius-lg;
+  }
+
+  &__notice-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  &__notice-title {
+    margin: 0 0 $space-1;
+    font-size: $text-sm;
+    font-weight: 600;
+    color: $color-warning;
+  }
+
+  &__notice-body {
+    margin: 0;
+    font-size: $text-xs;
+    color: $pm-text-muted;
+    line-height: 1.5;
+
+    code {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.9em;
+      background: $pm-card-hover;
+      padding: 1px 5px;
+      border-radius: $radius-sm;
+      color: $pm-accent;
+    }
+  }
+
+  // ── Input area ───────────────────────────────────────────
+  &__input-row {
+    display: flex;
+    align-items: flex-end;
+    gap: $space-2;
+    padding: $space-3;
+    background: $pm-card;
+    border: 1px solid $pm-border;
+    border-radius: $radius-xl;
+    transition: border-color 150ms ease;
+
+    &:focus-within {
+      border-color: $pm-accent-dim;
+    }
+  }
+
+  &__input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    color: $pm-text;
+    font-size: $text-sm;
+    line-height: 1.5;
+    font-family: inherit;
+    max-height: 160px;
+    overflow-y: auto;
+    padding: 0;
+
+    &::placeholder {
+      color: $pm-text-dim;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &__send-btn {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    background: $pm-accent;
+    border: none;
+    border-radius: $radius-md;
+    color: $color-neutral-900;
+    font-size: $text-base;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 150ms ease, opacity 150ms ease;
+
+    &:hover:not(:disabled) {
+      background: $color-accent-400;
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+  }
+}
+
+@keyframes chat-typing {
+  0%, 60%, 100% { transform: translateY(0);    opacity: 0.4; }
+  30%            { transform: translateY(-5px); opacity: 1;   }
+}
+
+// ── Reduced motion (final) ────────────────────────────────
+
 @media (prefers-reduced-motion: reduce) {
-  .pm-quests-bar__progress { transition: none; }
-  .pm-quests-drawer        { transition: none; }
-  .pm-quest__check-mark    { animation: none; }
+  .pm-quests-bar__progress                { transition: none; }
+  .pm-quests-drawer                       { transition: none; }
+  .pm-quest__check-mark                   { animation: none; }
+  .pm-drive-checklist__sync-btn--syncing  { animation: none; }
+  .pm-streak-tracker__fire--active        { animation: none; }
+  .pm-streak-tracker__count--pop          { animation: none; }
+  .pm-confetti__particle                  { animation: none; display: none; }
+  .pm-station__dot                        { animation: none; }
+  .pm-station                             { transition: none; }
+  .pm-station__progress-fill              { transition: none; }
+  .task-card                              { transition: none; }
+  .pm-command-bar__tab                    { transition: none; }
+  .pm-chat__typing-dot                    { animation: none; }
+  .pm-chat__input-row                     { transition: none; }
+  .pm-chat__quick-pill                    { transition: none; }
+}
+
+// ============================================================
+// COMMAND BAR
+// ============================================================
+
+.pm-command-bar {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+  padding: 0 $space-5;
+  height: 52px;
+  background: $pm-card;
+  border-bottom: 1px solid $pm-border;
+  flex-shrink: 0;
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    flex-shrink: 0;
+    border-radius: $radius-md;
+    padding: $space-1 $space-2;
+    margin: 0 (-$space-2);
+    transition: background 150ms ease;
+
+    &:hover { background: $pm-card-hover; }
+    &:focus { outline: 2px solid $pm-accent; outline-offset: 1px; }
+  }
+
+  &__logo {
+    color: $pm-accent;
+    font-size: $text-lg;
+    line-height: 1;
+  }
+
+  &__brand-text {
+    font-size: $text-sm;
+    font-weight: 700;
+    color: $pm-text;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  &__separator {
+    width: 1px;
+    height: 20px;
+    background: $pm-border;
+    flex-shrink: 0;
+  }
+
+  &__nav {
+    display: flex;
+    align-items: center;
+    gap: $space-1;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__tab {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: $space-1_5;
+    padding: $space-2 $space-3;
+    background: transparent;
+    border: none;
+    border-radius: $radius-md;
+    color: $pm-text-muted;
+    font-size: $text-xs;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 150ms ease, background 150ms ease;
+
+    &:hover:not(.pm-command-bar__tab--active) {
+      color: $pm-text;
+      background: $pm-card-hover;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $pm-accent;
+      outline-offset: 1px;
+    }
+
+    &--active {
+      color: $pm-accent;
+      background: oklch(from #{$pm-accent} l c h / 0.08);
+    }
+  }
+
+  &__tab-icon {
+    font-size: $text-sm;
+    line-height: 1;
+  }
+
+  &__tab-label {
+    line-height: 1;
+  }
+
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 8px;
+    background: $color-error;
+    color: oklch(1 0 0);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  &__icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    border-radius: $radius-md;
+    color: $pm-text-dim;
+    font-size: $text-sm;
+    cursor: pointer;
+    transition: color 150ms ease, background 150ms ease;
+
+    &:hover:not(:disabled) {
+      color: $pm-text;
+      background: $pm-card-hover;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.4;
+    }
+  }
+
+  &__logout {
+    padding: $space-1 $space-3;
+    background: transparent;
+    border: 1px solid $pm-border;
+    border-radius: $radius-md;
+    color: $pm-text-dim;
+    font-size: $text-xs;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 150ms ease, border-color 150ms ease;
+
+    &:hover {
+      color: $color-error;
+      border-color: $color-error;
+    }
+  }
+}
+
+@include media(md) {
+  .pm-command-bar {
+    padding: 0 $space-4;
+    gap: $space-2;
+
+    &__brand-text { display: none; }
+    &__separator  { display: none; }
+
+    &__tab {
+      padding: $space-2;
+
+      &-label { display: none; }
+    }
+  }
 }

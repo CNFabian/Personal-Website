@@ -191,6 +191,15 @@ const TaskBoard: React.FC<Props> = ({ token }) => {
       {error && <p className="pm-error">{error}</p>}
 
       <div className="task-board">
+        {tasks.length === 0 && (
+          <div className="pm-empty-state pm-empty-state--wide">
+            <span className="pm-empty-state__icon">📋</span>
+            <p className="pm-empty-state__title">No tasks yet</p>
+            <p className="pm-empty-state__desc">
+              Click "New Task" to create your first task.
+            </p>
+          </div>
+        )}
         {COLUMNS.map((col, colIdx) => {
           const colTasks   = tasks.filter(t => t.status === col.status);
           const prevStatus = colIdx > 0 ? COLUMNS[colIdx - 1].status : null;

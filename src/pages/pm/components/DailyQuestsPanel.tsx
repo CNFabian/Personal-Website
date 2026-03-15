@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import QuestItem, { Quest } from './QuestItem';
+import GoogleDriveChecklist from './GoogleDriveChecklist';
+import StreakTracker from './StreakTracker';
+import Confetti from './Confetti';
 
 const PM_API = `${process.env.REACT_APP_SOCKET_URL || 'http://localhost:3001'}/api/pm`;
 
@@ -21,12 +24,11 @@ const DEFAULT_STREAK: Streak = {
   total_quests_completed: 0,
 };
 
-const SECTION_ORDER = ['ai_priority', 'drive_checklist', 'manual'] as const;
+const SECTION_ORDER = ['ai_priority', 'manual'] as const;
 
 const SECTION_LABELS: Record<string, string> = {
-  ai_priority:     'AI Priorities',
-  drive_checklist: 'Google Drive',
-  manual:          'Manual',
+  ai_priority: 'AI Priorities',
+  manual:      'Manual',
 };
 
 const DailyQuestsPanel: React.FC<Props> = ({ token }) => {
@@ -37,8 +39,12 @@ const DailyQuestsPanel: React.FC<Props> = ({ token }) => {
   const [addInput, setAddInput] = useState('');
   const [adding, setAdding]     = useState(false);
 
-  const inputRef = useRef<HTMLInputElement>(null);
-  const headers  = { Authorization: `Bearer ${token}` };
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  const inputRef    = useRef<HTMLInputElement>(null);
+  const prevAllDone = useRef(false);
+  const hasLoaded   = useRef(false);
+  const headers     = { Authorization: `Bearer ${token}` };
 
   const fetchData = useCallback(() => {
     setLoading(true);
@@ -113,19 +119,34 @@ const DailyQuestsPanel: React.FC<Props> = ({ token }) => {
     }
   };
 
-  // Derived stats
-  const total  = quests.length;
-  const done   = quests.filter(q => q.is_completed).length;
+  // Derived stats (must be above the confetti effect that reads allDone)
+  const total   = quests.length;
+  const done    = quests.filter(q => q.is_completed).length;
   const allDone = total > 0 && done === total;
-  const pct    = total > 0 ? Math.round((done / total) * 100) : 0;
+  const pct     = total > 0 ? Math.round((done / total) * 100) : 0;
 
   const questsByType = SECTION_ORDER.reduce((acc, type) => {
     acc[type] = quests.filter(q => q.quest_type === type);
     return acc;
   }, {} as Record<string, Quest[]>);
 
+  // Fire confetti when allDone transitions false → true (not on initial load)
+  useEffect(() => {
+    if (loading) return;
+    if (!hasLoaded.current) {
+      hasLoaded.current   = true;
+      prevAllDone.current = allDone;
+      return;
+    }
+    if (allDone && !prevAllDone.current && quests.length > 0) {
+      setShowConfetti(true);
+    }
+    prevAllDone.current = allDone;
+  }, [allDone, loading, quests.length]);
+
   return (
     <div className="pm-quests-panel">
+      <Confetti active={showConfetti} onComplete={() => setShowConfetti(false)} />
 
       {/* Drawer — slides up above the bar */}
       <div className={`pm-quests-drawer${expanded ? ' pm-quests-drawer--open' : ''}`}>
@@ -142,7 +163,7 @@ const DailyQuestsPanel: React.FC<Props> = ({ token }) => {
         ) : (
           <>
             {allDone && (
-              <p className="pm-quests-drawer__all-clear">All done for today! 🎉</p>
+              <p className="pm-quests-drawer__all-clear">All clear for today! ✨</p>
             )}
 
             {SECTION_ORDER.map(type => {
@@ -164,6 +185,8 @@ const DailyQuestsPanel: React.FC<Props> = ({ token }) => {
                 </div>
               );
             })}
+
+            <GoogleDriveChecklist token={token} onItemToggled={fetchData} />
 
             <div className="pm-quests-drawer__add">
               <input
@@ -209,9 +232,11 @@ const DailyQuestsPanel: React.FC<Props> = ({ token }) => {
           <span className="pm-quests-bar__count">{done}/{total} done</span>
         )}
 
-        <span className={`pm-quests-bar__streak${streak.current_streak > 0 ? ' pm-quests-bar__streak--active' : ''}`}>
-          🔥 {streak.current_streak}
-        </span>
+        <StreakTracker
+          currentStreak={streak.current_streak}
+          longestStreak={streak.longest_streak}
+          totalCompleted={streak.total_quests_completed}
+        />
 
         <span className="pm-quests-bar__chevron" aria-hidden="true">
           {expanded ? '▾' : '▴'}

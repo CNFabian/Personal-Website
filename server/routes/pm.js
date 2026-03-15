@@ -932,4 +932,69 @@ router.get('/drive/checklist/live', async (req, res) => {
   }
 });
 
+// ============================================================
+// AI CHAT
+// ============================================================
+
+// POST /api/pm/chat — send a message to the PM AI assistant
+router.post('/chat', async (req, res) => {
+  try {
+    const { message } = req.body;
+    if (!message || !message.trim()) {
+      return res.status(400).json({ success: false, error: 'message is required.' });
+    }
+
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return res.json({
+        success: true,
+        configured: false,
+        response: 'AI chat is not configured. Add ANTHROPIC_API_KEY to your server .env to enable it.',
+      });
+    }
+
+    const db = getDb();
+
+    // Load recent conversation history for context
+    const history = db.prepare(
+      'SELECT role, message FROM pm_chat_history ORDER BY created_at DESC LIMIT 20'
+    ).all().reverse();
+
+    const response = await pmChat(message.trim(), history);
+
+    res.json({ success: true, configured: true, response });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// GET /api/pm/chat/history — get conversation history
+router.get('/chat/history', (req, res) => {
+  try {
+    const db = getDb();
+    const limit = Math.min(parseInt(req.query.limit) || 50, 200);
+    const offset = parseInt(req.query.offset) || 0;
+
+    const messages = db.prepare(
+      'SELECT * FROM pm_chat_history ORDER BY created_at ASC LIMIT ? OFFSET ?'
+    ).all(limit, offset);
+
+    const total = db.prepare('SELECT COUNT(*) as count FROM pm_chat_history').get();
+
+    res.json({ success: true, messages, total: total.count, limit, offset });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// DELETE /api/pm/chat/history — clear conversation history
+router.delete('/chat/history', (req, res) => {
+  try {
+    const db = getDb();
+    const deleted = db.prepare('DELETE FROM pm_chat_history').run();
+    res.json({ success: true, deleted: deleted.changes });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 module.exports = { router };

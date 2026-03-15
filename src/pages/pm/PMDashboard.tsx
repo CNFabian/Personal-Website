@@ -1,22 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/pages/_pm.scss';
+import CommandBar, { Tab } from './components/CommandBar';
 import CommandCenter from './components/CommandCenter';
 import TeamOverview  from './components/TeamOverview';
 import TaskBoard     from './components/TaskBoard';
 import ActivityFeed  from './components/ActivityFeed';
 import AlertsPanel   from './components/AlertsPanel';
+import PMChat        from './components/PMChat';
 import { ToastProvider } from './components/Toast';
-
-type Tab = 'command' | 'team' | 'tasks' | 'activity' | 'alerts';
-
-const TABS: { id: Tab; label: string }[] = [
-  { id: 'command',  label: '🎯 Command' },
-  { id: 'team',     label: 'Team'       },
-  { id: 'tasks',    label: 'Tasks'      },
-  { id: 'activity', label: 'Activity'   },
-  { id: 'alerts',   label: 'Alerts'     },
-];
 
 const PMDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('command');
@@ -27,6 +19,22 @@ const PMDashboard: React.FC = () => {
       navigate('/pm/login');
     }
   }, [navigate]);
+
+  // Alt+1–5: keyboard tab switching
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      if (e.altKey && e.key >= '1' && e.key <= '6') {
+        e.preventDefault();
+        const tabs: Tab[] = ['command', 'team', 'tasks', 'activity', 'alerts', 'chat'];
+        const idx = parseInt(e.key) - 1;
+        if (tabs[idx]) setActiveTab(tabs[idx]);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const token = localStorage.getItem('pm_auth_token') ?? '';
 
@@ -40,24 +48,12 @@ const PMDashboard: React.FC = () => {
   return (
     <ToastProvider>
       <div className="pm-dashboard">
-        <header className="pm-header">
-          <h1 className="pm-header__title">PM Dashboard</h1>
-          <button className="pm-header__logout" onClick={handleLogout}>
-            Logout
-          </button>
-        </header>
-
-        <nav className="pm-tabs">
-          {TABS.map(tab => (
-            <button
-              key={tab.id}
-              className={`pm-tab${activeTab === tab.id ? ' pm-tab--active' : ''}`}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </nav>
+        <CommandBar
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          onLogout={handleLogout}
+          token={token}
+        />
 
         <main className="pm-content">
           <div key={activeTab} className="pm-tab-content">
@@ -66,6 +62,7 @@ const PMDashboard: React.FC = () => {
             {activeTab === 'tasks'    && <TaskBoard     token={token} />}
             {activeTab === 'activity' && <ActivityFeed  token={token} />}
             {activeTab === 'alerts'   && <AlertsPanel   token={token} />}
+            {activeTab === 'chat'     && <PMChat        token={token} />}
           </div>
         </main>
       </div>
