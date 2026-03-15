@@ -60,6 +60,8 @@ export class GinRummyGameScene extends Phaser.Scene {
   private knockButton!: Phaser.GameObjects.Container;
   private newRoundButton!: Phaser.GameObjects.Container;
   private newGameButton!: Phaser.GameObjects.Container;
+  private sortBySuitBtn!: Phaser.GameObjects.Container;
+  private sortByRankBtn!: Phaser.GameObjects.Container;
 
   // Drag state
   private draggedSprite: CardSprite | null = null;
@@ -81,6 +83,9 @@ export class GinRummyGameScene extends Phaser.Scene {
   // Round result display
   private roundResultContainer: Phaser.GameObjects.Container | null = null;
 
+  // Discard pile viewer
+  private discardViewerContainer: Phaser.GameObjects.Container | null = null;
+
   constructor() {
     super({ key: GIN_RUMMY_GAME_SCENE_KEY });
   }
@@ -96,6 +101,7 @@ export class GinRummyGameScene extends Phaser.Scene {
 
     this.createBackground();
     this.createUI();
+    this.setupSceneDrag();
     this.startNewRound();
   }
 
@@ -208,6 +214,67 @@ export class GinRummyGameScene extends Phaser.Scene {
       () => this.onNewGame()
     );
     this.newGameButton.setVisible(false);
+
+    // Sort buttons - positioned below the hand on the left
+    const sortY = this.handY + (this.isMobile ? 52 : 62);
+    this.sortBySuitBtn = this.createSmallButton(
+      this.isMobile ? 50 : 70,
+      sortY,
+      'By Suit',
+      0x2C3E50,
+      () => {
+        this.gameLogic.sortHandBySuit(1);
+        this.renderPlayerHand();
+        this.renderDeadwood();
+      }
+    );
+    this.sortByRankBtn = this.createSmallButton(
+      this.isMobile ? 130 : 170,
+      sortY,
+      'By Rank',
+      0x2C3E50,
+      () => {
+        this.gameLogic.sortHandByRank(1);
+        this.renderPlayerHand();
+        this.renderDeadwood();
+      }
+    );
+  }
+
+  private createSmallButton(
+    x: number,
+    y: number,
+    label: string,
+    color: number,
+    callback: () => void
+  ): Phaser.GameObjects.Container {
+    const container = this.add.container(x, y).setDepth(60);
+    const bw = this.isMobile ? 56 : 65;
+    const bh = this.isMobile ? 22 : 26;
+
+    const bg = this.add.graphics();
+    bg.fillStyle(color, 0.85);
+    bg.fillRoundedRect(-bw / 2, -bh / 2, bw, bh, 5);
+    bg.lineStyle(1, 0xFFFFFF, 0.4);
+    bg.strokeRoundedRect(-bw / 2, -bh / 2, bw, bh, 5);
+
+    const text = this.add.text(0, 0, label, {
+      fontSize: this.isMobile ? '10px' : '11px',
+      color: '#FFFFFF',
+      fontStyle: 'bold',
+    }).setOrigin(0.5);
+
+    container.add([bg, text]);
+    container.setSize(bw, bh);
+    container.setInteractive({ useHandCursor: true });
+
+    container.on('pointerover', () => container.setScale(1.05));
+    container.on('pointerout', () => container.setScale(1));
+    container.on('pointerdown', () => {
+      if (!this.isAnimating && !this.roundResultContainer) callback();
+    });
+
+    return container;
   }
 
   private createButton(
@@ -254,6 +321,7 @@ export class GinRummyGameScene extends Phaser.Scene {
     this.draggedSprite = null;
     this.isDragging = false;
     this.clearRoundResult();
+    this.closeDiscardViewer();
     this.renderAll();
   }
 
@@ -266,6 +334,8 @@ export class GinRummyGameScene extends Phaser.Scene {
     const fromY = this.centerZoneY;
 
     this.gameLogic.drawFromStock();
+    // Place the drawn card at the right edge of the deadwood section
+    this.gameLogic.placeDrawnCardInDeadwood();
 
     // Animate card from stock to hand area
     this.animateCard(null, fromX, fromY, +this.game.config.width / 2, this.handY, false, 300, () => {
@@ -286,6 +356,8 @@ export class GinRummyGameScene extends Phaser.Scene {
     const fromY = this.centerZoneY;
 
     this.gameLogic.drawFromDiscard();
+    // Place the drawn card at the right edge of the deadwood section
+    this.gameLogic.placeDrawnCardInDeadwood();
 
     // Animate the face-up discard card to hand area
     this.animateCard(discardCard, fromX, fromY, +this.game.config.width / 2, this.handY, true, 300, () => {
@@ -415,6 +487,91 @@ export class GinRummyGameScene extends Phaser.Scene {
     this.startNewRound();
   }
 
+  // --- Discard Pile Viewer ---
+
+  private onDiscardPileClick(): void {
+    if (this.isAnimating) return;
+    if (this.discardViewerContainer) return; // already open
+
+    // If player is in draw phase, draw the card
+    if (this.gameLogic.state === GinRummyState.PLAYER_TURN_DRAW && this.gameLogic.topDiscard) {
+      this.onDrawDiscard();
+      return;
+    }
+
+    // Otherwise show the discard pile viewer
+    this.showDiscardViewer();
+  }
+
+  private showDiscardViewer(): void {
+    if (this.discardViewerContainer) return;
+
+    const w = +this.game.config.width;
+    const h = +this.game.config.height;
+    const pile = this.gameLogic.fullDiscardPile;
+    if (pile.length === 0) return;
+
+    this.discardViewerContainer = this.add.container(0, 0).setDepth(85);
+
+    // Overlay
+    const overlay = this.add.graphics();
+    overlay.fillStyle(0x000000, 0.75);
+    overlay.fillRect(0, 0, w, h);
+    this.discardViewerContainer.add(overlay);
+
+    // Blocker
+    const blocker = this.add.rectangle(w / 2, h / 2, w, h, 0x000000, 0);
+    blocker.setInteractive();
+    blocker.on('pointerdown', () => this.closeDiscardViewer());
+    this.discardViewerContainer.add(blocker);
+
+    // Title
+    const title = this.add.text(w / 2, this.isMobile ? 30 : 40, `Discard Pile (${pile.length} cards)`, {
+      fontSize: this.isMobile ? '16px' : '20px',
+      color: COLORS.GOLD,
+      fontStyle: 'bold',
+      fontFamily: 'Georgia, serif',
+    }).setOrigin(0.5);
+    this.discardViewerContainer.add(title);
+
+    // Display cards in a grid
+    const scale = this.isMobile ? 0.28 : 0.35;
+    const cardW = CARD_WIDTH * scale;
+    const cardH = CARD_HEIGHT * scale;
+    const cols = this.isMobile ? 6 : 8;
+    const padX = this.isMobile ? 4 : 8;
+    const padY = this.isMobile ? 4 : 8;
+    const gridW = cols * (cardW + padX) - padX;
+    const gridStartX = (w - gridW) / 2 + cardW / 2;
+    const gridStartY = this.isMobile ? 65 : 80;
+
+    // Show cards from bottom (oldest) to top (newest)
+    pile.forEach((card, i) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const cx = gridStartX + col * (cardW + padX);
+      const cy = gridStartY + row * (cardH + padY);
+
+      const cardSprite = this.createCardFace(card, cx, cy, scale);
+      cardSprite.setDepth(86);
+      this.discardViewerContainer!.add(cardSprite);
+    });
+
+    // Close hint
+    const hint = this.add.text(w / 2, h - (this.isMobile ? 20 : 30), 'Tap anywhere to close', {
+      fontSize: this.isMobile ? '12px' : '14px',
+      color: '#AAAAAA',
+    }).setOrigin(0.5);
+    this.discardViewerContainer.add(hint);
+  }
+
+  private closeDiscardViewer(): void {
+    if (this.discardViewerContainer) {
+      this.discardViewerContainer.destroy();
+      this.discardViewerContainer = null;
+    }
+  }
+
   // --- Drag & Drop Logic ---
 
   private getHandSlotIndex(worldX: number): number {
@@ -442,26 +599,14 @@ export class GinRummyGameScene extends Phaser.Scene {
     return y < this.handY - cardH / 2 - 10 && y > (this.isMobile ? 50 : 60);
   }
 
-  private setupCardDrag(sprite: CardSprite, index: number): void {
-    const scale = this.isMobile ? CARD_DISPLAY_SCALE_MOBILE : CARD_DISPLAY_SCALE;
-    sprite.setSize(CARD_WIDTH * scale, CARD_HEIGHT * scale);
-    sprite.setInteractive({ useHandCursor: true, draggable: false });
-
-    sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      if (this.isAnimating) return;
-      if (this.roundResultContainer) return;
-
-      this.draggedSprite = sprite;
-      this.dragStartX = pointer.x;
-      this.dragStartY = pointer.y;
-      this.isDragging = false;
-
-      // Bring to front
-      sprite.setDepth(100);
-    });
-
-    sprite.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-      if (!this.draggedSprite || this.draggedSprite !== sprite) return;
+  /**
+   * Set up scene-level pointer tracking for card dragging.
+   * Called once in create(). This avoids per-sprite pointerup issues
+   * where the pointer can leave the sprite during a fast drag.
+   */
+  private setupSceneDrag(): void {
+    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      if (!this.draggedSprite) return;
 
       const dx = pointer.x - this.dragStartX;
       const dy = pointer.y - this.dragStartY;
@@ -472,13 +617,15 @@ export class GinRummyGameScene extends Phaser.Scene {
       }
 
       if (this.isDragging) {
-        sprite.x = sprite.originalX! + dx;
-        sprite.y = sprite.originalY! + dy;
+        this.draggedSprite.x = this.draggedSprite.originalX! + dx;
+        this.draggedSprite.y = this.draggedSprite.originalY! + dy;
       }
     });
 
-    sprite.on('pointerup', (pointer: Phaser.Input.Pointer) => {
-      if (!this.draggedSprite || this.draggedSprite !== sprite) return;
+    this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+      if (!this.draggedSprite) return;
+
+      const sprite = this.draggedSprite;
       const wasDragging = this.isDragging;
       const cardIdx = sprite.cardIndex!;
 
@@ -488,7 +635,6 @@ export class GinRummyGameScene extends Phaser.Scene {
       if (wasDragging) {
         // Check where the card was dropped
         if (this.isInDiscardZone(pointer.x, pointer.y)) {
-          // Drop in the middle = discard
           if (this.gameLogic.state === GinRummyState.PLAYER_TURN_DISCARD) {
             this.discardCard(cardIdx);
             return;
@@ -501,21 +647,33 @@ export class GinRummyGameScene extends Phaser.Scene {
           this.gameLogic.reorderHand(1, cardIdx, targetIdx);
         }
 
-        // Snap back / re-render
+        // Re-render hand
         this.renderPlayerHand();
-      }
-      // If not dragging (was a tap), do nothing — taps are for piles
-    });
-
-    sprite.on('pointerupoutside', () => {
-      if (this.draggedSprite === sprite) {
-        this.draggedSprite = null;
-        this.isDragging = false;
-        // Snap back
-        sprite.x = sprite.originalX!;
-        sprite.y = sprite.originalY!;
+        this.renderDeadwood();
+      } else {
+        // Tap (not a drag) — reset depth
         sprite.setDepth(20 + (sprite.cardIndex || 0));
       }
+    });
+  }
+
+  private setupCardDrag(sprite: CardSprite, index: number): void {
+    const scale = this.isMobile ? CARD_DISPLAY_SCALE_MOBILE : CARD_DISPLAY_SCALE;
+    sprite.setSize(CARD_WIDTH * scale, CARD_HEIGHT * scale);
+    sprite.setInteractive({ useHandCursor: true, draggable: false });
+
+    sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      if (this.isAnimating) return;
+      if (this.roundResultContainer) return;
+      if (this.discardViewerContainer) return;
+
+      this.draggedSprite = sprite;
+      this.dragStartX = pointer.x;
+      this.dragStartY = pointer.y;
+      this.isDragging = false;
+
+      // Bring to front
+      sprite.setDepth(100);
     });
   }
 
@@ -581,14 +739,15 @@ export class GinRummyGameScene extends Phaser.Scene {
     }
     this.discardPileSprite.setDepth(5);
 
-    // Make discard pile tappable
+    // Make discard pile tappable — draw if in draw phase, otherwise show viewer
     this.discardPileSprite.setSize(CARD_WIDTH * scale, CARD_HEIGHT * scale);
     this.discardPileSprite.setInteractive({ useHandCursor: true });
-    this.discardPileSprite.on('pointerdown', () => this.onDrawDiscard());
+    this.discardPileSprite.on('pointerdown', () => this.onDiscardPileClick());
 
     // Discard label
+    const discardCount = this.gameLogic.fullDiscardPile.length;
     this.discardLabel.setPosition(this.discardPileX, centerY + (this.isMobile ? 50 : 55));
-    this.discardLabel.setText('Discard');
+    this.discardLabel.setText(`Discard (${discardCount})`);
   }
 
   private renderPlayerHand(): void {
@@ -700,6 +859,8 @@ export class GinRummyGameScene extends Phaser.Scene {
   private renderButtons(): void {
     const state = this.gameLogic.state;
     const isDiscardPhase = state === GinRummyState.PLAYER_TURN_DISCARD;
+    const isPlayerTurn =
+      state === GinRummyState.PLAYER_TURN_DRAW || isDiscardPhase;
 
     const canKnock = isDiscardPhase && this.gameLogic.canKnock();
     this.knockButton.setVisible(canKnock);
@@ -707,6 +868,10 @@ export class GinRummyGameScene extends Phaser.Scene {
     // Old buttons are hidden; round-over buttons are now created inside the overlay
     this.newRoundButton.setVisible(false);
     this.newGameButton.setVisible(false);
+
+    // Sort buttons visible when it's the player's turn
+    this.sortBySuitBtn.setVisible(isPlayerTurn);
+    this.sortByRankBtn.setVisible(isPlayerTurn);
   }
 
   private renderDeadwood(): void {

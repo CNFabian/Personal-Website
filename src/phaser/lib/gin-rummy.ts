@@ -664,6 +664,72 @@ export class GinRummy {
     hand.splice(toIndex, 0, card);
   }
 
+  /**
+   * Move the last card in player 1's hand (just-drawn card)
+   * to the right edge of the deadwood section.
+   * Finds the first meld-boundary from the right and inserts before it.
+   */
+  placeDrawnCardInDeadwood(): void {
+    const hand = this._player1Hand;
+    if (hand.length < 2) return;
+
+    // The drawn card is always the last element
+    const drawnCard = hand.pop()!;
+
+    // Detect melds on the current hand (without the drawn card)
+    const info = findMeldsFromArrangement(hand);
+    const usedIndices = new Set<number>();
+    info.meldRanges.forEach((r) => {
+      for (let j = r.start; j <= r.end; j++) usedIndices.add(j);
+    });
+
+    // Find the rightmost deadwood card index
+    let insertAt = hand.length; // default: end
+    for (let i = hand.length - 1; i >= 0; i--) {
+      if (!usedIndices.has(i)) {
+        insertAt = i + 1;
+        break;
+      }
+      if (i === 0) {
+        // All cards are in melds, insert at front
+        insertAt = 0;
+      }
+    }
+
+    hand.splice(insertAt, 0, drawnCard);
+  }
+
+  /**
+   * Sort player hand by suit (Clubs, Diamonds, Hearts, Spades) then rank within suit
+   */
+  sortHandBySuit(player: 1 | 2): void {
+    const hand = this.getHand(player);
+    const suitOrder = [Suit.CLUBS, Suit.DIAMONDS, Suit.HEARTS, Suit.SPADES];
+    hand.sort((a, b) => {
+      const suitDiff = suitOrder.indexOf(a.suit) - suitOrder.indexOf(b.suit);
+      if (suitDiff !== 0) return suitDiff;
+      return rankNumber(a) - rankNumber(b);
+    });
+  }
+
+  /**
+   * Sort player hand by rank (A, 2, 3, ..., K) then suit within rank
+   */
+  sortHandByRank(player: 1 | 2): void {
+    const hand = this.getHand(player);
+    const suitOrder = [Suit.CLUBS, Suit.DIAMONDS, Suit.HEARTS, Suit.SPADES];
+    hand.sort((a, b) => {
+      const rankDiff = rankNumber(a) - rankNumber(b);
+      if (rankDiff !== 0) return rankDiff;
+      return suitOrder.indexOf(a.suit) - suitOrder.indexOf(b.suit);
+    });
+  }
+
+  /**
+   * Get a copy of the full discard pile (bottom to top)
+   */
+  get fullDiscardPile(): Card[] { return [...this._discardPile]; }
+
   // --- Helpers ---
 
   private getHand(player: 1 | 2): Card[] {
